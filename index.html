@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Event Diary">
+<title>Event Diary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d0f;
+  --surface: #16161a;
+  --surface2: #1e1e24;
+  --border: rgba(255,255,255,0.07);
+  --gold: #e8c547;
+  --gold-dim: rgba(232,197,71,0.15);
+  --text: #f0ede8;
+  --text-mid: rgba(240,237,232,0.55);
+  --text-dim: rgba(240,237,232,0.32);
+  --red: #e05c5c;
+  --green: #5ce08a;
+  --radius: 14px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overscroll-behavior: none; }
+
+/* ── VIEWS ── */
+.view { display: none; min-height: 100vh; }
+.view.active { display: block; }
+#main-view { padding-bottom: calc(32px + var(--safe-bottom)); }
+
+/* ── STICKY HEADER ── */
+.sticky-header {
+  position: sticky; top: 0; z-index: 100;
+  background: linear-gradient(180deg, var(--bg) 70%, transparent 100%);
+  padding: calc(var(--safe-top) + 16px) 20px 12px;
+  pointer-events: none;
+}
+
+/* ── HERO ── */
+.header-hero { transition: all 0.3s ease; overflow: hidden; pointer-events: all; }
+.eyebrow { font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px; }
+.hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(52px,14vw,72px); line-height: 0.92; letter-spacing: 0.02em; margin-bottom: 10px; }
+.hero-title span { color: var(--gold); }
+
+/* ── DATE RANGE ── */
+.date-range-strip {
+  display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.date-range-item { font-size: 11px; color: var(--text-dim); }
+.date-range-item strong { color: var(--text-mid); font-weight: 500; }
+.date-range-sep { font-size: 11px; color: var(--text-dim); }
+
+/* ── SETTINGS BUTTON ── */
+.settings-btn {
+  position: fixed; top: calc(var(--safe-top) + 14px); right: 18px; z-index: 200;
+  width: 32px; height: 32px;
+  background: rgba(30,30,36,0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: opacity 0.25s, transform 0.2s; pointer-events: all;
+}
+.settings-btn:active { transform: scale(0.9); }
+.settings-btn.hidden { opacity: 0; pointer-events: none; }
+.settings-btn svg { width: 15px; height: 15px; color: var(--text-mid); }
+
+/* ── STATS GRID ── */
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 16px; pointer-events: all; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px 8px; text-align: center; cursor: pointer;
+  transition: border-color 0.2s, background 0.15s;
+}
+.stat-card:active { background: var(--surface2); border-color: rgba(232,197,71,0.3); }
+.stat-card.no-click { cursor: default; }
+.stat-card.no-click:active { background: var(--surface); border-color: var(--border); }
+.stat-number { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--gold); line-height: 1; display: block; }
+.stat-label { font-size: 9px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); display: block; margin-top: 3px; }
+
+/* ── SEARCH BAR ── */
+.search-wrap { position: relative; margin-bottom: 24px; pointer-events: all; }
+.search-input {
+  width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 13px 18px 13px 44px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text);
+  outline: none; transition: border-color 0.2s;
+}
+.search-input::placeholder { color: var(--text-dim); }
+.search-input:focus { border-color: rgba(232,197,71,0.4); }
+.search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-dim); pointer-events: none; }
+.search-clear {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  width: 20px; height: 20px; background: var(--surface2); border-radius: 50%;
+  display: none; align-items: center; justify-content: center;
+  cursor: pointer; border: none; color: var(--text-dim);
+}
+.search-clear.visible { display: flex; }
+
+/* ── SEARCH DROPDOWN ── */
+.search-dim-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  z-index: 140; display: none; pointer-events: auto;
+}
+.search-dim-overlay.active { display: block; }
+.search-results {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius);
+  z-index: 150; max-height: 320px; overflow-y: auto; display: none;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+}
+.search-results.open { display: block; }
+.search-result-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.15s; }
+.search-result-item:last-child { border-bottom: none; }
+.search-result-item:active { background: var(--gold-dim); }
+.search-result-item { padding: 11px 16px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.15s; display: flex; align-items: center; gap: 12px; }
+.search-result-date { flex-shrink: 0; text-align: center; width: 36px; }
+.search-result-date-month { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); display: block; }
+.search-result-date-day { font-family: 'Bebas Neue', sans-serif; font-size: 20px; line-height: 1; color: var(--text); display: block; }
+.search-result-date-year { font-size: 9px; font-weight: 500; color: var(--text-dim); display: block; margin-top: 1px; }
+.search-result-info { flex: 1; min-width: 0; }
+.search-result-artist { font-family: 'DM Serif Display', serif; font-size: 15px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.search-result-meta { font-size: 11px; color: var(--text-dim); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.search-result-tag { display: inline-block; font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 1px 5px; border-radius: 3px; margin-right: 3px; }
+.tag-artist { background: rgba(232,197,71,0.12); color: var(--gold); }
+.tag-venue { background: rgba(92,224,138,0.1); color: var(--green); }
+.search-result-count { font-size: 11px; color: var(--text-dim); padding: 8px 16px; border-top: 1px solid var(--border); text-align: center; font-style: italic; }
+
+/* ── CONTENT ── */
+.content-area { padding: 0 20px; }
+.section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
+.section-title { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); }
+.section-count { font-size: 11px; color: var(--text-dim); }
+
+/* ── YEAR GROUP ── */
+.year-group { margin-bottom: 32px; }
+.year-label { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.06em; color: var(--text-mid); margin-bottom: 10px; }
+
+/* ── EVENT CARD ── */
+.event-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  margin-bottom: 8px; overflow: hidden; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+}
+.event-card:active { background: var(--surface2); }
+.event-card-main { display: flex; align-items: center; padding: 14px 16px; gap: 14px; }
+.event-date-block { flex-shrink: 0; text-align: center; width: 46px; }
+.event-date-month { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); display: block; }
+.event-date-day { font-family: 'Bebas Neue', sans-serif; font-size: 28px; line-height: 1; color: var(--text); display: block; }
+.event-info { flex: 1; min-width: 0; }
+.event-artist { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--text); line-height: 1.25; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.event-venue { font-size: 12px; color: var(--text-dim); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.event-setlist-badge { flex-shrink: 0; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 9px; border-radius: 6px; border: 1px solid; }
+.setlist-yes { color: var(--gold); border-color: rgba(232,197,71,0.5); background: rgba(232,197,71,0.08); }
+.setlist-no { color: var(--text-dim); border-color: var(--border); background: transparent; }
+
+/* ── EMPTY / LOADING ── */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text-dim); }
+.empty-state-icon { font-size: 48px; margin-bottom: 16px; display: block; }
+.empty-state-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--text-mid); letter-spacing: 0.05em; margin-bottom: 8px; }
+.empty-state-text { font-size: 14px; line-height: 1.5; max-width: 260px; margin: 0 auto 20px; }
+.btn-primary {
+  display: inline-block; background: var(--gold); color: #0d0d0f; font-weight: 700; font-size: 13px;
+  letter-spacing: 0.06em; padding: 12px 24px; border-radius: 10px; border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; text-transform: uppercase; transition: opacity 0.2s, transform 0.15s;
+}
+.btn-primary:active { opacity: 0.8; transform: scale(0.97); }
+.no-results { padding: 40px 20px; text-align: center; color: var(--text-dim); font-style: italic; font-size: 14px; }
+
+/* ── SETTINGS VIEW ── */
+#settings-view { padding: calc(var(--safe-top) + 20px) 20px calc(32px + var(--safe-bottom)); min-height: 100vh; }
+.settings-header { display: flex; align-items: center; gap: 14px; margin-bottom: 32px; }
+.back-btn {
+  width: 36px; height: 36px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-mid); flex-shrink: 0;
+}
+.back-btn:active { background: var(--surface2); }
+.settings-title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 0.04em; }
+.settings-section { margin-bottom: 28px; }
+.settings-section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 12px; }
+.settings-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 10px; }
+.settings-card-title { font-weight: 600; font-size: 15px; color: var(--text); margin-bottom: 6px; }
+.settings-card-body { font-size: 13px; color: var(--text-mid); line-height: 1.6; margin-bottom: 14px; }
+.settings-card-body strong { color: var(--text); font-weight: 500; }
+.settings-card-body code { background: var(--surface2); padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 12px; color: var(--gold); }
+.settings-card ol { padding-left: 18px; margin-top: 8px; }
+.settings-card ol li { font-size: 13px; color: var(--text-mid); line-height: 1.7; margin-bottom: 2px; }
+.settings-card ol li strong { color: var(--text); font-weight: 500; }
+.url-input-wrap { margin-top: 10px; }
+.url-input {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
+  outline: none; margin-bottom: 10px; transition: border-color 0.2s;
+}
+.url-input::placeholder { color: var(--text-dim); }
+.url-input:focus { border-color: rgba(232,197,71,0.4); }
+.sync-btn {
+  width: 100%; background: var(--gold); color: #0d0d0f; font-family: 'DM Sans', sans-serif;
+  font-weight: 700; font-size: 14px; letter-spacing: 0.04em; padding: 13px; border-radius: 10px;
+  border: none; cursor: pointer; transition: opacity 0.2s, transform 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.sync-btn:active { opacity: 0.8; transform: scale(0.98); }
+.sync-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.sync-status { margin-top: 12px; font-size: 13px; border-radius: 8px; padding: 10px 12px; display: none; }
+.sync-status.success { display: block; background: rgba(92,224,138,0.1); color: var(--green); border: 1px solid rgba(92,224,138,0.2); }
+.sync-status.error { display: block; background: rgba(224,92,92,0.1); color: var(--red); border: 1px solid rgba(224,92,92,0.2); white-space: pre-wrap; word-break: break-word; font-size: 12px; }
+.sync-status.info { display: block; background: rgba(232,197,71,0.08); color: var(--gold); border: 1px solid rgba(232,197,71,0.2); }
+.last-sync-info { font-size: 12px; color: var(--text-dim); margin-top: 10px; text-align: center; }
+
+/* ── CENTER MODAL (replaces bottom sheet) ── */
+.detail-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  z-index: 300; display: none; align-items: center; justify-content: center;
+  padding: calc(var(--safe-top) + 16px) 16px calc(var(--safe-bottom) + 16px);
+}
+.detail-modal-overlay.open { display: flex; }
+.detail-modal {
+  width: 100%; max-width: 600px;
+  max-height: calc(100vh - 80px);
+  background: var(--surface); border-radius: 20px; border: 1px solid var(--border);
+  overflow-y: auto; padding: 0 0 24px;
+  animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  position: relative;
+}
+@keyframes popIn { from { opacity: 0; transform: scale(0.93); } to { opacity: 1; transform: scale(1); } }
+.modal-close-btn {
+  position: absolute; top: 14px; right: 14px;
+  width: 28px; height: 28px; background: var(--surface2); border-radius: 50%;
+  border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-dim); z-index: 10;
+}
+.modal-close-btn:active { background: rgba(255,255,255,0.1); }
+.modal-top-pad { height: 20px; }
+.modal-content { padding: 0 20px; }
+.modal-date-tag { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; display: block; }
+.modal-artists { margin-bottom: 6px; }
+.modal-artist-line { font-family: 'DM Serif Display', serif; font-size: 24px; line-height: 1.2; color: var(--text); display: block; }
+.modal-venue { font-size: 15px; color: var(--text-mid); margin-bottom: 2px; margin-top: 0; font-weight: 500; display: block; }
+.modal-venue-location { font-size: 13px; color: var(--text-dim); display: block; }
+.modal-venue-block { display: block; text-decoration: none; margin-top: 4px; margin-bottom: 16px; transition: opacity 0.15s; }
+.modal-venue-block:active { opacity: 0.7; }
+.modal-venue-link { text-decoration: none; display: block; transition: color 0.15s; }
+.modal-venue-link:hover, .modal-venue-link:active { color: var(--gold); }
+.modal-meta-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; margin-top: 4px; }
+.modal-meta-pill {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 20px;
+  padding: 5px 12px; font-size: 12px; color: var(--text-mid); display: flex; align-items: center; gap: 5px;
+}
+.modal-meta-pill-label { font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
+.modal-notes-block { background: var(--surface2); border-radius: 10px; padding: 14px; margin-bottom: 20px; }
+.modal-notes-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px; }
+.modal-notes-text { font-size: 14px; color: var(--text-mid); line-height: 1.6; font-style: italic; }
+.modal-divider { height: 1px; background: var(--border); margin: 4px 0 16px; }
+
+/* ── SETLIST ── */
+.setlist-section { margin-top: 4px; }
+.setlist-multi-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 480px) { .setlist-multi-row { grid-template-columns: 1fr; } }
+.setlist-col { min-width: 0; }
+.setlist-band-header {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+  margin-top: 16px;
+}
+.setlist-band-header:first-child { margin-top: 0; }
+.setlist-loading { font-size: 13px; color: var(--text-dim); font-style: italic; display: flex; align-items: center; gap: 8px; }
+.setlist-error { font-size: 12px; color: var(--red); }
+.setlist-songs { list-style: none; display: flex; flex-direction: column; gap: 0; margin-bottom: 4px; padding: 0; }
+.setlist-songs li {
+  display: flex; align-items: baseline; gap: 10px;
+  font-size: 13px; color: var(--text-mid); padding: 5px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.setlist-songs li:last-child { border-bottom: none; }
+.setlist-song-num { font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: var(--text-dim); flex-shrink: 0; width: 22px; }
+.setlist-song-name { flex: 1; }
+.setlist-song-note { font-size: 11px; color: var(--text-dim); font-style: italic; }
+.setlist-set-header {
+  display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+  color: #fff; background: #3a6bc4; border-radius: 4px;
+  padding: 3px 8px; margin-bottom: 8px;
+}
+.setlist-source { font-size: 11px; color: var(--text-dim); margin-top: 10px; font-style: italic; }
+.setlist-link { color: var(--gold); text-decoration: none; }
+.setlist-separator { height: 1px; background: var(--border); margin: 12px 0; }
+
+/* ── SPINNER ── */
+.spinner { width: 16px; height: 16px; border: 2px solid rgba(232,197,71,0.2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── GENERIC OVERLAY MODAL (for stat popups) ── */
+.stat-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  z-index: 400; display: none; align-items: center; justify-content: center;
+  padding: calc(var(--safe-top) + 16px) 16px calc(var(--safe-bottom) + 16px);
+}
+.stat-modal-overlay.open { display: flex; }
+.stat-modal {
+  width: 100%; max-width: 500px; max-height: calc(100vh - 80px);
+  background: var(--surface); border-radius: 20px; border: 1px solid var(--border);
+  overflow: hidden; display: flex; flex-direction: column;
+  animation: popIn 0.22s cubic-bezier(0.34,1.56,0.64,1);
+}
+.stat-modal-header {
+  padding: 20px 20px 14px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.stat-modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 0.04em; }
+.stat-modal-close {
+  width: 28px; height: 28px; background: var(--surface2); border-radius: 50%;
+  border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-dim);
+}
+.stat-modal-close:active { background: rgba(255,255,255,0.1); }
+.stat-modal-body { overflow-y: auto; flex: 1; padding: 6px 0 16px; }
+.stat-list-item {
+  padding: 11px 20px; border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 14px; color: var(--text-mid);
+  display: flex; align-items: baseline; gap: 10px;
+}
+.stat-list-item:last-child { border-bottom: none; }
+.stat-list-item-main { flex: 1; }
+.stat-list-item-name-row { display: flex; align-items: baseline; gap: 5px; }
+.stat-list-item-sub { font-size: 11px; color: var(--text-dim); }
+.stat-list-item-date { font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
+.stat-list-item-count { font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
+.stat-list-link { color: var(--gold); text-decoration: none; cursor: pointer; font-family: 'DM Serif Display', serif; font-size: 15px; }
+.stat-list-link:active { opacity: 0.7; }
+
+/* ── HIGHLIGHT ── */
+.highlight { color: var(--gold); font-weight: 600; }
+</style>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d0d0f">
+<link rel="apple-touch-icon" href="icon-180.png">
+
+</head>
+<body>
+
+<!-- SETTINGS GEAR -->
+<button class="settings-btn" id="settingsBtn" onclick="showSettings()" aria-label="Settings">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+  </svg>
+</button>
+
+<!-- ════════ MAIN VIEW ════════ -->
+<div class="view active" id="main-view">
+  <div class="sticky-header" id="stickyHeader">
+    <div class="header-hero" id="headerHero">
+      <p class="eyebrow">Personal Archive</p>
+      <h1 class="hero-title">EVENT <span>DIARY</span></h1>
+      <div class="date-range-strip" id="dateRangeStrip">
+        <span class="date-range-item">First: <strong id="dateFirst">—</strong></span>
+        <span class="date-range-sep">·</span>
+        <span class="date-range-item">Latest: <strong id="dateLatest">—</strong></span>
+      </div>
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card no-click">
+          <span class="stat-number" id="statEvents">0</span><span class="stat-label">Events</span>
+        </div>
+        <div class="stat-card" onclick="onStatClick('artists')" title="All artists">
+          <span class="stat-number" id="statArtists">0</span><span class="stat-label">Artists</span>
+        </div>
+        <div class="stat-card" onclick="onStatClick('venues')" title="All venues">
+          <span class="stat-number" id="statVenues">0</span><span class="stat-label">Venues</span>
+        </div>
+        <div class="stat-card" onclick="onStatClick('setlists')" title="All setlists">
+          <span class="stat-number" id="statSetlists">0</span><span class="stat-label">Setlists</span>
+        </div>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="search" class="search-input" id="searchInput" placeholder="Search artists, venues, notes…" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button class="search-clear" id="searchClear" onclick="clearSearch()">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <div class="search-dim-overlay" id="searchDimOverlay" onclick="clearSearch()"></div>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+  </div>
+  <div class="content-area" id="contentArea">
+    <div id="eventsContainer"></div>
+  </div>
+</div>
+
+<!-- ════════ SETTINGS VIEW ════════ -->
+<div class="view" id="settings-view">
+  <div class="settings-header">
+    <div class="back-btn" onclick="showMain()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </div>
+    <h2 class="settings-title">Settings</h2>
+  </div>
+  <div class="settings-section">
+    <p class="settings-section-label">Data Source</p>
+    <div class="settings-card">
+      <p class="settings-card-title">Google Sheet URL</p>
+      <p class="settings-card-body">Paste the published CSV URL of your Google Sheet below, then tap Sync. Your data will be preserved until you sync again.</p>
+      <div class="url-input-wrap">
+        <input type="url" class="url-input" id="sheetUrlInput" placeholder="https://docs.google.com/spreadsheets/d/…/pub?output=csv">
+        <button class="sync-btn" id="syncBtn" onclick="syncSheet()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+          Sync Google Sheet
+        </button>
+        <div class="sync-status" id="syncStatus"></div>
+        <p class="last-sync-info" id="lastSyncInfo"></p>
+      </div>
+    </div>
+  </div>
+  <div class="settings-section">
+    <p class="settings-section-label">How to Publish Your Google Sheet</p>
+    <div class="settings-card">
+      <p class="settings-card-title">Step-by-step Setup</p>
+      <p class="settings-card-body">Your sheet must be <strong>published as CSV</strong> so this app can read it.</p>
+      <ol>
+        <li>Open your Google Sheet in a browser.</li>
+        <li>Click <strong>File → Share → Publish to web</strong>.</li>
+        <li>In the first dropdown, choose the specific sheet tab (e.g. "Sheet1").</li>
+        <li>In the second dropdown, choose <strong>Comma-separated values (.csv)</strong>.</li>
+        <li>Click <strong>Publish</strong> and confirm.</li>
+        <li>Copy the URL — it looks like:<br><code>https://docs.google.com/spreadsheets/d/YOUR_ID/pub?gid=0&single=true&output=csv</code></li>
+        <li>Paste that URL above and tap <strong>Sync Google Sheet</strong>.</li>
+      </ol>
+    </div>
+    <div class="settings-card">
+      <p class="settings-card-title">Required Column Headers (Row 1)</p>
+      <p class="settings-card-body">
+        <code>Date</code> &nbsp;<code>Artist(s)</code> &nbsp;<code>Venue</code> &nbsp;<code>Attended With</code> &nbsp;<code>Type</code> &nbsp;<code>Notes</code> &nbsp;<code>Setlist</code><br><br>
+        <strong>Date</strong>: <code>YYYY-MM-DD</code> format.<br>
+        <strong>Artist(s)</strong>: Multiple artists on separate lines within the cell — the app will display them with commas in list view and on separate lines in detail view.<br>
+        <strong>Venue</strong>: Include city and state in the venue name (e.g. "The Sinkhole St. Louis, MO").<br>
+        <strong>Setlist</strong>: Leave blank or paste a setlist.fm URL.
+      </p>
+    </div>
+    <div class="settings-card">
+      <p class="settings-card-title">Add to iPhone Home Screen</p>
+      <p class="settings-card-body">Open in <strong>Safari</strong>. Tap the <strong>Share</strong> button, then <strong>"Add to Home Screen"</strong>. Launches full-screen like a native app.</p>
+    </div>
+  </div>
+  <div class="settings-section">
+    <p class="settings-section-label">About</p>
+    <div class="settings-card">
+      <p class="settings-card-title">Event Diary</p>
+      <p class="settings-card-body">Data is stored locally on your device. Setlists are fetched from setlist.fm and cached locally for offline viewing.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ EVENT DETAIL MODAL (center popup) ════════ -->
+<div class="detail-modal-overlay" id="detailModal" onclick="closeModalIfOutside(event)">
+  <div class="detail-modal" id="detailModalContent">
+    <button class="modal-close-btn" onclick="closeModal()">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <div class="modal-top-pad"></div>
+    <div class="modal-content" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ════════ STAT POPUP MODAL ════════ -->
+<div class="stat-modal-overlay" id="statModal" onclick="closeStatModalIfOutside(event)">
+  <div class="stat-modal" id="statModalInner">
+    <div class="stat-modal-header">
+      <span class="stat-modal-title" id="statModalTitle">—</span>
+      <button class="stat-modal-close" onclick="closeStatModal()">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="stat-modal-body" id="statModalBody"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  CONSTANTS & STATE
+// ══════════════════════════════════════════════
+const STORAGE_KEYS = {
+  events: 'eventdiary_events_v3',      // bumped: forces re-sync after CSV parser fix
+  sheetUrl: 'eventdiary_url',
+  lastSync: 'eventdiary_lastsync_v3',
+  setlistCache: 'eventdiary_setlists_v11'
+};
+const APP_VERSION = 'v3';
+const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+let allEvents = [];
+
+// ══════════════════════════════════════════════
+//  STORAGE
+// ══════════════════════════════════════════════
+function save(key, val) { try { localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val)); } catch(e){} }
+function load(key) {
+  try { const v = localStorage.getItem(key); if (!v) return null; try { return JSON.parse(v); } catch { return v; } } catch { return null; }
+}
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', async () => {
+  const savedUrl = load(STORAGE_KEYS.sheetUrl);
+  if (savedUrl) document.getElementById('sheetUrlInput').value = savedUrl;
+
+  const savedEvents = load(STORAGE_KEYS.events);
+  if (savedEvents && savedEvents.length) {
+    // Valid v3 cache — load instantly
+    allEvents = savedEvents;
+    renderAll();
+  } else if (savedUrl) {
+    // No v3 cache but we have a URL — auto-re-fetch silently
+    showLoadingState();
+    await autoResync(savedUrl);
+  } else {
+    showEmptyState();
+  }
+
+  updateLastSyncLabel();
+  setupScrollWatcher();
+  document.getElementById('searchInput').addEventListener('input', onSearchInput);
+  document.getElementById('searchInput').addEventListener('focus', onSearchFocus);
+  // blur handled by onDocClick
+  document.addEventListener('click', onDocClick);
+});
+
+function showLoadingState() {
+  document.getElementById('eventsContainer').innerHTML = `
+    <div class="empty-state">
+      <span class="empty-state-icon" style="font-size:32px">
+        <span class="spinner" style="width:32px;height:32px;border-width:3px"></span>
+      </span>
+      <p class="empty-state-title" style="margin-top:20px">Updating…</p>
+      <p class="empty-state-text">Re-syncing your events with the latest data.</p>
+    </div>`;
+}
+
+async function autoResync(rawUrl) {
+  try {
+    const csvUrl = buildCsvUrl(rawUrl);
+    const { text } = await fetchCsvText(csvUrl);
+    const cleanText = decodeProxyResponse(text);
+    if (cleanText && !cleanText.trim().startsWith('<!') && !cleanText.trim().startsWith('<html')) {
+      const rows = parseCSV(cleanText);
+      if (rows.length >= 2) {
+        const events = rowsToEvents(rows);
+        if (events.length) {
+          allEvents = events;
+          save(STORAGE_KEYS.events, events);
+          save(STORAGE_KEYS.sheetUrl, csvUrl);
+          save(STORAGE_KEYS.lastSync, new Date().toISOString());
+          renderAll();
+          return;
+        }
+      }
+    }
+  } catch(e) {}
+  // Auto-resync failed — prompt user to go to Settings and sync manually
+  document.getElementById('eventsContainer').innerHTML = `
+    <div class="empty-state">
+      <span class="empty-state-icon">⚠️</span>
+      <p class="empty-state-title">Re-Sync Required</p>
+      <p class="empty-state-text">A one-time re-sync is needed after an app update. Tap below to go to Settings.</p>
+      <button class="btn-primary" onclick="showSettings()">Open Settings to Sync</button>
+    </div>`;
+  ['statEvents','statArtists','statVenues','statSetlists'].forEach(id => document.getElementById(id).textContent = '0');
+}
+
+// ══════════════════════════════════════════════
+//  ARTIST PARSING
+//  Handles newline-separated artists within a cell
+//  (Google Sheets wraps multi-line cells in quotes with \n inside)
+// ══════════════════════════════════════════════
+function parseArtists(raw) {
+  if (!raw) return [];
+  // Split on newlines or line breaks that come from multi-line cells
+  const parts = raw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  return parts.length > 0 ? parts : [raw.trim()];
+}
+
+function artistsToCommaList(raw) {
+  return parseArtists(raw).join(', ');
+}
+
+// Parse venue cell: multi-line cells have venue name on line 1, "City, ST" on line 2
+// Returns { name, location } e.g. { name: "The Gothic", location: "Denver, CO" }
+// If single-line, puts everything in name, location empty
+function parseVenue(raw) {
+  if (!raw) return { name: '', location: '' };
+  const parts = raw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  if (parts.length >= 2) {
+    return { name: parts[0], location: parts.slice(1).join(', ') };
+  }
+  return { name: raw.trim(), location: '' };
+}
+
+// Full venue display: "Venue Name, City, ST"
+function venueDisplay(raw) {
+  const { name, location } = parseVenue(raw);
+  if (location) return name + ', ' + location;
+  return name;
+}
+
+// Short venue for list card: "Venue Name · City, ST" — but keep both on same line
+function venueDisplayShort(raw) {
+  const { name, location } = parseVenue(raw);
+  if (location) return name + ' · ' + location;
+  return name;
+}
+
+// ══════════════════════════════════════════════
+//  SCROLL WATCHER
+// ══════════════════════════════════════════════
+function setupScrollWatcher() {
+  let ticking = false;
+  const hero = document.getElementById('headerHero');
+  const btn = document.getElementById('settingsBtn');
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        btn.classList.toggle('hidden', hero.getBoundingClientRect().bottom < 0);
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+}
+
+// ══════════════════════════════════════════════
+//  VIEWS
+// ══════════════════════════════════════════════
+function showSettings() {
+  document.getElementById('main-view').classList.remove('active');
+  document.getElementById('settings-view').classList.add('active');
+  document.getElementById('settingsBtn').style.display = 'none';
+  window.scrollTo(0,0);
+  updateLastSyncLabel();
+}
+function showMain() {
+  document.getElementById('settings-view').classList.remove('active');
+  document.getElementById('main-view').classList.add('active');
+  document.getElementById('settingsBtn').style.display = '';
+  window.scrollTo(0,0);
+}
+
+// ══════════════════════════════════════════════
+//  CSV PARSING — robust single-pass RFC 4180 parser
+//  Handles: quoted fields with embedded newlines/commas,
+//  Windows (\r\n) and Unix (\n) line endings, BOM, allorigins JSON wrapping
+// ══════════════════════════════════════════════
+function parseCSV(rawText) {
+  // Strip BOM if present
+  let text = rawText.replace(/^\uFEFF/, '');
+
+  // If the entire text came back as a JSON-escaped string (some proxies do this),
+  // unescape literal \n sequences that aren't inside a JSON string context
+  // We detect this by checking if NO real newlines exist but \n sequences do
+  if (!text.includes('\n') && text.includes('\\n')) {
+    text = text.replace(/\\n/g, '\n').replace(/\\r/g, '');
+  }
+
+  const rows = [];
+  let currentRow = [], currentField = '', inQuotes = false, i = 0;
+
+  while (i < text.length) {
+    const ch = text[i];
+
+    if (inQuotes) {
+      if (ch === '"') {
+        // Check for escaped quote: "" -> "
+        if (i + 1 < text.length && text[i+1] === '"') {
+          currentField += '"';
+          i += 2;
+          continue;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        // Inside quoted field: keep everything including embedded newlines
+        currentField += ch;
+      }
+    } else {
+      if (ch === '"') {
+        inQuotes = true;
+      } else if (ch === ',') {
+        currentRow.push(currentField.trim());
+        currentField = '';
+      } else if (ch === '\n') {
+        // End of row
+        currentRow.push(currentField.trim());
+        if (currentRow.some(f => f)) rows.push(currentRow);
+        currentRow = [];
+        currentField = '';
+      } else if (ch === '\r') {
+        // Skip carriage returns (Windows \r\n line endings)
+      } else {
+        currentField += ch;
+      }
+    }
+    i++;
+  }
+
+  // Flush the last row (file may not end with newline)
+  if (currentField.trim() || currentRow.length > 0) {
+    currentRow.push(currentField.trim());
+    if (currentRow.some(f => f)) rows.push(currentRow);
+  }
+
+  return rows;
+}
+
+function rowsToEvents(rows) {
+  if (!rows.length) return [];
+  const header = rows[0].map(h => h.replace(/^\uFEFF/,'').toLowerCase().trim().replace(/[^a-z]/g,''));
+  const findCol = (...kws) => {
+    for (const kw of kws) { const i = header.findIndex(h => h === kw); if (i !== -1) return i; }
+    for (const kw of kws) { const i = header.findIndex(h => h.includes(kw)); if (i !== -1) return i; }
+    return -1;
+  };
+  const dateIdx     = findCol('date');
+  const artistIdx   = findCol('artists','artist');
+  const venueIdx    = findCol('venue');
+  // "Attended With" -> strips to "attendedwith"; never match 'with' alone (too broad)
+  const attendedIdx = findCol('attendedwith','attendedwith');
+  const typeIdx     = findCol('type');
+  const notesIdx    = findCol('notes','note');
+  const setlistIdx  = findCol('setlist','setlisturl');
+
+  const colDate     = dateIdx     >= 0 ? dateIdx     : 0;
+  const colArtist   = artistIdx   >= 0 ? artistIdx   : 1;
+  const colVenue    = venueIdx    >= 0 ? venueIdx    : 2;
+  const colAttended = attendedIdx >= 0 ? attendedIdx : 3;
+  const colType     = typeIdx     >= 0 ? typeIdx     : 4;
+  const colNotes    = notesIdx    >= 0 ? notesIdx    : 5;
+  const colSetlist  = setlistIdx  >= 0 ? setlistIdx  : 6;
+
+  const g = (row, col) => (row[col] || '').trim();
+  const events = [];
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    if (!row || row.length === 0 || !row.some(c => c && c.trim())) continue;
+    const dateRaw = g(row, colDate);
+    if (!dateRaw) continue;
+    events.push({
+      id: i,
+      date: dateRaw,
+      artists: g(row, colArtist),       // raw — may contain \n for multi-artist
+      venue: g(row, colVenue),
+      attendedWith: g(row, colAttended),
+      type: g(row, colType),
+      notes: g(row, colNotes),
+      setlist: g(row, colSetlist)
+    });
+  }
+  return events.sort((a,b) => b.date.localeCompare(a.date));
+}
+
+// ══════════════════════════════════════════════
+//  SYNC
+// ══════════════════════════════════════════════
+function buildCsvUrl(raw) {
+  const url = raw.trim();
+  if (url.includes('output=csv')) return url;
+  const idMatch = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  if (!idMatch) return url;
+  const gidMatch = url.match(/[?&#]gid=(\d+)/) || url.match(/edit#gid=(\d+)/);
+  return `https://docs.google.com/spreadsheets/d/${idMatch[1]}/pub?gid=${gidMatch ? gidMatch[1] : '0'}&single=true&output=csv`;
+}
+
+// Decode a proxy response that may be a base64 data URI or plain text
+function decodeProxyResponse(raw) {
+  if (!raw) return '';
+  // allorigins sometimes returns: data:text/csv;base64,<b64> or data:text/html;base64,...
+  if (raw.startsWith('data:')) {
+    const b64Match = raw.match(/^data:[^;]+;base64,(.+)$/s);
+    if (b64Match) {
+      try {
+        return atob(b64Match[1].trim());
+      } catch(e) {
+        // atob failed — return raw and let caller handle it
+      }
+    }
+  }
+  return raw;
+}
+
+async function fetchCsvText(csvUrl) {
+  const errors = [];
+
+  // 1. Direct fetch (works when hosted on a server or CORS is open)
+  try {
+    const r = await fetch(csvUrl, { mode: 'cors', cache: 'no-cache' });
+    if (r.ok) {
+      const text = await r.text();
+      if (text && text.length > 10) return { text, via: 'direct' };
+    } else { errors.push(`direct: HTTP ${r.status}`); }
+  } catch(e) { errors.push(`direct: ${e.message}`); }
+
+  // 2. corsproxy.io — returns raw text, most reliable
+  try {
+    const r = await fetch(`https://corsproxy.io/?${encodeURIComponent(csvUrl)}`, { cache: 'no-cache' });
+    if (r.ok) {
+      const text = await r.text();
+      if (text && text.length > 10) return { text, via: 'corsproxy.io' };
+    } else { errors.push(`corsproxy.io: HTTP ${r.status}`); }
+  } catch(e) { errors.push(`corsproxy.io: ${e.message}`); }
+
+  // 3. allorigins — returns JSON wrapper; response may be base64-encoded
+  try {
+    const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(csvUrl)}`, { cache: 'no-cache' });
+    if (r.ok) {
+      const j = await r.json();
+      if (j && j.contents) {
+        const text = decodeProxyResponse(j.contents);
+        if (text && text.length > 10) return { text, via: 'allorigins' };
+      }
+    } else { errors.push(`allorigins: HTTP ${r.status}`); }
+  } catch(e) { errors.push(`allorigins: ${e.message}`); }
+
+  // 4. cors-anywhere fallback
+  try {
+    const r = await fetch(`https://cors-anywhere.herokuapp.com/${csvUrl}`, { cache: 'no-cache', headers: {'X-Requested-With': 'XMLHttpRequest'} });
+    if (r.ok) {
+      const text = await r.text();
+      if (text && text.length > 10) return { text, via: 'cors-anywhere' };
+    } else { errors.push(`cors-anywhere: HTTP ${r.status}`); }
+  } catch(e) { errors.push(`cors-anywhere: ${e.message}`); }
+
+  throw new Error(`All fetch methods failed:\n${errors.join('\n')}\n\nMake sure your sheet is published as CSV (File → Share → Publish to web → CSV).`);
+}
+
+async function syncSheet() {
+  // Clear any legacy cached data from older app versions
+  ['eventdiary_events_v2','eventdiary_events','eventdiary_lastsync','eventdiary_setlists_v2','eventdiary_setlists'].forEach(k => {
+    try { localStorage.removeItem(k); } catch(e) {}
+  });
+
+  const urlInput = document.getElementById('sheetUrlInput');
+  const btn = document.getElementById('syncBtn');
+  const rawUrl = urlInput.value.trim();
+  if (!rawUrl) { showSyncStatus('error','Please enter a Google Sheet URL first.'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span> Syncing…`;
+  document.getElementById('syncStatus').className = 'sync-status';
+  document.getElementById('syncStatus').style.display = 'none';
+
+  try {
+    const csvUrl = buildCsvUrl(rawUrl);
+    showSyncStatus('info', 'Fetching data…');
+    const { text, via } = await fetchCsvText(csvUrl);
+    // Decode base64 data URI if proxy returned one (belt-and-suspenders)
+    const cleanText = decodeProxyResponse(text);
+    if (cleanText.trim().startsWith('<!') || cleanText.trim().startsWith('<html')) {
+      throw new Error('Got an HTML page instead of CSV. The sheet may not be published yet.\nGo to File → Share → Publish to web → choose CSV → Publish.');
+    }
+    const rows = parseCSV(cleanText);
+    // Debug: show what we got if parsing fails
+    if (rows.length < 2) {
+      const preview = cleanText.substring(0, 300).replace(/\r/g, '').replace(/\n/g, '↵');
+      throw new Error(`Sheet appears empty or only has a header row.\n\nGot ${rows.length} row(s). Text preview:\n${preview}\n\nMake sure your sheet tab has data rows below the header, and that the URL points to the correct sheet tab.`);
+    }
+    const events = rowsToEvents(rows);
+    if (!events.length) {
+      const found = rows[0].join(' | ');
+      throw new Error(`No valid events found.\nHeaders detected: "${found}"\nExpected headers: Date | Artist(s) | Venue | Attended With | Type | Notes | Setlist`);
+    }
+    allEvents = events;
+    save(STORAGE_KEYS.events, events);
+    save(STORAGE_KEYS.sheetUrl, csvUrl);
+    save(STORAGE_KEYS.lastSync, new Date().toISOString());
+    urlInput.value = csvUrl;
+    showSyncStatus('success', `✓ Synced ${events.length} event${events.length !== 1 ? 's' : ''} (via ${via}).`);
+    updateLastSyncLabel();
+    renderAll();
+  } catch(err) {
+    showSyncStatus('error', err.message);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg> Sync Google Sheet`;
+}
+
+function showSyncStatus(type, msg) {
+  const el = document.getElementById('syncStatus');
+  el.className = 'sync-status ' + type;
+  el.style.whiteSpace = 'pre-wrap'; el.textContent = msg; el.style.display = 'block';
+}
+function updateLastSyncLabel() {
+  const ts = load(STORAGE_KEYS.lastSync);
+  const el = document.getElementById('lastSyncInfo');
+  if (ts) { const d = new Date(ts); el.textContent = `Last synced: ${d.toLocaleDateString()} at ${d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`; }
+  else el.textContent = '';
+}
+
+// ══════════════════════════════════════════════
+//  DATE HELPERS
+// ══════════════════════════════════════════════
+function formatDateParts(dateStr) {
+  const p = dateStr.split('-');
+  return { year: p[0], month: MONTHS[parseInt(p[1])-1] || '???', day: String(parseInt(p[2])).padStart(2,'0') };
+}
+function formatDateFull(dateStr) {
+  const p = dateStr.split('-');
+  return `${MONTHS_FULL[parseInt(p[1])-1]} ${parseInt(p[2])}, ${p[0]}`;
+}
+function formatDateShort(dateStr) {
+  const p = dateStr.split('-');
+  return `${MONTHS[parseInt(p[1])-1]} ${parseInt(p[2])}, ${p[0]}`;
+}
+
+// ══════════════════════════════════════════════
+//  STATS & DATE RANGE
+// ══════════════════════════════════════════════
+function computeStats(events) {
+  const artists = new Set(), venues = new Set();
+  let setlists = 0;
+  events.forEach(e => {
+    // Exclude "Play" type events from artist count
+    if (!(e.type && e.type.trim().toLowerCase() === 'play')) {
+      parseArtists(e.artists).forEach(a => artists.add(a.toLowerCase().trim()));
+    }
+    if (e.venue) {
+      // Deduplicate venues by their full display (name + location normalized)
+      venues.add(venueDisplay(e.venue).toLowerCase().trim());
+    }
+    if (e.setlist && e.setlist.trim()) setlists++;
+  });
+  return { events: events.length, artists: artists.size, venues: venues.size, setlists };
+}
+
+function updateStats(events) {
+  const s = computeStats(events);
+  document.getElementById('statEvents').textContent = s.events;
+  document.getElementById('statArtists').textContent = s.artists;
+  document.getElementById('statVenues').textContent = s.venues;
+  document.getElementById('statSetlists').textContent = s.setlists;
+}
+
+function updateDateRange(events) {
+  if (!events.length) { document.getElementById('dateFirst').textContent = '—'; document.getElementById('dateLatest').textContent = '—'; return; }
+  const sorted = [...events].sort((a,b) => a.date.localeCompare(b.date));
+  document.getElementById('dateFirst').textContent = formatDateShort(sorted[0].date);
+  document.getElementById('dateLatest').textContent = formatDateShort(sorted[sorted.length-1].date);
+}
+
+// ══════════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════════
+function renderAll(events) {
+  const data = events || allEvents;
+  updateStats(allEvents);
+  updateDateRange(allEvents);
+  renderEventsList(data);
+}
+
+function renderEventsList(events) {
+  const container = document.getElementById('eventsContainer');
+  if (!events.length) { container.innerHTML = `<div class="no-results">No events found.</div>`; return; }
+  const byYear = {};
+  events.forEach(e => { const y = e.date.substring(0,4); if (!byYear[y]) byYear[y] = []; byYear[y].push(e); });
+  const years = Object.keys(byYear).sort((a,b) => b-a);
+  let html = `<div class="section-header"><span class="section-title">All Events</span><span class="section-count">${events.length} event${events.length!==1?'s':''}</span></div>`;
+  years.forEach(year => {
+    html += `<div class="year-group" id="year-${year}"><div class="year-label">${year}</div>`;
+    byYear[year].forEach(e => { html += buildEventCard(e); });
+    html += `</div>`;
+  });
+  container.innerHTML = html;
+}
+
+function buildEventCard(e) {
+  const { month, day, year } = formatDateParts(e.date);
+  const hasSetlist = !!(e.setlist && e.setlist.trim());
+  const badge = hasSetlist
+    ? `<div class="event-setlist-badge setlist-yes">Setlist</div>`
+    : '';
+  const displayArtists = escHtml(artistsToCommaList(e.artists));
+  return `<div class="event-card" id="card-${e.id}" onclick="openModal(${e.id})">
+    <div class="event-card-main">
+      <div class="event-date-block">
+        <span class="event-date-month">${month}</span>
+        <span class="event-date-day">${day}</span>
+      </div>
+      <div class="event-info">
+        <span class="event-artist">${displayArtists}</span>
+        <div class="event-venue">${escHtml(venueDisplayShort(e.venue))}</div>
+      </div>
+      ${badge}
+    </div>
+  </div>`;
+}
+
+function escHtml(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showEmptyState() {
+  document.getElementById('eventsContainer').innerHTML = `
+    <div class="empty-state">
+      <span class="empty-state-icon">🎵</span>
+      <p class="empty-state-title">No Events Yet</p>
+      <p class="empty-state-text">Connect your Google Sheet to load your concert diary.</p>
+      <button class="btn-primary" onclick="showSettings()">Open Settings</button>
+    </div>`;
+  ['statEvents','statArtists','statVenues','statSetlists'].forEach(id => document.getElementById(id).textContent = '0');
+  document.getElementById('dateFirst').textContent = '—';
+  document.getElementById('dateLatest').textContent = '—';
+}
+
+// ══════════════════════════════════════════════
+//  STAT CARD CLICKS
+// ══════════════════════════════════════════════
+function onStatClick(type) {
+  if (!allEvents.length) return;
+  if (type === 'artists') openArtistsModal();
+  if (type === 'venues') openVenuesModal();
+  if (type === 'setlists') openSetlistsModal();
+}
+
+function openStatModal(title, bodyHtml) {
+  document.getElementById('statModalTitle').textContent = title;
+  document.getElementById('statModalBody').innerHTML = bodyHtml;
+  document.getElementById('statModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeStatModal() {
+  document.getElementById('statModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeStatModalIfOutside(e) {
+  if (e.target === document.getElementById('statModal')) closeStatModal();
+}
+
+// Global lookup so stat list items can safely reference strings via index
+window._statItems = [];
+
+function openArtistsModal() {
+  window._statItems = [];
+  const artistMap = {};
+  allEvents.forEach(e => {
+    if (e.type && e.type.trim().toLowerCase() === 'play') return;
+    parseArtists(e.artists).forEach(a => {
+      const key = a.toLowerCase().trim();
+      if (!artistMap[key]) artistMap[key] = { display: a.trim(), count: 0 };
+      artistMap[key].count++;
+    });
+  });
+  const sorted = Object.values(artistMap).sort((a,b) => a.display.toLowerCase().localeCompare(b.display.toLowerCase()));
+  const html = sorted.map(({ display, count }) => {
+    const idx = window._statItems.length;
+    window._statItems.push({ type: 'artist', searchTerm: display });
+    return `<div class="stat-list-item">
+      <div class="stat-list-item-main">
+        <a class="stat-list-link" onclick="statItemClick(${idx})">${escHtml(display)}</a>
+        ${count > 1 ? `<span class="stat-list-item-count">(${count})</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  openStatModal(`Artists (${sorted.length})`, html);
+}
+
+function statItemClick(idx) {
+  const item = window._statItems[idx];
+  if (!item) return;
+  closeStatModal();
+  // Populate search input and show dropdown (same as if user typed the name)
+  const input = document.getElementById('searchInput');
+  input.value = item.searchTerm;  // Just the name, not "name city state"
+  document.getElementById('searchClear').classList.add('visible');
+  document.getElementById('main-view').scrollTo({ top: 0, behavior: 'smooth' });
+  // Show dropdown after modal close animation settles
+  setTimeout(() => showSearchDropdown(item.searchTerm), 50);
+}
+
+function triggerArtistSearch(name) {
+  const input = document.getElementById('searchInput');
+  input.value = name;
+  document.getElementById('searchClear').classList.add('visible');
+  showSearchDropdown(name);
+  document.getElementById('main-view').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function openVenuesModal() {
+  window._statItems = [];
+  const venueMap = {};
+  allEvents.forEach(e => {
+    if (!e.venue) return;
+    const key = e.venue.toLowerCase().trim();
+    if (!venueMap[key]) venueMap[key] = { raw: e.venue.trim(), count: 0 };
+    venueMap[key].count++;
+  });
+  const sorted = Object.values(venueMap).sort((a,b) => {
+    const an = parseVenue(a.raw).name.toLowerCase(), bn = parseVenue(b.raw).name.toLowerCase();
+    return an.localeCompare(bn);
+  });
+  const html = sorted.map(({ raw, count }) => {
+    const { name, location } = parseVenue(raw);
+    const idx = window._statItems.length;
+    // Search by venue name only — not "name city, state" which breaks matching
+    window._statItems.push({ type: 'venue', searchTerm: name });
+    return `<div class="stat-list-item">
+      <div class="stat-list-item-main">
+        <span class="stat-list-item-name-row">
+          <a class="stat-list-link" onclick="statItemClick(${idx})">${escHtml(name)}</a>
+          ${count > 1 ? `<span class="stat-list-item-count">(${count})</span>` : ''}
+        </span>
+        ${location ? `<br><span class="stat-list-item-sub">${escHtml(location)}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  openStatModal(`Venues (${sorted.length})`, html);
+}
+
+function triggerVenueSearch(term) {
+  const input = document.getElementById('searchInput');
+  input.value = term;
+  document.getElementById('searchClear').classList.add('visible');
+  showSearchDropdown(term);
+  document.getElementById('main-view').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function openSetlistsModal() {
+  // Each event = one row. For multi-setlist events, extract each artist from their URL
+  // and show them comma-separated on one line.
+  const rows = [];
+  allEvents
+    .filter(e => e.setlist && e.setlist.trim())
+    .sort((a,b) => b.date.localeCompare(a.date))
+    .forEach(e => {
+      const urls = e.setlist.split(/\n/).map(s => s.trim()).filter(Boolean);
+      const eventArtists = parseArtists(e.artists);
+      if (urls.length === 1) {
+        // Single URL — extract artist from URL
+        const urlArtist = extractArtistFromSetlistUrl(urls[0], eventArtists);
+        rows.push({ e, displayName: urlArtist || artistsToCommaList(e.artists) });
+      } else {
+        // Multiple URLs — extract each artist and join on one line
+        const names = urls.map(url => extractArtistFromSetlistUrl(url, eventArtists)).filter(Boolean);
+        const displayName = names.length ? names.join(', ') : artistsToCommaList(e.artists);
+        rows.push({ e, displayName });
+      }
+    });
+
+  const html = rows.map(({ e, displayName }) =>
+    `<div class="stat-list-item">
+      <div class="stat-list-item-main">
+        <a class="stat-list-link" onclick="closeStatModal(); openModal(${e.id})">${escHtml(displayName)}</a>
+      </div>
+      <span class="stat-list-item-date">${formatDateShort(e.date)}</span>
+    </div>`
+  ).join('');
+
+  openStatModal(`Setlists (${rows.length})`, html || '<div class="stat-list-item">No setlists yet.</div>');
+}
+
+// ══════════════════════════════════════════════
+//  EVENT DETAIL MODAL
+// ══════════════════════════════════════════════
+let currentModalEventId = null;
+
+function openModal(id) {
+  const e = allEvents.find(ev => ev.id === id);
+  if (!e) return;
+  currentModalEventId = id;
+  const { month, day, year } = formatDateParts(e.date);
+  const hasSetlist = !!(e.setlist && e.setlist.trim());
+  const artists = parseArtists(e.artists);
+
+  // Artists — each on own line
+  const artistsHtml = artists.map(a => `<span class="modal-artist-line">${escHtml(a)}</span>`).join('');
+
+  // Meta pills — corrected column mapping: attendedWith = who you were with, type = type of event, notes = notes
+  let pills = '';
+  if (e.attendedWith && e.attendedWith.trim()) {
+    // Multi-line cell from Google Sheets → comma-separated names
+    const withNames = e.attendedWith.split(/[\n,]+/).map(s => s.trim()).filter(Boolean).join(', ');
+    pills += `<div class="modal-meta-pill"><span class="modal-meta-pill-label">With</span>&nbsp;${escHtml(withNames)}</div>`;
+  }
+  if (e.type && e.type.trim()) pills += `<div class="modal-meta-pill"><span class="modal-meta-pill-label">Type</span>&nbsp;${escHtml(e.type)}</div>`;
+
+  let notesBlock = '';
+  if (e.notes && e.notes.trim()) {
+    notesBlock = `<div class="modal-notes-block"><div class="modal-notes-label">Notes</div><p class="modal-notes-text">${escHtml(e.notes)}</p></div>`;
+  }
+
+  // Parse multiple setlist URLs (one per line)
+  const setlistUrls = hasSetlist
+    ? e.setlist.split(/\n/).map(s => s.trim()).filter(Boolean)
+    : [];
+  const multiSetlist = setlistUrls.length > 1;
+
+  let setlistBlock = '';
+  if (setlistUrls.length === 1) {
+    setlistBlock = `<div class="setlist-section" id="modalSetlist">
+      <div id="setlistContent"><div class="setlist-loading"><span class="spinner"></span>&nbsp;Loading setlist…</div></div>
+    </div>`;
+  } else if (setlistUrls.length > 1) {
+    // Side-by-side columns, one per setlist URL
+    const cols = setlistUrls.map((url, i) =>
+      `<div class="setlist-col" id="setlistCol${i}">
+        <div class="setlist-loading"><span class="spinner"></span>&nbsp;Loading…</div>
+      </div>`
+    ).join('');
+    setlistBlock = `<div class="setlist-section" id="modalSetlist">
+      <div class="setlist-multi-row">${cols}</div>
+    </div>`;
+  }
+
+  // Build Google Maps URL for the venue
+  const venueParsed = parseVenue(e.venue);
+  const mapsQuery = encodeURIComponent(
+    venueParsed.location ? `${venueParsed.name} ${venueParsed.location}` : venueParsed.name
+  );
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
+
+  document.getElementById('modalBody').innerHTML = `
+    <span class="modal-date-tag">${month} ${day}, ${year}</span>
+    <div class="modal-artists">${artistsHtml}</div>
+    <a class="modal-venue-block" href="${mapsUrl}" target="_blank" rel="noopener">
+      <span class="modal-venue">${escHtml(venueParsed.name)}</span>
+      ${venueParsed.location ? `<span class="modal-venue-location">${escHtml(venueParsed.location)}</span>` : ''}
+    </a>
+    ${setlistBlock}
+    ${(pills || notesBlock) ? `<div class="modal-divider"></div>` : ''}
+    ${pills ? `<div class="modal-meta-row">${pills}</div>` : ''}
+    ${notesBlock}
+  `;
+
+  document.getElementById('detailModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  if (setlistUrls.length === 1) {
+    loadSetlist(e, setlistUrls[0], null);
+  } else if (setlistUrls.length > 1) {
+    const eventArtists = parseArtists(e.artists);
+    setlistUrls.forEach((url, i) => {
+      const artist = eventArtists[i] || eventArtists[0];
+      loadSetlistInto(`setlistCol${i}`, url, [artist]);
+    });
+  }
+}
+
+function closeModal() {
+  document.getElementById('detailModal').classList.remove('open');
+  document.body.style.overflow = '';
+  currentModalEventId = null;
+}
+function closeModalIfOutside(e) {
+  if (e.target === document.getElementById('detailModal')) closeModal();
+}
+
+// ══════════════════════════════════════════════
+//  SETLIST — LOCAL CACHE + FETCH
+// ══════════════════════════════════════════════
+
+// Load the persistent setlist cache from localStorage
+let setlistCache = load(STORAGE_KEYS.setlistCache) || {};
+// Purge any cached entries that parsed as empty (from old broken parser)
+Object.keys(setlistCache).forEach(k => {
+  const v = setlistCache[k];
+  if (!v || !v.sets || !v.sets.length || !v.sets.some(s => s.songs && s.songs.length)) {
+    delete setlistCache[k];
+  }
+});
+saveSetlistCache();
+
+function saveSetlistCache() { save(STORAGE_KEYS.setlistCache, setlistCache); }
+
+// Shared fetch logic for a single setlist URL
+async function fetchSetlistHtml(url) {
+  if (setlistCache[url] && setlistCache[url].sets) return { cached: setlistCache[url] };
+  const proxies = [
+    async () => {
+      const r = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`, { cache: 'no-cache' });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.text();
+    },
+    async () => {
+      const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, { cache: 'no-cache' });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const j = await r.json();
+      if (!j || !j.contents) throw new Error('empty');
+      return decodeProxyResponse(j.contents);
+    },
+  ];
+  for (const tryProxy of proxies) {
+    try {
+      const text = await tryProxy();
+      if (text && text.length > 500 && text.includes('<')) return { html: text };
+    } catch(e) {}
+  }
+  return { html: null };
+}
+
+// Load a setlist into the default #setlistContent container (single-setlist path)
+async function loadSetlist(event, url, _unused) {
+  const container = document.getElementById('setlistContent');
+  if (!container) return;
+  if (!url) url = event.setlist.trim();
+  const artists = parseArtists(event.artists);
+  const { cached, html } = await fetchSetlistHtml(url);
+  if (cached) { container.innerHTML = renderSetlistHTML(cached, url, artists); return; }
+  if (!html) {
+    container.innerHTML = `<p class="setlist-error">Could not load setlist automatically.</p>
+      <p class="setlist-source" style="margin-top:8px"><a class="setlist-link" href="${escHtml(url)}" target="_blank">View on setlist.fm ↗</a></p>`;
+    return;
+  }
+  const parsed = parseSetlistFm(html);
+  if (parsed.sets && parsed.sets.length && parsed.sets.some(s => s.songs && s.songs.length)) {
+    setlistCache[url] = parsed; saveSetlistCache();
+  }
+  container.innerHTML = renderSetlistHTML(parsed, url, artists);
+}
+
+// Load a setlist into a specific container by ID (multi-setlist path)
+async function loadSetlistInto(containerId, url, artists) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  // Mark as multi-column so header shows artist name
+  if (artists && artists.length) artists._isMultiCol = true;
+  const { cached, html } = await fetchSetlistHtml(url);
+  if (cached) { container.innerHTML = renderSetlistHTML(cached, url, artists); return; }
+  if (!html) {
+    container.innerHTML = `<p class="setlist-error">Could not load.</p>
+      <p class="setlist-source"><a class="setlist-link" href="${escHtml(url)}" target="_blank">View on setlist.fm ↗</a></p>`;
+    return;
+  }
+  const parsed = parseSetlistFm(html);
+  if (parsed.sets && parsed.sets.length && parsed.sets.some(s => s.songs && s.songs.length)) {
+    setlistCache[url] = parsed; saveSetlistCache();
+  }
+  container.innerHTML = renderSetlistHTML(parsed, url, artists);
+}
+
+
+// Extract artist name from setlist.fm URL, optionally matching against event artists
+// URL format: https://www.setlist.fm/setlist/the-academy-is/2025/gothic-theatre-...
+function extractArtistFromSetlistUrl(url, eventArtists) {
+  if (!url) return null;
+  const match = url.match(/setlist\.fm\/setlist\/([^\/]+)/);
+  if (!match) return null;
+  const slug = match[1];
+  
+  // Convert slug to title case: "the-academy-is" -> "The Academy Is"
+  const slugTitle = slug
+    .split('-')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+  
+  // If we have event artists, try to find a case-insensitive match
+  // This preserves proper capitalization and punctuation (e.g., "The Academy Is...")
+  if (eventArtists && eventArtists.length) {
+    const found = eventArtists.find(a => 
+      a.toLowerCase().replace(/[^a-z0-9]/g, '') === 
+      slugTitle.toLowerCase().replace(/[^a-z0-9]/g, '')
+    );
+    if (found) return found;
+  }
+  
+  return slugTitle;
+}
+
+function parseSetlistFm(html) {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const result = { sets: [] };
+
+  const SET_HEADER_RE = /^(set\s*\d|encore(\s*\d+)?\s*:?|band\s*intro|intermission|acoustic|piano|electric|unplugged|double-neck\s*acoustic)\b/i;
+  const isSetLabel = (text) => SET_HEADER_RE.test(text.trim());
+
+  // Words found in breadcrumb/nav lists — used to skip non-song ols
+  const NAV_WORDS = /^(you are here|artists?|festivals?|venues?|statistics|news|forum|setlists?|s|a|p)$/i;
+
+  // Returns true if an ol looks like a song list (not a breadcrumb/nav)
+  const isSongOl = (ol) => {
+    if (ol.closest('nav, header, footer, aside, [class*="breadcrumb"], [class*="Breadcrumb"]')) return false;
+    const lis = Array.from(ol.querySelectorAll('li'));
+    if (!lis.length) return false;
+    // If the ol contains "You are here" anywhere → breadcrumb
+    if (ol.textContent.includes('You are here')) return false;
+    // If any item matches a date-setlist pattern like "October 4, 2025 Setlist" → breadcrumb
+    if (lis.some(li => /\b(\d{4}\s+setlist|setlist$)/i.test(li.textContent.trim()))) return false;
+    // If most items are short nav-like words, skip
+    const navCount = lis.filter(li => NAV_WORDS.test(li.textContent.trim())).length;
+    if (navCount >= 2) return false;
+    // Must have at least one item that looks like a real song title (longer than 3 chars, not a nav word)
+    return lis.some(li => {
+      const t = li.textContent.trim();
+      return t.length > 3 && t.length < 200 && !isSetLabel(t) && !NAV_WORDS.test(t);
+    });
+  };
+
+  // Extract song name and optional note from a list item
+  const extractSong = (li) => {
+    const labelEl = li.querySelector('.songLabel a, .songLabel, a.songLabel');
+    let name = '';
+    if (labelEl) {
+      name = labelEl.textContent.trim();
+    } else {
+      const clone = li.cloneNode(true);
+      clone.querySelectorAll('.songInfo, .tape, .songCover, .shortNote, button, svg, small, sup').forEach(el => el.remove());
+      name = clone.textContent.trim().split('\n')[0].trim().replace(/\s+/g, ' ');
+    }
+    const infoEl = li.querySelector('.shortNote, .songInfo, .tape');
+    const note = infoEl ? infoEl.textContent.trim().replace(/\s+/g, ' ') : '';
+    return { name, note };
+  };
+
+  // Find the set label immediately preceding a song <ol>
+  const getSetLabel = (ol) => {
+    // Check previous siblings
+    let node = ol.previousElementSibling;
+    while (node) {
+      const text = node.textContent.trim().replace(/\s+/g, ' ');
+      if (text.length > 0 && text.length < 100 && isSetLabel(text)) return text;
+      if (node.tagName.toLowerCase() === 'ol') break;
+      node = node.previousElementSibling;
+    }
+    // Check parent's previous siblings (one level up)
+    const parent = ol.parentElement;
+    if (parent && parent !== doc.body) {
+      let prev = parent.previousElementSibling;
+      while (prev) {
+        const text = prev.textContent.trim().replace(/\s+/g, ' ');
+        if (text.length > 0 && text.length < 100 && isSetLabel(text)) return text;
+        if (prev.tagName.toLowerCase() === 'ol') break;
+        prev = prev.previousElementSibling;
+      }
+    }
+    return null;
+  };
+
+  // ── Strategy 1: find all song-like ols ──
+  const songOls = Array.from(doc.querySelectorAll('ol')).filter(isSongOl);
+
+  if (songOls.length > 0) {
+    songOls.forEach(ol => {
+      const label = getSetLabel(ol);
+      const songs = Array.from(ol.querySelectorAll('li'))
+        .map(li => extractSong(li))
+        .filter(s => s.name.length > 1 && s.name.length < 200 && !isSetLabel(s.name) && !NAV_WORDS.test(s.name));
+      if (songs.length > 0) result.sets.push({ label, songs });
+    });
+  }
+
+  // ── Strategy 2: li.song (older setlist.fm markup) ──
+  if (!result.sets.length) {
+    const songItems = doc.querySelectorAll('li.song');
+    if (songItems.length) {
+      let main = [], encore = [];
+      songItems.forEach(li => {
+        const s = extractSong(li);
+        const inEncore = !!(li.closest('.encore') || /encore/i.test((li.parentElement || {}).className || ''));
+        (inEncore ? encore : main).push(s);
+      });
+      if (main.length) result.sets.push({ label: null, songs: main });
+      if (encore.length) result.sets.push({ label: 'Encore', songs: encore });
+    }
+  }
+
+  // ── Strategy 3: largest <ol> on page (last resort) ──
+  if (!result.sets.length) {
+    let best = null, bestN = 0;
+    doc.querySelectorAll('ol').forEach(ol => {
+      if (ol.closest('nav, header, footer, aside')) return;
+      const n = ol.querySelectorAll('li').length;
+      if (n > bestN) { best = ol; bestN = n; }
+    });
+    if (best && bestN >= 3) {
+      const songs = Array.from(best.querySelectorAll('li'))
+        .map(li => ({ name: li.textContent.trim().split('\n')[0].trim(), note: '' }))
+        .filter(s => s.name.length > 1 && s.name.length < 200);
+      if (songs.length) result.sets.push({ label: null, songs });
+    }
+  }
+
+  return result;
+}
+
+// Patterns that indicate junk/non-song content to filter out
+const JUNK_PATTERNS = [
+  /^<!\[CDATA\[/i, /^<!--/, /^\/\*/, /CDATA/i,
+  /^setlist\.fm/i, /^edit setlist/i, /^share/i,
+  /^tour statistics/i, /^i was there/i
+];
+
+function isSongNameValid(name) {
+  if (!name || name.length < 1 || name.length > 200) return false;
+  return !JUNK_PATTERNS.some(p => p.test(name.trim()));
+}
+
+// Returns true if this set label looks like a section header (Set 1, Set 2, Encore, etc.)
+function isSetHeader(label) {
+  if (!label) return false;
+  return /^(set\s*\d|encore|band intro|intermission)/i.test(label.trim());
+}
+
+function renderSetlistHTML(parsed, url, artists) {
+  if (!parsed.sets || !parsed.sets.length || !parsed.sets.some(s => s.songs && s.songs.length)) {
+    return `<p class="setlist-error">Could not load setlist automatically.</p>
+      <p class="setlist-source" style="margin-top:6px"><a class="setlist-link" href="${escHtml(url)}" target="_blank">View on setlist.fm ↗</a></p>`;
+  }
+
+  // Header logic:
+  // 1. Try to extract artist from the setlist.fm URL itself
+  // 2. If that fails or it's a single-artist show, just say "SETLIST"
+  // 3. For multi-column views, use the passed artist name
+  let headerText = 'SETLIST';
+  const urlArtist = extractArtistFromSetlistUrl(url, artists);
+  
+  if (artists && artists.length === 1) {
+    // Single artist OR multi-column
+    if (artists._isMultiCol) {
+      // Multi-column: show the passed artist name
+      headerText = `SETLIST — ${escHtml(artists[0].toUpperCase())}`;
+    } else if (urlArtist) {
+      // Single-artist show but URL has artist → shouldn't happen, just show SETLIST
+      headerText = 'SETLIST';
+    }
+    // else: single-artist show, just "SETLIST"
+  } else if (artists && artists.length > 1) {
+    // Multi-artist show: use URL artist if available, otherwise show all
+    if (urlArtist) {
+      headerText = `SETLIST — ${escHtml(urlArtist.toUpperCase())}`;
+    } else {
+      headerText = `SETLIST — ${escHtml(artists.join(', ').toUpperCase())}`;
+    }
+  } else if (urlArtist) {
+    // No artists passed but URL has artist (fallback)
+    headerText = `SETLIST — ${escHtml(urlArtist.toUpperCase())}`;
+  }
+  let html = `<div class="setlist-band-header">${headerText}</div>`;
+
+  // Global song counter across all sets (like setlist.fm shows it)
+  let songNum = 0;
+  let firstSet = true;
+
+  parsed.sets.forEach((set) => {
+    // Filter junk from songs
+    const validSongs = set.songs.filter(s => isSongNameValid(s.name));
+    if (!validSongs.length && !set.label) return;
+
+    // Gap between sets (not before the very first)
+    const gapStyle = firstSet ? '' : ' style="margin-top:20px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.07)"';
+    firstSet = false;
+
+    // Set section header — styled like setlist.fm's blue pill labels
+    if (set.label) {
+      html += `<div class="setlist-set-header"${gapStyle}>${escHtml(set.label)}</div>`;
+    } else if (gapStyle) {
+      // No label but still need the gap div
+      html += `<div${gapStyle}></div>`;
+    }
+
+    if (!validSongs.length) return;
+
+    // Songs list — manual numbering so headers don't count
+    html += `<ol class="setlist-songs">`;
+    validSongs.forEach(s => {
+      songNum++;
+      const num = String(songNum).padStart(2, '0');
+      html += `<li><span class="setlist-song-num">${num}</span><span class="setlist-song-name">${escHtml(s.name)}</span>${s.note ? `<span class="setlist-song-note"> (${escHtml(s.note)})</span>` : ''}</li>`;
+    });
+    html += `</ol>`;
+  });
+
+  html += `<p class="setlist-source">Via <a class="setlist-link" href="${escHtml(url)}" target="_blank">setlist.fm ↗</a></p>`;
+  return html;
+}
+
+// ══════════════════════════════════════════════
+//  SEARCH
+// ══════════════════════════════════════════════
+let searchDebounce = null;
+
+function onSearchInput(e) {
+  const val = e.target.value.trim();
+  document.getElementById('searchClear').classList.toggle('visible', val.length > 0);
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(() => performSearch(val), 180);
+}
+function onSearchFocus() {
+  const val = document.getElementById('searchInput').value.trim();
+  if (val.length >= 1) showSearchDropdown(val);
+}
+// onSearchBlur intentionally removed — onDocClick handles clearing on outside click
+function onDocClick(e) {
+  const input = document.getElementById('searchInput');
+  const results = document.getElementById('searchResults');
+  const clearBtn = document.getElementById('searchClear');
+  const dimOverlay = document.getElementById('searchDimOverlay');
+  // If click is outside search input, dropdown, and clear button → clear everything
+  if (!results.contains(e.target) && e.target !== input && e.target !== clearBtn && !clearBtn.contains(e.target) && e.target !== dimOverlay) {
+    if (input.value.trim()) {
+      input.value = '';
+      clearBtn.classList.remove('visible');
+      results.classList.remove('open');
+      setSearchDim(false);
+      renderAll();
+    } else {
+      results.classList.remove('open');
+      setSearchDim(false);
+    }
+  }
+}
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchClear').classList.remove('visible');
+  document.getElementById('searchResults').classList.remove('open');
+  setSearchDim(false);
+  renderAll();
+}
+
+function matchingEvents(query) {
+  if (!query) return [];
+  const q = query.toLowerCase();
+  return allEvents.filter(e =>
+    (e.artists && e.artists.toLowerCase().includes(q)) ||
+    (e.venue && e.venue.toLowerCase().includes(q)) ||
+    (e.notes && e.notes.toLowerCase().includes(q)) ||
+    (e.type && e.type.toLowerCase().includes(q)) ||
+    (e.attendedWith && e.attendedWith.toLowerCase().includes(q)) ||
+    (e.date && e.date.includes(q))
+  );
+}
+
+function performSearch(query) {
+  if (!query) { 
+    renderAll();
+    document.getElementById('searchResults').classList.remove('open');
+    setSearchDim(false);
+    return; 
+  }
+  // Show dropdown with suggestions
+  showSearchDropdown(query);
+}
+
+// Actually filter the main event list (for when user hits Enter or clicks a suggestion)
+function filterEventsBySearch(query) {
+  if (!query) { renderAll(); return; }
+  const q = query.toLowerCase();
+  const results = allEvents.filter(e =>
+    (e.artists && e.artists.toLowerCase().includes(q)) ||
+    (e.venue && e.venue.toLowerCase().includes(q)) ||
+    (e.notes && e.notes.toLowerCase().includes(q)) ||
+    (e.type && e.type.toLowerCase().includes(q)) ||
+    (e.attendedWith && e.attendedWith.toLowerCase().includes(q)) ||
+    (e.date && e.date.includes(q))
+  );
+  renderAll(results);
+}
+
+function setSearchDim(on) {
+  const overlay = document.getElementById('searchDimOverlay');
+  if (overlay) overlay.classList.toggle('active', on);
+}
+
+function showSearchDropdown(query) {
+  const resultsEl = document.getElementById('searchResults');
+  if (!query) { resultsEl.classList.remove('open'); setSearchDim(false); return; }
+
+  const matches = matchingEvents(query);
+
+  if (!matches.length) {
+    resultsEl.innerHTML = `<div class="search-result-count">No results for "${escHtml(query)}"</div>`;
+    resultsEl.classList.add('open');
+    setSearchDim(true);
+    return;
+  }
+
+  const MAX_SHOWN = 12;
+  const shown = matches.slice(0, MAX_SHOWN);
+
+  resultsEl.innerHTML = shown.map(e => {
+    const { month, day, year } = formatDateParts(e.date);
+    const artistDisplay = artistsToCommaList(e.artists);
+    const hlArtist = artistDisplay.replace(new RegExp(escRegex(query), 'gi'), m => `<span class="highlight">${m}</span>`);
+    const venueParsed = parseVenue(e.venue);
+    const venueLine = venueParsed.location ? `${venueParsed.name} · ${venueParsed.location}` : venueParsed.name;
+    const hlVenue = venueLine.replace(new RegExp(escRegex(query), 'gi'), m => `<span class="highlight">${m}</span>`);
+    return `<div class="search-result-item" onclick="openSearchResult(${e.id})">
+      <div class="search-result-date">
+        <span class="search-result-date-month">${month}</span>
+        <span class="search-result-date-day">${day}</span>
+        <span class="search-result-date-year">${year}</span>
+      </div>
+      <div class="search-result-info">
+        <div class="search-result-artist">${hlArtist}</div>
+        <div class="search-result-meta">${hlVenue}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  if (matches.length > MAX_SHOWN) {
+    resultsEl.innerHTML += `<div class="search-result-count">${matches.length - MAX_SHOWN} more result${matches.length - MAX_SHOWN !== 1 ? 's' : ''}…</div>`;
+  }
+
+  resultsEl.classList.add('open');
+  setSearchDim(true);
+}
+
+function openSearchResult(id) {
+  document.getElementById('searchResults').classList.remove('open');
+  setSearchDim(false);
+  openModal(id);
+}
+
+function escRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(reg => console.log('Service Worker registered'))
+      .catch(err => console.log('Service Worker registration failed:', err));
+  });
+}
+</script>
+
+
+<script>
+function refreshPWA() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistration().then(reg => {
+      if (reg) {
+        reg.update();
+        caches.delete('event-diary-v1').then(() => {
+          window.location.reload();
+        });
+      }
+    });
+  }
+}
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const syncBtn = document.getElementById("syncButton");
+  if (syncBtn) {
+    syncBtn.addEventListener("click", function() {
+      // Run after existing sync logic completes
+      setTimeout(function() {
+        if (typeof refreshPWA === "function") {
+          refreshPWA();
+        }
+      }, 500);
+    });
+  }
+});
+</script>
+
+</body>
+</html>
