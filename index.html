@@ -32,12 +32,11 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 /* ── VIEWS ── */
 .view { display: none; min-height: 100vh; }
 .view.active { display: block; }
-#main-view { padding-bottom: calc(32px + var(--safe-bottom)); }
+#main-view { padding-bottom: calc(32px + var(--safe-bottom)); overscroll-behavior-y: contain; }
 
 /* ── STICKY HEADER ── */
 .sticky-header {
-  position: sticky; top: 0; z-index: 100;
-  background: linear-gradient(180deg, var(--bg) 70%, transparent 100%);
+  /* No longer sticky - scrolls with content */
   padding: calc(var(--safe-top) + 16px) 20px 12px;
   pointer-events: none;
 }
@@ -323,24 +322,20 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
   padding: 11px 20px; border-bottom: 1px solid rgba(255,255,255,0.04);
   font-size: 14px; color: var(--text-mid);
   display: flex; align-items: baseline; gap: 10px;
+  cursor: pointer; transition: background 0.15s;
 }
+.stat-list-item:active { background: var(--surface2); }
 .stat-list-item:last-child { border-bottom: none; }
 .stat-list-item-main { flex: 1; }
 .stat-list-item-name-row { display: flex; align-items: baseline; gap: 5px; }
-.stat-list-item-sub { font-size: 11px; color: var(--text-dim); }
+.stat-list-item-sub { font-size: 11px; color: var(--text-dim); line-height: 1.3; }
 .stat-list-item-date { font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
 .stat-list-item-count { font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
-.stat-list-link { color: var(--gold); text-decoration: none; cursor: pointer; font-family: 'DM Serif Display', serif; font-size: 15px; }
-.stat-list-link:active { opacity: 0.7; }
+.stat-list-link { color: var(--gold); text-decoration: none; font-family: 'DM Serif Display', serif; font-size: 15px; }
 
 /* ── HIGHLIGHT ── */
 .highlight { color: var(--gold); font-weight: 600; }
 </style>
-
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0d0d0f">
-<link rel="apple-touch-icon" href="icon-180.png">
-
 </head>
 <body>
 
@@ -508,8 +503,9 @@ function load(key) {
 //  INIT
 // ══════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', async () => {
-  const savedUrl = load(STORAGE_KEYS.sheetUrl);
-  if (savedUrl) document.getElementById('sheetUrlInput').value = savedUrl;
+  const DEFAULT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTbDktqpGqlQh20V-1MrB6ppZ0E1HzxdRKbjCVdpT1sIzHoBeAGQQD8BjNoAiA8FnWqJv12fqiO5Ov9/pub?output=csv';
+  const savedUrl = load(STORAGE_KEYS.sheetUrl) || DEFAULT_SHEET_URL;
+  document.getElementById('sheetUrlInput').value = savedUrl;
 
   const savedEvents = load(STORAGE_KEYS.events);
   if (savedEvents && savedEvents.length) {
@@ -526,11 +522,48 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   updateLastSyncLabel();
   setupScrollWatcher();
+  setupPullToRefresh();
   document.getElementById('searchInput').addEventListener('input', onSearchInput);
   document.getElementById('searchInput').addEventListener('focus', onSearchFocus);
   // blur handled by onDocClick
   document.addEventListener('click', onDocClick);
 });
+
+// Pull-to-refresh support (mobile)
+function setupPullToRefresh() {
+  const mainView = document.getElementById('main-view');
+  let touchStartY = 0;
+  let isPulling = false;
+
+  mainView.addEventListener('touchstart', (e) => {
+    if (mainView.scrollTop === 0) {
+      touchStartY = e.touches[0].clientY;
+    }
+  }, { passive: true });
+
+  mainView.addEventListener('touchmove', (e) => {
+    if (mainView.scrollTop === 0) {
+      const touchY = e.touches[0].clientY;
+      if (touchY > touchStartY + 100 && !isPulling) {
+        isPulling = true;
+        refreshData();
+      }
+    }
+  }, { passive: true });
+
+  mainView.addEventListener('touchend', () => {
+    isPulling = false;
+  }, { passive: true });
+}
+
+async function refreshData() {
+  const savedUrl = load(STORAGE_KEYS.sheetUrl);
+  if (!savedUrl) return;
+  
+  showLoadingState();
+  await autoResync(savedUrl);
+  updateLastSyncLabel();
+}
 
 function showLoadingState() {
   document.getElementById('eventsContainer').innerHTML = `
@@ -1058,9 +1091,9 @@ function openArtistsModal() {
   const html = sorted.map(({ display, count }) => {
     const idx = window._statItems.length;
     window._statItems.push({ type: 'artist', searchTerm: display });
-    return `<div class="stat-list-item">
+    return `<div class="stat-list-item" onclick="statItemClick(${idx})">
       <div class="stat-list-item-main">
-        <a class="stat-list-link" onclick="statItemClick(${idx})">${escHtml(display)}</a>
+        <span class="stat-list-link">${escHtml(display)}</span>
         ${count > 1 ? `<span class="stat-list-item-count">(${count})</span>` : ''}
       </div>
     </div>`;
@@ -1107,10 +1140,10 @@ function openVenuesModal() {
     const idx = window._statItems.length;
     // Search by venue name only — not "name city, state" which breaks matching
     window._statItems.push({ type: 'venue', searchTerm: name });
-    return `<div class="stat-list-item">
+    return `<div class="stat-list-item" onclick="statItemClick(${idx})">
       <div class="stat-list-item-main">
         <span class="stat-list-item-name-row">
-          <a class="stat-list-link" onclick="statItemClick(${idx})">${escHtml(name)}</a>
+          <span class="stat-list-link">${escHtml(name)}</span>
           ${count > 1 ? `<span class="stat-list-item-count">(${count})</span>` : ''}
         </span>
         ${location ? `<br><span class="stat-list-item-sub">${escHtml(location)}</span>` : ''}
@@ -1151,9 +1184,9 @@ function openSetlistsModal() {
     });
 
   const html = rows.map(({ e, displayName }) =>
-    `<div class="stat-list-item">
+    `<div class="stat-list-item" onclick="closeStatModal(); openModal(${e.id})">
       <div class="stat-list-item-main">
-        <a class="stat-list-link" onclick="closeStatModal(); openModal(${e.id})">${escHtml(displayName)}</a>
+        <span class="stat-list-link">${escHtml(displayName)}</span>
       </div>
       <span class="stat-list-item-date">${formatDateShort(e.date)}</span>
     </div>`
@@ -1715,49 +1748,18 @@ function openSearchResult(id) {
 
 function escRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
 </script>
-
 <script>
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
+  window.addEventListener('load', function() {
     navigator.serviceWorker.register('./service-worker.js')
-      .then(reg => console.log('Service Worker registered'))
-      .catch(err => console.log('Service Worker registration failed:', err));
+      .then(function(registration) {
+        console.log('Service Worker registered:', registration.scope);
+      })
+      .catch(function(error) {
+        console.log('Service Worker registration failed:', error);
+      });
   });
 }
 </script>
-
-
-<script>
-function refreshPWA() {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistration().then(reg => {
-      if (reg) {
-        reg.update();
-        caches.delete('event-diary-v1').then(() => {
-          window.location.reload();
-        });
-      }
-    });
-  }
-}
-</script>
-
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  const syncBtn = document.getElementById("syncButton");
-  if (syncBtn) {
-    syncBtn.addEventListener("click", function() {
-      // Run after existing sync logic completes
-      setTimeout(function() {
-        if (typeof refreshPWA === "function") {
-          refreshPWA();
-        }
-      }, 500);
-    });
-  }
-});
-</script>
-
 </body>
 </html>
