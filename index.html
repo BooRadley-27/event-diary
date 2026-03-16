@@ -2,11 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Event Diary">
 <title>Event Diary</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-512.png">
+<meta name="theme-color" content="#0d0d0f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -57,17 +60,21 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 .date-range-sep { font-size: 11px; color: var(--text-dim); }
 
 /* ── SETTINGS BUTTON ── */
-.settings-btn {
-  position: fixed; top: calc(var(--safe-top) + 14px); right: 18px; z-index: 200;
+.settings-btn, .sync-btn-top {
+  position: fixed; top: calc(var(--safe-top) + 14px); z-index: 200;
   width: 32px; height: 32px;
   background: rgba(30,30,36,0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border); border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; transition: opacity 0.25s, transform 0.2s; pointer-events: all;
 }
-.settings-btn:active { transform: scale(0.9); }
-.settings-btn.hidden { opacity: 0; pointer-events: none; }
-.settings-btn svg { width: 15px; height: 15px; color: var(--text-mid); }
+.settings-btn { right: 18px; }
+.sync-btn-top { right: 58px; } /* 32px button + 8px gap + 18px margin */
+.settings-btn:active, .sync-btn-top:active { transform: scale(0.9); }
+.settings-btn.hidden, .sync-btn-top.hidden { opacity: 0; pointer-events: none; }
+.settings-btn svg, .sync-btn-top svg { width: 15px; height: 15px; color: var(--text-mid); }
+.sync-btn-top.syncing { animation: spin 1s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 /* ── STATS GRID ── */
 .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 16px; pointer-events: all; }
@@ -90,44 +97,20 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
   outline: none; transition: border-color 0.2s;
 }
 .search-input::placeholder { color: var(--text-dim); }
+.search-input::-webkit-search-cancel-button { display: none; }
 .search-input:focus { border-color: rgba(232,197,71,0.4); }
 .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-dim); pointer-events: none; }
 .search-clear {
   position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-  width: 20px; height: 20px; background: var(--surface2); border-radius: 50%;
+  width: 20px; height: 20px;
   display: none; align-items: center; justify-content: center;
-  cursor: pointer; border: none; color: var(--text-dim);
+  cursor: pointer; border: none; 
+  background: rgba(255,255,255,0.08); 
+  border-radius: 50%;
+  color: var(--text-dim);
+  padding: 0;
 }
 .search-clear.visible { display: flex; }
-
-/* ── SEARCH DROPDOWN ── */
-.search-dim-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-  z-index: 140; display: none; pointer-events: auto;
-}
-.search-dim-overlay.active { display: block; }
-.search-results {
-  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
-  background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius);
-  z-index: 150; max-height: 320px; overflow-y: auto; display: none;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
-}
-.search-results.open { display: block; }
-.search-result-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.15s; }
-.search-result-item:last-child { border-bottom: none; }
-.search-result-item:active { background: var(--gold-dim); }
-.search-result-item { padding: 11px 16px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.15s; display: flex; align-items: center; gap: 12px; }
-.search-result-date { flex-shrink: 0; text-align: center; width: 36px; }
-.search-result-date-month { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); display: block; }
-.search-result-date-day { font-family: 'Bebas Neue', sans-serif; font-size: 20px; line-height: 1; color: var(--text); display: block; }
-.search-result-date-year { font-size: 9px; font-weight: 500; color: var(--text-dim); display: block; margin-top: 1px; }
-.search-result-info { flex: 1; min-width: 0; }
-.search-result-artist { font-family: 'DM Serif Display', serif; font-size: 15px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.search-result-meta { font-size: 11px; color: var(--text-dim); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.search-result-tag { display: inline-block; font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 1px 5px; border-radius: 3px; margin-right: 3px; }
-.tag-artist { background: rgba(232,197,71,0.12); color: var(--gold); }
-.tag-venue { background: rgba(92,224,138,0.1); color: var(--green); }
-.search-result-count { font-size: 11px; color: var(--text-dim); padding: 8px 16px; border-top: 1px solid var(--border); text-align: center; font-style: italic; }
 
 /* ── CONTENT ── */
 .content-area { padding: 0 20px; }
@@ -146,13 +129,14 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 }
 .event-card:active { background: var(--surface2); }
 .event-card-main { display: flex; align-items: center; padding: 14px 16px; gap: 14px; }
-.event-date-block { flex-shrink: 0; text-align: center; width: 46px; }
+.event-date-block { flex-shrink: 0; text-align: center; width: 46px; align-self: center; }
 .event-date-month { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); display: block; }
 .event-date-day { font-family: 'Bebas Neue', sans-serif; font-size: 28px; line-height: 1; color: var(--text); display: block; }
 .event-info { flex: 1; min-width: 0; }
-.event-artist { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--text); line-height: 1.25; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.event-artist { font-family: 'DM Sans', sans-serif; font-size: 17px; color: var(--text); line-height: 1.25; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.event-artist-line { font-family: 'DM Sans', sans-serif; font-size: 17px; color: var(--text); line-height: 1.35; display: block; }
 .event-venue { font-size: 12px; color: var(--text-dim); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.event-setlist-badge { flex-shrink: 0; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 9px; border-radius: 6px; border: 1px solid; }
+.event-setlist-badge { flex-shrink: 0; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 9px; border-radius: 6px; border: 1px solid; align-self: center; }
 .setlist-yes { color: var(--gold); border-color: rgba(232,197,71,0.5); background: rgba(232,197,71,0.08); }
 .setlist-no { color: var(--text-dim); border-color: var(--border); background: transparent; }
 
@@ -225,7 +209,11 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
   overflow-y: auto; padding: 0 0 24px;
   animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
   position: relative;
+  /* Hide scrollbar but keep functionality */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
 }
+.detail-modal::-webkit-scrollbar { display: none; } /* Chrome/Safari/Opera */
 @keyframes popIn { from { opacity: 0; transform: scale(0.93); } to { opacity: 1; transform: scale(1); } }
 .modal-close-btn {
   position: absolute; top: 14px; right: 14px;
@@ -238,7 +226,7 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 .modal-content { padding: 0 20px; }
 .modal-date-tag { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; display: block; }
 .modal-artists { margin-bottom: 6px; }
-.modal-artist-line { font-family: 'DM Serif Display', serif; font-size: 24px; line-height: 1.2; color: var(--text); display: block; }
+.modal-artist-line { font-family: 'DM Sans', sans-serif; font-size: 24px; line-height: 1.2; color: var(--text); display: block; }
 .modal-venue { font-size: 15px; color: var(--text-mid); margin-bottom: 2px; margin-top: 0; font-weight: 500; display: block; }
 .modal-venue-location { font-size: 13px; color: var(--text-dim); display: block; }
 .modal-venue-block { display: block; text-decoration: none; margin-top: 4px; margin-bottom: 16px; transition: opacity 0.15s; }
@@ -328,16 +316,26 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 .stat-list-item:last-child { border-bottom: none; }
 .stat-list-item-main { flex: 1; }
 .stat-list-item-name-row { display: flex; align-items: baseline; gap: 5px; }
-.stat-list-item-sub { font-size: 11px; color: var(--text-dim); line-height: 1.3; }
+.stat-list-item-sub { font-size: 11px; color: var(--text-dim); }
 .stat-list-item-date { font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
 .stat-list-item-count { font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
-.stat-list-link { color: var(--gold); text-decoration: none; font-family: 'DM Serif Display', serif; font-size: 15px; }
+.stat-list-link { color: var(--gold); text-decoration: none; font-family: 'DM Sans', sans-serif; font-size: 15px; }
 
 /* ── HIGHLIGHT ── */
 .highlight { color: var(--gold); font-weight: 600; }
 </style>
 </head>
 <body>
+
+<!-- SYNC BUTTON -->
+<button class="sync-btn-top" id="syncBtnTop" onclick="quickSync()" aria-label="Sync">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 2v6h-6"/>
+    <path d="M3 12a9 9 0 0 1 15-6.7L21 8"/>
+    <path d="M3 22v-6h6"/>
+    <path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
+  </svg>
+</button>
 
 <!-- SETTINGS GEAR -->
 <button class="settings-btn" id="settingsBtn" onclick="showSettings()" aria-label="Settings">
@@ -379,8 +377,7 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
       <button class="search-clear" id="searchClear" onclick="clearSearch()">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
-      <div class="search-dim-overlay" id="searchDimOverlay" onclick="clearSearch()"></div>
-      <div class="search-results" id="searchResults"></div>
+
     </div>
   </div>
   <div class="content-area" id="contentArea">
@@ -522,48 +519,12 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   updateLastSyncLabel();
   setupScrollWatcher();
-  setupPullToRefresh();
   document.getElementById('searchInput').addEventListener('input', onSearchInput);
-  document.getElementById('searchInput').addEventListener('focus', onSearchFocus);
-  // blur handled by onDocClick
+  // Click outside handled by onDocClick
   document.addEventListener('click', onDocClick);
 });
 
-// Pull-to-refresh support (mobile)
-function setupPullToRefresh() {
-  const mainView = document.getElementById('main-view');
-  let touchStartY = 0;
-  let isPulling = false;
 
-  mainView.addEventListener('touchstart', (e) => {
-    if (mainView.scrollTop === 0) {
-      touchStartY = e.touches[0].clientY;
-    }
-  }, { passive: true });
-
-  mainView.addEventListener('touchmove', (e) => {
-    if (mainView.scrollTop === 0) {
-      const touchY = e.touches[0].clientY;
-      if (touchY > touchStartY + 100 && !isPulling) {
-        isPulling = true;
-        refreshData();
-      }
-    }
-  }, { passive: true });
-
-  mainView.addEventListener('touchend', () => {
-    isPulling = false;
-  }, { passive: true });
-}
-
-async function refreshData() {
-  const savedUrl = load(STORAGE_KEYS.sheetUrl);
-  if (!savedUrl) return;
-  
-  showLoadingState();
-  await autoResync(savedUrl);
-  updateLastSyncLabel();
-}
 
 function showLoadingState() {
   document.getElementById('eventsContainer').innerHTML = `
@@ -870,6 +831,37 @@ async function fetchCsvText(csvUrl) {
   throw new Error(`All fetch methods failed:\n${errors.join('\n')}\n\nMake sure your sheet is published as CSV (File → Share → Publish to web → CSV).`);
 }
 
+async function quickSync() {
+  const btn = document.getElementById('syncBtnTop');
+  if (!btn) return;
+  
+  // Add spinning animation
+  btn.classList.add('syncing');
+  btn.disabled = true;
+  
+  const urlInput = document.getElementById('sheetUrlInput');
+  const savedUrl = load(STORAGE_KEYS.sheetUrl);
+  
+  if (!savedUrl) {
+    btn.classList.remove('syncing');
+    btn.disabled = false;
+    alert('No sheet URL configured. Please go to Settings to set up your Google Sheet.');
+    return;
+  }
+  
+  // Temporarily set the input value for syncSheet to read
+  const originalValue = urlInput.value;
+  urlInput.value = savedUrl;
+  
+  // Call the existing sync function
+  await syncSheet();
+  
+  // Restore original value and remove spinner
+  urlInput.value = originalValue;
+  btn.classList.remove('syncing');
+  btn.disabled = false;
+}
+
 async function syncSheet() {
   // Clear any legacy cached data from older app versions
   ['eventdiary_events_v2','eventdiary_events','eventdiary_lastsync','eventdiary_setlists_v2','eventdiary_setlists'].forEach(k => {
@@ -1016,7 +1008,13 @@ function buildEventCard(e) {
   const badge = hasSetlist
     ? `<div class="event-setlist-badge setlist-yes">Setlist</div>`
     : '';
-  const displayArtists = escHtml(artistsToCommaList(e.artists));
+  
+  // For multi-artist events, render each on its own line
+  const artists = parseArtists(e.artists);
+  const artistsHtml = artists.length > 1
+    ? artists.map(a => `<span class="event-artist-line">${escHtml(a)}</span>`).join('')
+    : `<span class="event-artist">${escHtml(artists[0] || '')}</span>`;
+  
   return `<div class="event-card" id="card-${e.id}" onclick="openModal(${e.id})">
     <div class="event-card-main">
       <div class="event-date-block">
@@ -1024,7 +1022,7 @@ function buildEventCard(e) {
         <span class="event-date-day">${day}</span>
       </div>
       <div class="event-info">
-        <span class="event-artist">${displayArtists}</span>
+        ${artistsHtml}
         <div class="event-venue">${escHtml(venueDisplayShort(e.venue))}</div>
       </div>
       ${badge}
@@ -1105,21 +1103,14 @@ function statItemClick(idx) {
   const item = window._statItems[idx];
   if (!item) return;
   closeStatModal();
-  // Populate search input and show dropdown (same as if user typed the name)
-  const input = document.getElementById('searchInput');
-  input.value = item.searchTerm;  // Just the name, not "name city state"
-  document.getElementById('searchClear').classList.add('visible');
-  document.getElementById('main-view').scrollTo({ top: 0, behavior: 'smooth' });
-  // Show dropdown after modal close animation settles
-  setTimeout(() => showSearchDropdown(item.searchTerm), 50);
-}
-
-function triggerArtistSearch(name) {
-  const input = document.getElementById('searchInput');
-  input.value = name;
-  document.getElementById('searchClear').classList.add('visible');
-  showSearchDropdown(name);
-  document.getElementById('main-view').scrollTo({ top: 0, behavior: 'smooth' });
+  // Wait for modal close animation, then populate search and filter
+  setTimeout(() => {
+    const input = document.getElementById('searchInput');
+    input.value = item.searchTerm;
+    document.getElementById('searchClear').classList.add('visible');
+    filterEventsBySearch(item.searchTerm);
+    document.getElementById('main-view').scrollTo({ top: 0, behavior: 'smooth' });
+  }, 100);
 }
 
 function openVenuesModal() {
@@ -1146,19 +1137,11 @@ function openVenuesModal() {
           <span class="stat-list-link">${escHtml(name)}</span>
           ${count > 1 ? `<span class="stat-list-item-count">(${count})</span>` : ''}
         </span>
-        ${location ? `<br><span class="stat-list-item-sub">${escHtml(location)}</span>` : ''}
+        ${location ? `<span class="stat-list-item-sub"> ${escHtml(location)}</span>` : ''}
       </div>
     </div>`;
   }).join('');
   openStatModal(`Venues (${sorted.length})`, html);
-}
-
-function triggerVenueSearch(term) {
-  const input = document.getElementById('searchInput');
-  input.value = term;
-  document.getElementById('searchClear').classList.add('visible');
-  showSearchDropdown(term);
-  document.getElementById('main-view').scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function openSetlistsModal() {
@@ -1312,17 +1295,38 @@ function saveSetlistCache() { save(STORAGE_KEYS.setlistCache, setlistCache); }
 async function fetchSetlistHtml(url) {
   if (setlistCache[url] && setlistCache[url].sets) return { cached: setlistCache[url] };
   const proxies = [
+    // Try direct fetch first (will fail due to CORS but worth trying)
+    async () => {
+      const r = await fetch(url, { cache: 'no-cache', mode: 'cors' });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.text();
+    },
+    // Cloudflare CORS proxy
+    async () => {
+      const r = await fetch(`https://cors-anywhere.herokuapp.com/${url}`, { 
+        cache: 'no-cache',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.text();
+    },
+    // AllOrigins
+    async () => {
+      const r = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, { cache: 'no-cache' });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.text();
+    },
+    // Corsproxy
     async () => {
       const r = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`, { cache: 'no-cache' });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return r.text();
     },
+    // ThingProxy
     async () => {
-      const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, { cache: 'no-cache' });
+      const r = await fetch(`https://thingproxy.freeboard.io/fetch/${url}`, { cache: 'no-cache' });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      const j = await r.json();
-      if (!j || !j.contents) throw new Error('empty');
-      return decodeProxyResponse(j.contents);
+      return r.text();
     },
   ];
   for (const tryProxy of proxies) {
@@ -1344,7 +1348,7 @@ async function loadSetlist(event, url, _unused) {
   if (cached) { container.innerHTML = renderSetlistHTML(cached, url, artists); return; }
   if (!html) {
     container.innerHTML = `<p class="setlist-error">Could not load setlist automatically.</p>
-      <p class="setlist-source" style="margin-top:8px"><a class="setlist-link" href="${escHtml(url)}" target="_blank">View on setlist.fm ↗</a></p>`;
+      <p class="setlist-source" style="margin-top:8px"><a class="setlist-link" href="${escHtml(url)}" target="_blank">View on setlist.fm</a></p>`;
     return;
   }
   const parsed = parseSetlistFm(html);
@@ -1364,7 +1368,7 @@ async function loadSetlistInto(containerId, url, artists) {
   if (cached) { container.innerHTML = renderSetlistHTML(cached, url, artists); return; }
   if (!html) {
     container.innerHTML = `<p class="setlist-error">Could not load.</p>
-      <p class="setlist-source"><a class="setlist-link" href="${escHtml(url)}" target="_blank">View on setlist.fm ↗</a></p>`;
+      <p class="setlist-source"><a class="setlist-link" href="${escHtml(url)}" target="_blank">View on setlist.fm</a></p>`;
     return;
   }
   const parsed = parseSetlistFm(html);
@@ -1539,7 +1543,7 @@ function isSetHeader(label) {
 function renderSetlistHTML(parsed, url, artists) {
   if (!parsed.sets || !parsed.sets.length || !parsed.sets.some(s => s.songs && s.songs.length)) {
     return `<p class="setlist-error">Could not load setlist automatically.</p>
-      <p class="setlist-source" style="margin-top:6px"><a class="setlist-link" href="${escHtml(url)}" target="_blank">View on setlist.fm ↗</a></p>`;
+      <p class="setlist-source" style="margin-top:6px"><a class="setlist-link" href="${escHtml(url)}" target="_blank">View on setlist.fm</a></p>`;
   }
 
   // Header logic:
@@ -1605,7 +1609,7 @@ function renderSetlistHTML(parsed, url, artists) {
     html += `</ol>`;
   });
 
-  html += `<p class="setlist-source">Via <a class="setlist-link" href="${escHtml(url)}" target="_blank">setlist.fm ↗</a></p>`;
+  html += `<p class="setlist-source">Via <a class="setlist-link" href="${escHtml(url)}" target="_blank">setlist.fm</a></p>`;
   return html;
 }
 
@@ -1620,35 +1624,22 @@ function onSearchInput(e) {
   clearTimeout(searchDebounce);
   searchDebounce = setTimeout(() => performSearch(val), 180);
 }
-function onSearchFocus() {
-  const val = document.getElementById('searchInput').value.trim();
-  if (val.length >= 1) showSearchDropdown(val);
-}
 // onSearchBlur intentionally removed — onDocClick handles clearing on outside click
 function onDocClick(e) {
   const input = document.getElementById('searchInput');
-  const results = document.getElementById('searchResults');
   const clearBtn = document.getElementById('searchClear');
-  const dimOverlay = document.getElementById('searchDimOverlay');
-  // If click is outside search input, dropdown, and clear button → clear everything
-  if (!results.contains(e.target) && e.target !== input && e.target !== clearBtn && !clearBtn.contains(e.target) && e.target !== dimOverlay) {
+  // If click is outside search input and clear button → clear
+  if (e.target !== input && e.target !== clearBtn && !clearBtn.contains(e.target)) {
     if (input.value.trim()) {
       input.value = '';
       clearBtn.classList.remove('visible');
-      results.classList.remove('open');
-      setSearchDim(false);
       renderAll();
-    } else {
-      results.classList.remove('open');
-      setSearchDim(false);
     }
   }
 }
 function clearSearch() {
   document.getElementById('searchInput').value = '';
   document.getElementById('searchClear').classList.remove('visible');
-  document.getElementById('searchResults').classList.remove('open');
-  setSearchDim(false);
   renderAll();
 }
 
@@ -1668,12 +1659,10 @@ function matchingEvents(query) {
 function performSearch(query) {
   if (!query) { 
     renderAll();
-    document.getElementById('searchResults').classList.remove('open');
-    setSearchDim(false);
     return; 
   }
-  // Show dropdown with suggestions
-  showSearchDropdown(query);
+  // Filter main list to matching events
+  filterEventsBySearch(query);
 }
 
 // Actually filter the main event list (for when user hits Enter or clicks a suggestion)
@@ -1691,73 +1680,15 @@ function filterEventsBySearch(query) {
   renderAll(results);
 }
 
-function setSearchDim(on) {
-  const overlay = document.getElementById('searchDimOverlay');
-  if (overlay) overlay.classList.toggle('active', on);
-}
-
-function showSearchDropdown(query) {
-  const resultsEl = document.getElementById('searchResults');
-  if (!query) { resultsEl.classList.remove('open'); setSearchDim(false); return; }
-
-  const matches = matchingEvents(query);
-
-  if (!matches.length) {
-    resultsEl.innerHTML = `<div class="search-result-count">No results for "${escHtml(query)}"</div>`;
-    resultsEl.classList.add('open');
-    setSearchDim(true);
-    return;
-  }
-
-  const MAX_SHOWN = 12;
-  const shown = matches.slice(0, MAX_SHOWN);
-
-  resultsEl.innerHTML = shown.map(e => {
-    const { month, day, year } = formatDateParts(e.date);
-    const artistDisplay = artistsToCommaList(e.artists);
-    const hlArtist = artistDisplay.replace(new RegExp(escRegex(query), 'gi'), m => `<span class="highlight">${m}</span>`);
-    const venueParsed = parseVenue(e.venue);
-    const venueLine = venueParsed.location ? `${venueParsed.name} · ${venueParsed.location}` : venueParsed.name;
-    const hlVenue = venueLine.replace(new RegExp(escRegex(query), 'gi'), m => `<span class="highlight">${m}</span>`);
-    return `<div class="search-result-item" onclick="openSearchResult(${e.id})">
-      <div class="search-result-date">
-        <span class="search-result-date-month">${month}</span>
-        <span class="search-result-date-day">${day}</span>
-        <span class="search-result-date-year">${year}</span>
-      </div>
-      <div class="search-result-info">
-        <div class="search-result-artist">${hlArtist}</div>
-        <div class="search-result-meta">${hlVenue}</div>
-      </div>
-    </div>`;
-  }).join('');
-
-  if (matches.length > MAX_SHOWN) {
-    resultsEl.innerHTML += `<div class="search-result-count">${matches.length - MAX_SHOWN} more result${matches.length - MAX_SHOWN !== 1 ? 's' : ''}…</div>`;
-  }
-
-  resultsEl.classList.add('open');
-  setSearchDim(true);
-}
-
-function openSearchResult(id) {
-  document.getElementById('searchResults').classList.remove('open');
-  setSearchDim(false);
-  openModal(id);
-}
-
 function escRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
 </script>
 <script>
+// Register service worker for PWA offline support
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('./service-worker.js')
-      .then(function(registration) {
-        console.log('Service Worker registered:', registration.scope);
-      })
-      .catch(function(error) {
-        console.log('Service Worker registration failed:', error);
-      });
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(reg => console.log('Service Worker registered'))
+      .catch(err => console.log('Service Worker registration failed:', err));
   });
 }
 </script>
