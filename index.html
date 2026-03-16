@@ -1295,36 +1295,31 @@ function saveSetlistCache() { save(STORAGE_KEYS.setlistCache, setlistCache); }
 async function fetchSetlistHtml(url) {
   if (setlistCache[url] && setlistCache[url].sets) return { cached: setlistCache[url] };
   const proxies = [
-    // Try direct fetch first (will fail due to CORS but worth trying)
+    // AllOrigins with raw endpoint (most reliable)
     async () => {
-      const r = await fetch(url, { cache: 'no-cache', mode: 'cors' });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.text();
-    },
-    // Cloudflare CORS proxy
-    async () => {
-      const r = await fetch(`https://cors-anywhere.herokuapp.com/${url}`, { 
+      const r = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, { 
         cache: 'no-cache',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        headers: { 'Accept': 'text/html' }
       });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return r.text();
     },
-    // AllOrigins
+    // AllOrigins with GET endpoint + content extraction
     async () => {
-      const r = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, { cache: 'no-cache' });
+      const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, { 
+        cache: 'no-cache' 
+      });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.text();
+      const j = await r.json();
+      if (!j || !j.contents) throw new Error('empty');
+      return decodeProxyResponse(j.contents);
     },
     // Corsproxy
     async () => {
-      const r = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`, { cache: 'no-cache' });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.text();
-    },
-    // ThingProxy
-    async () => {
-      const r = await fetch(`https://thingproxy.freeboard.io/fetch/${url}`, { cache: 'no-cache' });
+      const r = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`, { 
+        cache: 'no-cache',
+        headers: { 'Accept': 'text/html' }
+      });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return r.text();
     },
