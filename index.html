@@ -39,13 +39,12 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 
 /* ── STICKY HEADER ── */
 .sticky-header {
-  /* No longer sticky - scrolls with content */
   padding: calc(var(--safe-top) + 16px) 20px 12px;
   pointer-events: none;
 }
 
 /* ── HERO ── */
-.header-hero { transition: all 0.3s ease; overflow: hidden; pointer-events: all; }
+.header-hero { transition: all 0.3s ease; overflow: hidden; pointer-events: all; padding-left: 2px; }
 .eyebrow { font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px; }
 .hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(52px,14vw,72px); line-height: 0.92; letter-spacing: 0.02em; margin-bottom: 10px; }
 .hero-title span { color: var(--gold); }
@@ -69,7 +68,7 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
   cursor: pointer; transition: opacity 0.25s, transform 0.2s; pointer-events: all;
 }
 .settings-btn { right: 18px; }
-.sync-btn-top { right: 58px; } /* 32px button + 8px gap + 18px margin */
+.sync-btn-top { right: 58px; }
 .settings-btn:active, .sync-btn-top:active { transform: scale(0.9); }
 .settings-btn.hidden, .sync-btn-top.hidden { opacity: 0; pointer-events: none; }
 .settings-btn svg, .sync-btn-top svg { width: 15px; height: 15px; color: var(--text-mid); }
@@ -77,7 +76,82 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 /* ── STATS GRID ── */
-.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 16px; pointer-events: all; }
+.stats-toggle-btn {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 8px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+  color: var(--text-mid); cursor: pointer; margin-bottom: 16px;
+  transition: background 0.15s, color 0.15s; display: inline-flex; align-items: center; gap: 6px;
+  pointer-events: all;
+}
+.stats-toggle-btn:active { background: var(--surface); }
+.stats-toggle-btn.open { color: var(--gold); }
+.stats-toggle-btn svg { width: 12px; height: 12px; transition: transform 0.2s; }
+.stats-toggle-btn.open svg { transform: rotate(180deg); }
+
+/* Stats grid — 4 cols per row, each row gets its own row */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; pointer-events: all;
+  max-height: 0; overflow: hidden; opacity: 0; margin-bottom: 0;
+  transition: max-height 0.4s ease, opacity 0.2s ease, margin-bottom 0.3s ease;
+}
+.stats-grid.open {
+  max-height: 400px; opacity: 1; margin-bottom: 12px;
+}
+
+/* Sports stat row — same grid but visually separated */
+.stats-grid-sports {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; pointer-events: all;
+  max-height: 0; overflow: hidden; opacity: 0; margin-bottom: 0;
+  transition: max-height 0.4s ease, opacity 0.2s ease, margin-bottom 0.3s ease;
+  border-top: 1px solid var(--border); padding-top: 0;
+}
+.stats-grid-sports.open {
+  max-height: 200px; opacity: 1; margin-bottom: 12px; padding-top: 8px;
+}
+
+/* Type filter pills — wrap, never overflow */
+.type-filters {
+  display: flex; gap: 8px; flex-wrap: wrap; pointer-events: all;
+  max-height: 0; overflow: hidden; opacity: 0; margin-bottom: 0;
+  transition: max-height 0.4s ease, opacity 0.2s ease, margin-bottom 0.3s ease;
+}
+.type-filters.open {
+  max-height: 500px; opacity: 1; margin-bottom: 16px;
+}
+.type-filter-btn {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 20px;
+  padding: 4px 12px; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
+  color: var(--text-mid); cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; gap: 5px; flex-shrink: 0; white-space: nowrap;
+}
+.type-filter-btn:active { transform: scale(0.95); }
+.type-filter-btn.active {
+  background: var(--gold); color: #000; border-color: var(--gold); font-weight: 600;
+}
+
+/* Sports filter chips — same pill style */
+.sport-filter-btn {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 20px;
+  padding: 4px 12px; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
+  color: var(--text-mid); cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; gap: 5px; flex-shrink: 0; white-space: nowrap;
+}
+.sport-filter-btn:active { transform: scale(0.95); }
+.sport-filter-btn.active {
+  background: var(--gold-dim); border-color: rgba(232,197,71,0.5); color: var(--gold); font-weight: 600;
+}
+
+/* Divider label inside expanded panel */
+.stats-section-divider {
+  max-height: 0; overflow: hidden; opacity: 0; margin: 0;
+  transition: max-height 0.4s ease, opacity 0.2s ease, margin 0.3s ease;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-dim);
+}
+.stats-section-divider.open {
+  max-height: 30px; opacity: 1; margin-bottom: 6px;
+}
+
 .stat-card {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 12px 8px; text-align: center; cursor: pointer;
@@ -104,8 +178,8 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
   position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
   width: 20px; height: 20px;
   display: none; align-items: center; justify-content: center;
-  cursor: pointer; border: none; 
-  background: rgba(255,255,255,0.08); 
+  cursor: pointer; border: none;
+  background: rgba(255,255,255,0.08);
   border-radius: 50%;
   color: var(--text-dim);
   padding: 0;
@@ -122,7 +196,7 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 .year-group { margin-bottom: 32px; }
 .year-label { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.06em; color: var(--text-mid); margin-bottom: 10px; }
 
-/* ── EVENT CARD ── */
+/* ── EVENT CARD (concerts/non-sport) ── */
 .event-card {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
   margin-bottom: 8px; overflow: hidden; cursor: pointer; transition: border-color 0.2s, background 0.2s;
@@ -139,6 +213,34 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 .event-setlist-badge { flex-shrink: 0; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 9px; border-radius: 6px; border: 1px solid; align-self: center; }
 .setlist-yes { color: var(--gold); border-color: rgba(232,197,71,0.5); background: rgba(232,197,71,0.08); }
 .setlist-no { color: var(--text-dim); border-color: var(--border); background: transparent; }
+
+/* ── SPORT CARD ── */
+.sport-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  margin-bottom: 8px; overflow: hidden; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+  border-left: 3px solid transparent;
+}
+.sport-card:active { background: var(--surface2); }
+.sport-card-main { display: flex; align-items: center; padding: 11px 14px; gap: 12px; }
+.sport-date-block { flex-shrink: 0; text-align: center; width: 46px; align-self: center; }
+.sport-date-month { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); display: block; }
+.sport-date-day { font-family: 'Bebas Neue', sans-serif; font-size: 28px; line-height: 1; color: var(--text); display: block; }
+.logos-zone { flex-shrink: 0; display: flex; align-items: center; gap: 4px; width: 96px; justify-content: center; }
+.team-logo-col { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.logo-score { font-family: 'Bebas Neue', sans-serif; font-size: 14px; line-height: 1; color: var(--text-mid); letter-spacing: 0.04em; }
+.team-logo { width: 34px; height: 34px; object-fit: contain; }
+.team-logo-ph { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.vs-divider { font-size: 9px; font-weight: 700; color: var(--text-dim); flex-shrink: 0; }
+.sport-event-info { flex: 1; min-width: 0; }
+.event-matchup { font-size: 13.5px; font-weight: 500; color: var(--text); line-height: 1.35; display: block; }
+.event-matchup-away { display: block; }
+.event-matchup-vs { color: var(--text-dim); font-size: 11px; font-weight: 400; margin: 0 3px; }
+.event-matchup-home { display: block; }
+.event-sub { font-size: 11px; color: var(--text-dim); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+.result-pill { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; margin-top: 3px; }
+.result-pill.win { background: rgba(92,224,138,0.15); color: var(--green); border: 1px solid rgba(92,224,138,0.3); }
+.result-pill.loss { background: rgba(224,92,92,0.15); color: var(--red); border: 1px solid rgba(224,92,92,0.3); }
+.result-pill.draw { background: rgba(232,197,71,0.12); color: var(--gold); border: 1px solid rgba(232,197,71,0.3); }
 
 /* ── EMPTY / LOADING ── */
 .empty-state { text-align: center; padding: 60px 20px; color: var(--text-dim); }
@@ -188,13 +290,16 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 }
 .sync-btn:active { opacity: 0.8; transform: scale(0.98); }
 .sync-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.sync-btn-secondary { width: 100%; background: var(--surface2); color: var(--text-mid); font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px; padding: 13px; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
+.load-new-panel { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+.load-new-panel.open { display: block; }
 .sync-status { margin-top: 12px; font-size: 13px; border-radius: 8px; padding: 10px 12px; display: none; }
 .sync-status.success { display: block; background: rgba(92,224,138,0.1); color: var(--green); border: 1px solid rgba(92,224,138,0.2); }
 .sync-status.error { display: block; background: rgba(224,92,92,0.1); color: var(--red); border: 1px solid rgba(224,92,92,0.2); white-space: pre-wrap; word-break: break-word; font-size: 12px; }
 .sync-status.info { display: block; background: rgba(232,197,71,0.08); color: var(--gold); border: 1px solid rgba(232,197,71,0.2); }
 .last-sync-info { font-size: 12px; color: var(--text-dim); margin-top: 10px; text-align: center; }
 
-/* ── CENTER MODAL (replaces bottom sheet) ── */
+/* ── CENTER MODAL (events) ── */
 .detail-modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.8);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
@@ -209,11 +314,9 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
   overflow-y: auto; padding: 0 0 24px;
   animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
   position: relative;
-  /* Hide scrollbar but keep functionality */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none; -ms-overflow-style: none;
 }
-.detail-modal::-webkit-scrollbar { display: none; } /* Chrome/Safari/Opera */
+.detail-modal::-webkit-scrollbar { display: none; }
 @keyframes popIn { from { opacity: 0; transform: scale(0.93); } to { opacity: 1; transform: scale(1); } }
 .modal-close-btn {
   position: absolute; top: 14px; right: 14px;
@@ -278,7 +381,6 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 
 /* ── SPINNER ── */
 .spinner { width: 16px; height: 16px; border: 2px solid rgba(232,197,71,0.2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; flex-shrink: 0; }
-@keyframes spin { to { transform: rotate(360deg); } }
 
 /* ── GENERIC OVERLAY MODAL (for stat popups) ── */
 .stat-modal-overlay {
@@ -323,6 +425,86 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 
 /* ── HIGHLIGHT ── */
 .highlight { color: var(--gold); font-weight: 600; }
+
+/* ── SPORTS MODAL ── */
+.sports-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  z-index: 300; display: none; align-items: center; justify-content: center;
+  box-sizing: border-box; padding: calc(var(--safe-top) + 20px) 12px calc(var(--safe-bottom) + 20px);
+}
+.sports-modal-overlay.open { display: flex; }
+.sports-detail-modal {
+  width: 100%; max-width: 520px;
+  max-height: calc(100vh - var(--safe-top) - var(--safe-bottom) - 40px);
+  background: var(--surface); border-radius: 20px; border: 1px solid var(--border);
+  overflow-y: auto; padding: 0 0 28px;
+  animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  position: relative; scrollbar-width: none;
+}
+.sports-detail-modal::-webkit-scrollbar { display: none; }
+
+/* Sports modal scoreboard */
+.modal-team-record { font-size: 10px; color: var(--text-dim); text-align: center; margin-top: 3px; line-height: 1.4; min-height: 4px; }
+.modal-venue-str { font-size: 11px; color: var(--text-mid); margin-top: 3px; text-align: center; }
+.modal-final-str { font-size: 10px; color: var(--text-dim); margin-top: 2px; letter-spacing: 0.06em; }
+.modal-scores-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 6px 0 2px; }
+.modal-score-big { font-size: 52px; font-weight: 800; line-height: 1; color: var(--text); font-family: 'Bebas Neue', sans-serif; letter-spacing: -1px; }
+.modal-score-sep { font-size: 32px; font-weight: 300; color: var(--text-dim); line-height: 1; }
+.modal-scoreboard { display: flex; align-items: flex-start; justify-content: space-between; padding: 20px 20px 12px; gap: 8px; }
+.modal-team { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; min-width: 0; padding-top: 10px; }
+.modal-center { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; justify-content: flex-start; padding-top: 4px; }
+.modal-team-logo { width: 60px; height: 60px; object-fit: contain; }
+.modal-team-logo-ph { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 34px; }
+.modal-team-score { font-family: 'Bebas Neue', sans-serif; font-size: 48px; line-height: 1; color: var(--text); }
+.modal-team-score.win-score { color: var(--green); }
+.modal-team-score.loss-score { color: var(--text-mid); }
+.modal-team-name { font-size: 11px; font-weight: 600; color: var(--text-mid); text-align: center; line-height: 1.3; max-width: 100px; }
+.modal-result-pill { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 14px; border-radius: 6px; }
+.modal-result-pill.win { background: rgba(92,224,138,0.15); color: var(--green); border: 1px solid rgba(92,224,138,0.3); }
+.modal-result-pill.loss { background: rgba(224,92,92,0.15); color: var(--red); border: 1px solid rgba(224,92,92,0.3); }
+.modal-result-pill.draw { background: rgba(232,197,71,0.12); color: var(--gold); border: 1px solid rgba(232,197,71,0.3); }
+.modal-result-pill.none { background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border); }
+.modal-date-str { font-size: 11px; color: var(--text-dim); text-align: center; }
+
+/* ── BOX SCORE ── */
+.bs-section { margin-top: 4px; }
+.bs-section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.bs-loading { font-size: 13px; color: var(--text-dim); font-style: italic; display: flex; align-items: center; gap: 8px; padding: 8px 0; }
+.bs-error { font-size: 12px; color: var(--text-dim); font-style: italic; }
+.bs-link-btn { display: inline-flex; align-items: center; gap: 6px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 500; color: var(--text-mid); text-decoration: none; margin-top: 4px; }
+.bs-link-btn:hover { border-color: rgba(232,197,71,0.3); color: var(--gold); }
+.ls-wrap { overflow-x: auto; margin-bottom: 16px; scrollbar-width: none; }
+.ls-wrap::-webkit-scrollbar { display: none; }
+.ls-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 340px; }
+.ls-table th { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); padding: 5px 6px; text-align: center; border-bottom: 1px solid var(--border); }
+.ls-table th.ls-team-col { text-align: left; }
+.ls-table th.ls-tot { color: var(--gold); }
+.ls-table td { padding: 8px 6px; text-align: center; color: var(--text-mid); font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 0.03em; }
+.ls-table td.ls-team-col { font-family: inherit; font-size: inherit; text-align: left; display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+.ls-table tr:last-child td { border-bottom: none; }
+.ls-table td:last-child,.ls-table th:last-child { padding-right: 0; }
+.ls-logo { width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; }
+.ls-name { font-weight: 600; color: var(--text); font-size: 12px; }
+.ls-tot-val { font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: var(--gold); }
+.ls-rhe { color: var(--text-dim); font-size: 11px; }
+.ls-rhe-head { color: var(--text-dim); font-size: 9px; }
+.bs-tabs { display: flex; gap: 0; margin-bottom: 14px; border-bottom: 1px solid var(--border); }
+.bs-tab { flex: 1; padding: 9px 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); cursor: pointer; text-align: center; border-bottom: 2px solid transparent; transition: all 0.15s; background: none; border-top: none; border-left: none; border-right: none; }
+.bs-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+.bs-stat-section { margin-bottom: 14px; }
+.bs-stat-heading { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-mid); margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+.bs-stat-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.bs-stat-table th { font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); padding: 3px 4px; text-align: right; }
+.bs-stat-table th:first-child { text-align: left; padding-left: 0; }
+.bs-stat-table td { padding: 5px 4px; text-align: right; color: var(--text-mid); border-bottom: 1px solid rgba(255,255,255,0.03); }
+.bs-stat-table td:first-child { text-align: left; padding-left: 0; color: var(--text); }
+.bs-stat-table tr:last-child td { border-bottom: none; }
+.bs-player-name { font-weight: 500; }
+.bs-player-pos { color: var(--text-dim); font-size: 10px; margin-left: 3px; }
+
+/* List item for sports modals */
+.list-item-clickable { padding: 12px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
 </style>
 </head>
 <body>
@@ -356,28 +538,66 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
         <span class="date-range-sep">·</span>
         <span class="date-range-item">Latest: <strong id="dateLatest">—</strong></span>
       </div>
+      <button class="stats-toggle-btn" id="statsToggle" onclick="toggleStats()">
+        <span>Stats / Filters</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+
+      <!-- UNIFIED stats row: Artists, Teams, Players, Venues -->
       <div class="stats-grid" id="statsGrid">
-        <div class="stat-card no-click">
-          <span class="stat-number" id="statEvents">0</span><span class="stat-label">Events</span>
-        </div>
         <div class="stat-card" onclick="onStatClick('artists')" title="All artists">
           <span class="stat-number" id="statArtists">0</span><span class="stat-label">Artists</span>
+        </div>
+        <div class="stat-card" onclick="openTeamsList()" style="cursor:pointer">
+          <span class="stat-number" id="statTeams">0</span><span class="stat-label">Teams</span>
+        </div>
+        <div class="stat-card" onclick="openPlayersList()" style="cursor:pointer">
+          <span class="stat-number" id="statPlayers">0</span><span class="stat-label">Players</span>
         </div>
         <div class="stat-card" onclick="onStatClick('venues')" title="All venues">
           <span class="stat-number" id="statVenues">0</span><span class="stat-label">Venues</span>
         </div>
-        <div class="stat-card" onclick="onStatClick('setlists')" title="All setlists">
-          <span class="stat-number" id="statSetlists">0</span><span class="stat-label">Setlists</span>
-        </div>
+      </div>
+
+      <!-- FILTERS: event types + sport types, all wrapping -->
+      <div class="type-filters" id="typeFilters">
+        <!-- Event type filters -->
+        <button class="type-filter-btn active" onclick="filterByType('all')" data-type="all">
+          <span>All</span>
+        </button>
+        <button class="type-filter-btn" onclick="filterByType('concert')" data-type="concert">
+          <span>🎸</span><span>Concert</span>
+        </button>
+        <button class="type-filter-btn" onclick="filterByType('comedy')" data-type="comedy">
+          <span>😂</span><span>Comedy</span>
+        </button>
+        <button class="type-filter-btn" onclick="filterByType('speaker')" data-type="speaker">
+          <span>🎤</span><span>Speaker</span>
+        </button>
+        <button class="type-filter-btn" onclick="filterByType('play')" data-type="play">
+          <span>🎭</span><span>Play</span>
+        </button>
+        <button class="type-filter-btn" onclick="filterByType('magic')" data-type="magic">
+          <span>🪄</span><span>Magic</span>
+        </button>
+        <button class="type-filter-btn" onclick="filterByType('setlists')" data-type="setlists">
+          <span>📋</span><span>Setlists</span>
+        </button>
+        <!-- Sport type filters (built dynamically, seeded with Sports label) -->
+        <button class="type-filter-btn" onclick="filterByType('sports')" data-type="sports">
+          <span>🏟️</span><span>Sports</span>
+        </button>
+        <div id="sportChipsContainer" style="display:contents"></div>
       </div>
     </div>
     <div class="search-wrap">
       <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="search" class="search-input" id="searchInput" placeholder="Search artists, venues, notes…" autocomplete="off" autocorrect="off" spellcheck="false">
+      <input type="search" class="search-input" id="searchInput" placeholder="Search events, teams, venues…" autocomplete="off" autocorrect="off" spellcheck="false">
       <button class="search-clear" id="searchClear" onclick="clearSearch()">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
-
     </div>
   </div>
   <div class="content-area" id="contentArea">
@@ -393,62 +613,90 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
     </div>
     <h2 class="settings-title">Settings</h2>
   </div>
+
+  <!-- EVENT DIARY section -->
   <div class="settings-section">
-    <p class="settings-section-label">Data Source</p>
+    <p class="settings-section-label">Event Diary — Data Source</p>
     <div class="settings-card">
       <p class="settings-card-title">Google Sheet URL</p>
-      <p class="settings-card-body">Paste the published CSV URL of your Google Sheet below, then tap Sync. Your data will be preserved until you sync again.</p>
+      <p class="settings-card-body">Paste the published CSV URL of your Event Diary Google Sheet, then tap Sync.</p>
       <div class="url-input-wrap">
         <input type="url" class="url-input" id="sheetUrlInput" placeholder="https://docs.google.com/spreadsheets/d/…/pub?output=csv">
         <button class="sync-btn" id="syncBtn" onclick="syncSheet()">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
-          Sync Google Sheet
+          Sync Event Sheet
         </button>
         <div class="sync-status" id="syncStatus"></div>
         <p class="last-sync-info" id="lastSyncInfo"></p>
       </div>
     </div>
+    <div class="settings-card">
+      <p class="settings-card-title">Required Columns (Events Sheet)</p>
+      <p class="settings-card-body">
+        <code>Date</code> &nbsp;<code>Artist(s)</code> &nbsp;<code>Venue</code> &nbsp;<code>Attended With</code> &nbsp;<code>Type</code> &nbsp;<code>Notes</code> &nbsp;<code>Setlist</code>
+      </p>
+    </div>
   </div>
+
+  <!-- SPORTS DIARY section -->
+  <div class="settings-section">
+    <p class="settings-section-label">Sports Diary — Data Source</p>
+    <div class="settings-card">
+      <p class="settings-card-title">Google Sheet</p>
+      <p class="settings-card-body">Sync your sports events from a published Google Sheet CSV.</p>
+      <button class="sync-btn" id="sportsSyncBtn" onclick="syncSportsExisting()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+        Sync Sports Sheet
+      </button>
+      <button class="sync-btn-secondary" id="sportsLoadNewBtn" onclick="toggleSportsLoadNew()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        Load New Sports Sheet
+      </button>
+      <div class="load-new-panel" id="sportsLoadNewPanel">
+        <input type="url" class="url-input" id="sportsSheetUrlInput" placeholder="https://docs.google.com/spreadsheets/d/…/pub?output=csv">
+        <button class="sync-btn" id="sportsLoadNewSyncBtn" onclick="syncNewSportsSheet()">Load Sheet</button>
+      </div>
+      <div class="sync-status" id="sportsSyncStatus"></div>
+      <p class="last-sync-info" id="sportsLastSyncInfo"></p>
+    </div>
+    <div class="settings-card">
+      <p class="settings-card-title">Required Columns (Sports Sheet)</p>
+      <p class="settings-card-body">
+        <code>Date</code> <code>Title</code> <code>Venue</code> <code>Result</code> <code>Score</code> <code>Notes</code> <code>Type</code> <code>Attended With</code><br><br>
+        <strong>Title</strong>: "Team A v Team B"<br>
+        <strong>Result</strong>: Win / Loss / Draw<br>
+        <strong>Type</strong>: Baseball / Football / Basketball / Hockey / Soccer
+      </p>
+    </div>
+  </div>
+
   <div class="settings-section">
     <p class="settings-section-label">How to Publish Your Google Sheet</p>
     <div class="settings-card">
       <p class="settings-card-title">Step-by-step Setup</p>
-      <p class="settings-card-body">Your sheet must be <strong>published as CSV</strong> so this app can read it.</p>
       <ol>
         <li>Open your Google Sheet in a browser.</li>
         <li>Click <strong>File → Share → Publish to web</strong>.</li>
-        <li>In the first dropdown, choose the specific sheet tab (e.g. "Sheet1").</li>
-        <li>In the second dropdown, choose <strong>Comma-separated values (.csv)</strong>.</li>
-        <li>Click <strong>Publish</strong> and confirm.</li>
-        <li>Copy the URL — it looks like:<br><code>https://docs.google.com/spreadsheets/d/YOUR_ID/pub?gid=0&single=true&output=csv</code></li>
-        <li>Paste that URL above and tap <strong>Sync Google Sheet</strong>.</li>
+        <li>Choose the sheet tab → <strong>Comma-separated values (.csv)</strong>.</li>
+        <li>Click <strong>Publish</strong> and copy the URL.</li>
+        <li>Paste that URL above and tap <strong>Sync</strong>.</li>
       </ol>
     </div>
     <div class="settings-card">
-      <p class="settings-card-title">Required Column Headers (Row 1)</p>
-      <p class="settings-card-body">
-        <code>Date</code> &nbsp;<code>Artist(s)</code> &nbsp;<code>Venue</code> &nbsp;<code>Attended With</code> &nbsp;<code>Type</code> &nbsp;<code>Notes</code> &nbsp;<code>Setlist</code><br><br>
-        <strong>Date</strong>: <code>YYYY-MM-DD</code> format.<br>
-        <strong>Artist(s)</strong>: Multiple artists on separate lines within the cell — the app will display them with commas in list view and on separate lines in detail view.<br>
-        <strong>Venue</strong>: Include city and state in the venue name (e.g. "The Sinkhole St. Louis, MO").<br>
-        <strong>Setlist</strong>: Leave blank or paste a setlist.fm URL.
-      </p>
-    </div>
-    <div class="settings-card">
       <p class="settings-card-title">Add to iPhone Home Screen</p>
-      <p class="settings-card-body">Open in <strong>Safari</strong>. Tap the <strong>Share</strong> button, then <strong>"Add to Home Screen"</strong>. Launches full-screen like a native app.</p>
+      <p class="settings-card-body">Open in <strong>Safari</strong>. Tap the <strong>Share</strong> button, then <strong>"Add to Home Screen"</strong>.</p>
     </div>
   </div>
   <div class="settings-section">
     <p class="settings-section-label">About</p>
     <div class="settings-card">
       <p class="settings-card-title">Event Diary</p>
-      <p class="settings-card-body">Data is stored locally on your device. Setlists are fetched from setlist.fm and cached locally for offline viewing.</p>
+      <p class="settings-card-body">All data stored locally on your device. Sports box scores fetched from ESPN, MLB, and NHL APIs. Setlists fetched from setlist.fm and cached locally.</p>
     </div>
   </div>
 </div>
 
-<!-- ════════ EVENT DETAIL MODAL (center popup) ════════ -->
+<!-- ════════ EVENT DETAIL MODAL ════════ -->
 <div class="detail-modal-overlay" id="detailModal" onclick="closeModalIfOutside(event)">
   <div class="detail-modal" id="detailModalContent">
     <button class="modal-close-btn" onclick="closeModal()">
@@ -456,6 +704,16 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
     </button>
     <div class="modal-top-pad"></div>
     <div class="modal-content" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ════════ SPORT DETAIL MODAL ════════ -->
+<div class="sports-modal-overlay" id="sportsDetailModal" onclick="closeSportsModalIfOutside(event)">
+  <div class="sports-detail-modal" id="sportsDetailModalContent">
+    <button class="modal-close-btn" onclick="closeSportsModal()">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <div id="sportsModalBody"></div>
   </div>
 </div>
 
@@ -472,147 +730,142 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
   </div>
 </div>
 
+<!-- Teams List Modal -->
+<div class="detail-modal-overlay" id="teamsModal" onclick="if(event.target===this)closeTeamsList()" style="z-index:400">
+  <div class="detail-modal" style="max-height:72vh;padding:0 0 20px">
+    <button class="modal-close-btn" onclick="closeTeamsList()"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <div style="padding:20px 20px 12px;border-bottom:1px solid var(--border)">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.04em">Teams Seen</div>
+    </div>
+    <div id="teamsListContent" style="padding:12px 20px;overflow-y:auto;max-height:calc(72vh - 80px)"></div>
+  </div>
+</div>
+
+<!-- Players List Modal -->
+<div class="detail-modal-overlay" id="playersModal" onclick="if(event.target===this)closePlayersList()" style="z-index:400">
+  <div class="detail-modal" style="max-height:72vh;padding:0 0 20px">
+    <button class="modal-close-btn" onclick="closePlayersList()"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <div style="padding:20px 20px 12px;border-bottom:1px solid var(--border)">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.04em">Players Seen</div>
+    </div>
+    <div id="playersListContent" style="padding:12px 20px;overflow-y:auto;max-height:calc(72vh - 80px)"></div>
+  </div>
+</div>
+
+<!-- Sports Venues List Modal -->
+<div class="detail-modal-overlay" id="sportsVenuesModal" onclick="if(event.target===this)closeSportsVenuesList()" style="z-index:400">
+  <div class="detail-modal" style="max-height:72vh;padding:0 0 20px">
+    <button class="modal-close-btn" onclick="closeSportsVenuesList()"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <div style="padding:20px 20px 12px;border-bottom:1px solid var(--border)">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.04em">Sports Venues</div>
+    </div>
+    <div id="sportsVenuesListContent" style="padding:12px 20px;overflow-y:auto;max-height:calc(72vh - 80px)"></div>
+  </div>
+</div>
+
 <script>
-// ══════════════════════════════════════════════
-//  CONSTANTS & STATE
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════
+//  SHARED UTILITIES
+// ══════════════════════════════════════════════════════════════════
+const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function save(key, val) { try { localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val)); } catch(e){} }
+function load(key) {
+  try { const v = localStorage.getItem(key); if (!v) return null; try { return JSON.parse(v); } catch { return v; } } catch { return null; }
+}
+function escHtml(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+// Alias for sports code
+const esc = escHtml;
+
+function buildCsvUrl(raw) {
+  const url = raw.trim();
+  if (url.includes('output=csv')) return url;
+  const idMatch = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  if (!idMatch) return url;
+  const gidMatch = url.match(/[?&#]gid=(\d+)/) || url.match(/edit#gid=(\d+)/);
+  return `https://docs.google.com/spreadsheets/d/${idMatch[1]}/pub?gid=${gidMatch ? gidMatch[1] : '0'}&single=true&output=csv`;
+}
+
+function decodeProxyResponse(raw) {
+  if (!raw) return '';
+  if (raw.startsWith('data:')) {
+    const b64Match = raw.match(/^data:[^;]+;base64,(.+)$/s);
+    if (b64Match) { try { return atob(b64Match[1].trim()); } catch(e) {} }
+  }
+  return raw;
+}
+
+async function fetchCsvText(csvUrl) {
+  const errors = [];
+  try {
+    const r = await fetch(csvUrl, { mode: 'cors', cache: 'no-cache' });
+    if (r.ok) { const text = await r.text(); if (text && text.length > 10) return { text, via: 'direct' }; }
+    else { errors.push(`direct: HTTP ${r.status}`); }
+  } catch(e) { errors.push(`direct: ${e.message}`); }
+
+  try {
+    const r = await fetch(`https://corsproxy.io/?${encodeURIComponent(csvUrl)}`, { cache: 'no-cache' });
+    if (r.ok) { const text = await r.text(); if (text && text.length > 10) return { text, via: 'corsproxy.io' }; }
+    else { errors.push(`corsproxy.io: HTTP ${r.status}`); }
+  } catch(e) { errors.push(`corsproxy.io: ${e.message}`); }
+
+  try {
+    const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(csvUrl)}`, { cache: 'no-cache' });
+    if (r.ok) {
+      const j = await r.json();
+      if (j && j.contents) { const text = decodeProxyResponse(j.contents); if (text && text.length > 10) return { text, via: 'allorigins' }; }
+    } else { errors.push(`allorigins: HTTP ${r.status}`); }
+  } catch(e) { errors.push(`allorigins: ${e.message}`); }
+
+  throw new Error(`All fetch methods failed:\n${errors.join('\n')}`);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  EVENT DIARY — CONSTANTS & STATE
+// ══════════════════════════════════════════════════════════════════
 const STORAGE_KEYS = {
-  events: 'eventdiary_events_v3',      // bumped: forces re-sync after CSV parser fix
+  events: 'eventdiary_events_v3',
   sheetUrl: 'eventdiary_url',
   lastSync: 'eventdiary_lastsync_v3',
   setlistCache: 'eventdiary_setlists_v12'
 };
 const APP_VERSION = 'v3';
-const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-const MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-let allEvents = [];
+let allEvents = [];   // event-diary events
 
-// ══════════════════════════════════════════════
-//  STORAGE
-// ══════════════════════════════════════════════
-function save(key, val) { try { localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val)); } catch(e){} }
-function load(key) {
-  try { const v = localStorage.getItem(key); if (!v) return null; try { return JSON.parse(v); } catch { return v; } } catch { return null; }
-}
+// ══════════════════════════════════════════════════════════════════
+//  SPORTS DIARY — CONSTANTS & STATE
+// ══════════════════════════════════════════════════════════════════
+const SK = {events:'sportsdiary_events_v2', url:'sportsdiary_url', sync:'sportsdiary_lastsync', players:'sportsdiary_players_v1'};
+const DEFAULT_SPORTS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRuxiJ9GbHAWFcrryUMJNZNgLzsZCmYAnSCmfjV1KSuOOZpwIgOYkFaYJWsJ1f-NnirtDS5pzoF4M-K/pub?output=csv';
 
-// ══════════════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', async () => {
-  const DEFAULT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTbDktqpGqlQh20V-1MrB6ppZ0E1HzxdRKbjCVdpT1sIzHoBeAGQQD8BjNoAiA8FnWqJv12fqiO5Ov9/pub?output=csv';
-  const savedUrl = load(STORAGE_KEYS.sheetUrl) || DEFAULT_SHEET_URL;
-  document.getElementById('sheetUrlInput').value = savedUrl;
+let allSportsEvents = [];  // sports-diary events
+let activeSportFilter = 'all';
 
-  const savedEvents = load(STORAGE_KEYS.events);
-  if (savedEvents && savedEvents.length) {
-    // Valid v3 cache — load instantly
-    allEvents = savedEvents;
-    renderAll();
-  } else if (savedUrl) {
-    // No v3 cache but we have a URL — auto-re-fetch silently
-    showLoadingState();
-    await autoResync(savedUrl);
-  } else {
-    showEmptyState();
-  }
-
+// ══════════════════════════════════════════════════════════════════
+//  VIEWS
+// ══════════════════════════════════════════════════════════════════
+function showSettings() {
+  document.getElementById('main-view').classList.remove('active');
+  document.getElementById('settings-view').classList.add('active');
+  document.getElementById('settingsBtn').style.display = 'none';
+  window.scrollTo(0,0);
   updateLastSyncLabel();
-  setupScrollWatcher();
-  document.getElementById('searchInput').addEventListener('input', onSearchInput);
-  // Click outside handled by onDocClick
-  document.addEventListener('click', onDocClick);
-});
-
-
-
-function showLoadingState() {
-  document.getElementById('eventsContainer').innerHTML = `
-    <div class="empty-state">
-      <span class="empty-state-icon" style="font-size:32px">
-        <span class="spinner" style="width:32px;height:32px;border-width:3px"></span>
-      </span>
-      <p class="empty-state-title" style="margin-top:20px">Updating…</p>
-      <p class="empty-state-text">Re-syncing your events with the latest data.</p>
-    </div>`;
+  updateSportsLastSyncLabel();
+}
+function showMain() {
+  document.getElementById('settings-view').classList.remove('active');
+  document.getElementById('main-view').classList.add('active');
+  document.getElementById('settingsBtn').style.display = '';
+  window.scrollTo(0,0);
 }
 
-async function autoResync(rawUrl) {
-  try {
-    const csvUrl = buildCsvUrl(rawUrl);
-    const { text } = await fetchCsvText(csvUrl);
-    const cleanText = decodeProxyResponse(text);
-    if (cleanText && !cleanText.trim().startsWith('<!') && !cleanText.trim().startsWith('<html')) {
-      const rows = parseCSV(cleanText);
-      if (rows.length >= 2) {
-        const events = rowsToEvents(rows);
-        if (events.length) {
-          allEvents = events;
-          save(STORAGE_KEYS.events, events);
-          save(STORAGE_KEYS.sheetUrl, csvUrl);
-          save(STORAGE_KEYS.lastSync, new Date().toISOString());
-          renderAll();
-          return;
-        }
-      }
-    }
-  } catch(e) {}
-  // Auto-resync failed — prompt user to go to Settings and sync manually
-  document.getElementById('eventsContainer').innerHTML = `
-    <div class="empty-state">
-      <span class="empty-state-icon">⚠️</span>
-      <p class="empty-state-title">Re-Sync Required</p>
-      <p class="empty-state-text">A one-time re-sync is needed after an app update. Tap below to go to Settings.</p>
-      <button class="btn-primary" onclick="showSettings()">Open Settings to Sync</button>
-    </div>`;
-  ['statEvents','statArtists','statVenues','statSetlists'].forEach(id => document.getElementById(id).textContent = '0');
-}
-
-// ══════════════════════════════════════════════
-//  ARTIST PARSING
-//  Handles newline-separated artists within a cell
-//  (Google Sheets wraps multi-line cells in quotes with \n inside)
-// ══════════════════════════════════════════════
-function parseArtists(raw) {
-  if (!raw) return [];
-  // Split on newlines or line breaks that come from multi-line cells
-  const parts = raw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-  return parts.length > 0 ? parts : [raw.trim()];
-}
-
-function artistsToCommaList(raw) {
-  return parseArtists(raw).join(', ');
-}
-
-// Parse venue cell: multi-line cells have venue name on line 1, "City, ST" on line 2
-// Returns { name, location } e.g. { name: "The Gothic", location: "Denver, CO" }
-// If single-line, puts everything in name, location empty
-function parseVenue(raw) {
-  if (!raw) return { name: '', location: '' };
-  const parts = raw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-  if (parts.length >= 2) {
-    return { name: parts[0], location: parts.slice(1).join(', ') };
-  }
-  return { name: raw.trim(), location: '' };
-}
-
-// Full venue display: "Venue Name, City, ST"
-function venueDisplay(raw) {
-  const { name, location } = parseVenue(raw);
-  if (location) return name + ', ' + location;
-  return name;
-}
-
-// Short venue for list card: "Venue Name · City, ST" — but keep both on same line
-function venueDisplayShort(raw) {
-  const { name, location } = parseVenue(raw);
-  if (location) return name + ' · ' + location;
-  return name;
-}
-
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════
 //  SCROLL WATCHER
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════
 function setupScrollWatcher() {
   let ticking = false;
   const hero = document.getElementById('headerHero');
@@ -628,86 +881,153 @@ function setupScrollWatcher() {
   }, { passive: true });
 }
 
-// ══════════════════════════════════════════════
-//  VIEWS
-// ══════════════════════════════════════════════
-function showSettings() {
-  document.getElementById('main-view').classList.remove('active');
-  document.getElementById('settings-view').classList.add('active');
-  document.getElementById('settingsBtn').style.display = 'none';
-  window.scrollTo(0,0);
-  updateLastSyncLabel();
-}
-function showMain() {
-  document.getElementById('settings-view').classList.remove('active');
-  document.getElementById('main-view').classList.add('active');
-  document.getElementById('settingsBtn').style.display = '';
-  window.scrollTo(0,0);
+// ══════════════════════════════════════════════════════════════════
+//  TOGGLE STATS / FILTERS PANEL
+// ══════════════════════════════════════════════════════════════════
+function toggleStats() {
+  const grid = document.getElementById('statsGrid');
+  const filters = document.getElementById('typeFilters');
+  const btn = document.getElementById('statsToggle');
+  const isOpen = grid.classList.toggle('open');
+  filters.classList.toggle('open', isOpen);
+  btn.classList.toggle('open', isOpen);
 }
 
-// ══════════════════════════════════════════════
-//  CSV PARSING — robust single-pass RFC 4180 parser
-//  Handles: quoted fields with embedded newlines/commas,
-//  Windows (\r\n) and Unix (\n) line endings, BOM, allorigins JSON wrapping
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════
+//  COMBINED FILTER STATE
+// ══════════════════════════════════════════════════════════════════
+let currentTypeFilter = 'all';
+
+function filterByType(type) {
+  currentTypeFilter = type;
+  activeSportFilter = 'all'; // always reset sport sub-filter when switching top-level type
+
+  // Update button states
+  document.querySelectorAll('.type-filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.type === type);
+  });
+  // Clear all sport sub-chips
+  document.querySelectorAll('.sport-filter-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+
+  applyFilters();
+}
+
+function filterBySport(sportKey) {
+  // This handles sports sub-filter chips
+  activeSportFilter = sportKey;
+  currentTypeFilter = 'sports';
+
+  document.querySelectorAll('.type-filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.type === 'sports');
+  });
+  document.querySelectorAll('.sport-filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.sport === sportKey);
+  });
+
+  applyFilters();
+}
+
+function applyFilters() {
+  const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+
+  let results = [];
+
+  if (currentTypeFilter === 'all') {
+    // Show events + sports both
+    const evFiltered = searchTerm
+      ? allEvents.filter(e => eventMatchesSearch(e, searchTerm))
+      : allEvents;
+    const spFiltered = searchTerm
+      ? allSportsEvents.filter(e => sportMatchesSearch(e, searchTerm))
+      : allSportsEvents;
+    results = [...evFiltered.map(e => ({...e, _source:'event'})), ...spFiltered.map(e => ({...e, _source:'sport'}))];
+  } else if (currentTypeFilter === 'setlists') {
+    // Events with setlists only
+    let evFiltered = allEvents.filter(e => e.setlist && e.setlist.trim());
+    if (searchTerm) evFiltered = evFiltered.filter(e => eventMatchesSearch(e, searchTerm));
+    results = evFiltered.map(e => ({...e, _source:'event'}));
+  } else if (currentTypeFilter === 'sports') {
+    // Sports only, apply sport sub-filter
+    let spFiltered = allSportsEvents;
+    if (activeSportFilter !== 'all') {
+      spFiltered = spFiltered.filter(e => getSportKey(e.type, e.league) === activeSportFilter);
+    }
+    if (searchTerm) spFiltered = spFiltered.filter(e => sportMatchesSearch(e, searchTerm));
+    results = spFiltered.map(e => ({...e, _source:'sport'}));
+  } else {
+    // Event type filter
+    let evFiltered = allEvents.filter(e => {
+      const eventType = (e.type || '').toLowerCase().trim();
+      return eventType === currentTypeFilter;
+    });
+    if (searchTerm) evFiltered = evFiltered.filter(e => eventMatchesSearch(e, searchTerm));
+    results = evFiltered.map(e => ({...e, _source:'event'}));
+  }
+
+  renderCombinedList(results);
+}
+
+function eventMatchesSearch(e, q) {
+  return [e.artists, e.venue, e.notes||'', e.type||'', e.attendedWith||'', e.date]
+    .join(' ').toLowerCase().includes(q);
+}
+function sportMatchesSearch(e, q) {
+  return [(e.title||''), (e.venue||''), (e.notes||''), (e.type||''), (e.attendedWith||''), e.date]
+    .join(' ').toLowerCase().includes(q);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SEARCH
+// ══════════════════════════════════════════════════════════════════
+let searchDebounce = null;
+function onSearchInput(e) {
+  const val = e.target.value.trim();
+  document.getElementById('searchClear').classList.toggle('visible', val.length > 0);
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(() => applyFilters(), 180);
+}
+function onDocClick(e) {
+  const input = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('searchClear');
+  if (e.target !== input && e.target !== clearBtn && !clearBtn.contains(e.target)) {
+    if (input.value.trim()) { input.value = ''; clearBtn.classList.remove('visible'); renderAll(); }
+  }
+}
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchClear').classList.remove('visible');
+  renderAll();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  EVENT CSV PARSING
+// ══════════════════════════════════════════════════════════════════
 function parseCSV(rawText) {
-  // Strip BOM if present
   let text = rawText.replace(/^\uFEFF/, '');
-
-  // If the entire text came back as a JSON-escaped string (some proxies do this),
-  // unescape literal \n sequences that aren't inside a JSON string context
-  // We detect this by checking if NO real newlines exist but \n sequences do
   if (!text.includes('\n') && text.includes('\\n')) {
     text = text.replace(/\\n/g, '\n').replace(/\\r/g, '');
   }
-
   const rows = [];
   let currentRow = [], currentField = '', inQuotes = false, i = 0;
-
   while (i < text.length) {
     const ch = text[i];
-
     if (inQuotes) {
       if (ch === '"') {
-        // Check for escaped quote: "" -> "
-        if (i + 1 < text.length && text[i+1] === '"') {
-          currentField += '"';
-          i += 2;
-          continue;
-        } else {
-          inQuotes = false;
-        }
-      } else {
-        // Inside quoted field: keep everything including embedded newlines
-        currentField += ch;
-      }
+        if (i + 1 < text.length && text[i+1] === '"') { currentField += '"'; i += 2; continue; }
+        else { inQuotes = false; }
+      } else { currentField += ch; }
     } else {
-      if (ch === '"') {
-        inQuotes = true;
-      } else if (ch === ',') {
-        currentRow.push(currentField.trim());
-        currentField = '';
-      } else if (ch === '\n') {
-        // End of row
-        currentRow.push(currentField.trim());
-        if (currentRow.some(f => f)) rows.push(currentRow);
-        currentRow = [];
-        currentField = '';
-      } else if (ch === '\r') {
-        // Skip carriage returns (Windows \r\n line endings)
-      } else {
-        currentField += ch;
-      }
+      if (ch === '"') { inQuotes = true; }
+      else if (ch === ',') { currentRow.push(currentField.trim()); currentField = ''; }
+      else if (ch === '\n') { currentRow.push(currentField.trim()); if (currentRow.some(f => f)) rows.push(currentRow); currentRow = []; currentField = ''; }
+      else if (ch === '\r') { /* skip */ }
+      else { currentField += ch; }
     }
     i++;
   }
-
-  // Flush the last row (file may not end with newline)
-  if (currentField.trim() || currentRow.length > 0) {
-    currentRow.push(currentField.trim());
-    if (currentRow.some(f => f)) rows.push(currentRow);
-  }
-
+  if (currentField.trim() || currentRow.length > 0) { currentRow.push(currentField.trim()); if (currentRow.some(f => f)) rows.push(currentRow); }
   return rows;
 }
 
@@ -722,12 +1042,10 @@ function rowsToEvents(rows) {
   const dateIdx     = findCol('date');
   const artistIdx   = findCol('artists','artist');
   const venueIdx    = findCol('venue');
-  // "Attended With" -> strips to "attendedwith"; never match 'with' alone (too broad)
   const attendedIdx = findCol('attendedwith','attendedwith');
   const typeIdx     = findCol('type');
   const notesIdx    = findCol('notes','note');
   const setlistIdx  = findCol('setlist','setlisturl');
-
   const colDate     = dateIdx     >= 0 ? dateIdx     : 0;
   const colArtist   = artistIdx   >= 0 ? artistIdx   : 1;
   const colVenue    = venueIdx    >= 0 ? venueIdx    : 2;
@@ -735,7 +1053,6 @@ function rowsToEvents(rows) {
   const colType     = typeIdx     >= 0 ? typeIdx     : 4;
   const colNotes    = notesIdx    >= 0 ? notesIdx    : 5;
   const colSetlist  = setlistIdx  >= 0 ? setlistIdx  : 6;
-
   const g = (row, col) => (row[col] || '').trim();
   const events = [];
   for (let i = 1; i < rows.length; i++) {
@@ -744,160 +1061,88 @@ function rowsToEvents(rows) {
     const dateRaw = g(row, colDate);
     if (!dateRaw) continue;
     events.push({
-      id: i,
-      date: dateRaw,
-      artists: g(row, colArtist),       // raw — may contain \n for multi-artist
-      venue: g(row, colVenue),
-      attendedWith: g(row, colAttended),
-      type: g(row, colType),
-      notes: g(row, colNotes),
-      setlist: g(row, colSetlist)
+      id: 'ev_' + i, date: dateRaw,
+      artists: g(row, colArtist), venue: g(row, colVenue),
+      attendedWith: g(row, colAttended), type: g(row, colType),
+      notes: g(row, colNotes), setlist: g(row, colSetlist),
+      _source: 'event'
     });
   }
   return events.sort((a,b) => b.date.localeCompare(a.date));
 }
 
-// ══════════════════════════════════════════════
-//  SYNC
-// ══════════════════════════════════════════════
-function buildCsvUrl(raw) {
-  const url = raw.trim();
-  if (url.includes('output=csv')) return url;
-  const idMatch = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
-  if (!idMatch) return url;
-  const gidMatch = url.match(/[?&#]gid=(\d+)/) || url.match(/edit#gid=(\d+)/);
-  return `https://docs.google.com/spreadsheets/d/${idMatch[1]}/pub?gid=${gidMatch ? gidMatch[1] : '0'}&single=true&output=csv`;
-}
-
-// Decode a proxy response that may be a base64 data URI or plain text
-function decodeProxyResponse(raw) {
-  if (!raw) return '';
-  // allorigins sometimes returns: data:text/csv;base64,<b64> or data:text/html;base64,...
-  if (raw.startsWith('data:')) {
-    const b64Match = raw.match(/^data:[^;]+;base64,(.+)$/s);
-    if (b64Match) {
-      try {
-        return atob(b64Match[1].trim());
-      } catch(e) {
-        // atob failed — return raw and let caller handle it
+// ══════════════════════════════════════════════════════════════════
+//  EVENT SYNC
+// ══════════════════════════════════════════════════════════════════
+async function autoResync(savedUrl) {
+  try {
+    const csvUrl = buildCsvUrl(savedUrl);
+    const { text } = await fetchCsvText(csvUrl);
+    const cleanText = decodeProxyResponse(text);
+    if (cleanText && !cleanText.trim().startsWith('<!') && !cleanText.trim().startsWith('<html')) {
+      const rows = parseCSV(cleanText);
+      if (rows.length >= 2) {
+        const events = rowsToEvents(rows);
+        if (events.length) {
+          allEvents = events;
+          save(STORAGE_KEYS.events, events);
+          save(STORAGE_KEYS.sheetUrl, csvUrl);
+          save(STORAGE_KEYS.lastSync, new Date().toISOString());
+          renderAll(); return;
+        }
       }
     }
-  }
-  return raw;
-}
-
-async function fetchCsvText(csvUrl) {
-  const errors = [];
-
-  // 1. Direct fetch (works when hosted on a server or CORS is open)
-  try {
-    const r = await fetch(csvUrl, { mode: 'cors', cache: 'no-cache' });
-    if (r.ok) {
-      const text = await r.text();
-      if (text && text.length > 10) return { text, via: 'direct' };
-    } else { errors.push(`direct: HTTP ${r.status}`); }
-  } catch(e) { errors.push(`direct: ${e.message}`); }
-
-  // 2. corsproxy.io — returns raw text, most reliable
-  try {
-    const r = await fetch(`https://corsproxy.io/?${encodeURIComponent(csvUrl)}`, { cache: 'no-cache' });
-    if (r.ok) {
-      const text = await r.text();
-      if (text && text.length > 10) return { text, via: 'corsproxy.io' };
-    } else { errors.push(`corsproxy.io: HTTP ${r.status}`); }
-  } catch(e) { errors.push(`corsproxy.io: ${e.message}`); }
-
-  // 3. allorigins — returns JSON wrapper; response may be base64-encoded
-  try {
-    const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(csvUrl)}`, { cache: 'no-cache' });
-    if (r.ok) {
-      const j = await r.json();
-      if (j && j.contents) {
-        const text = decodeProxyResponse(j.contents);
-        if (text && text.length > 10) return { text, via: 'allorigins' };
-      }
-    } else { errors.push(`allorigins: HTTP ${r.status}`); }
-  } catch(e) { errors.push(`allorigins: ${e.message}`); }
-
-  // 4. cors-anywhere fallback
-  try {
-    const r = await fetch(`https://cors-anywhere.herokuapp.com/${csvUrl}`, { cache: 'no-cache', headers: {'X-Requested-With': 'XMLHttpRequest'} });
-    if (r.ok) {
-      const text = await r.text();
-      if (text && text.length > 10) return { text, via: 'cors-anywhere' };
-    } else { errors.push(`cors-anywhere: HTTP ${r.status}`); }
-  } catch(e) { errors.push(`cors-anywhere: ${e.message}`); }
-
-  throw new Error(`All fetch methods failed:\n${errors.join('\n')}\n\nMake sure your sheet is published as CSV (File → Share → Publish to web → CSV).`);
+  } catch(e) {}
+  document.getElementById('eventsContainer').innerHTML = `
+    <div class="empty-state">
+      <span class="empty-state-icon">⚠️</span>
+      <p class="empty-state-title">Re-Sync Required</p>
+      <p class="empty-state-text">A one-time re-sync is needed. Tap below to go to Settings.</p>
+      <button class="btn-primary" onclick="showSettings()">Open Settings to Sync</button>
+    </div>`;
 }
 
 async function quickSync() {
   const btn = document.getElementById('syncBtnTop');
-  if (!btn) return;
-  
-  // Add spinning animation
-  btn.classList.add('syncing');
-  btn.disabled = true;
-  
+  if (btn) { btn.classList.add('syncing'); btn.disabled = true; }
   const urlInput = document.getElementById('sheetUrlInput');
   const savedUrl = load(STORAGE_KEYS.sheetUrl);
-  
-  if (!savedUrl) {
-    btn.classList.remove('syncing');
-    btn.disabled = false;
-    alert('No sheet URL configured. Please go to Settings to set up your Google Sheet.');
-    return;
+  if (savedUrl) {
+    const originalValue = urlInput.value;
+    urlInput.value = savedUrl;
+    await syncSheet();
+    urlInput.value = originalValue;
   }
-  
-  // Temporarily set the input value for syncSheet to read
-  const originalValue = urlInput.value;
-  urlInput.value = savedUrl;
-  
-  // Call the existing sync function
-  await syncSheet();
-  
-  // Restore original value and remove spinner
-  urlInput.value = originalValue;
-  btn.classList.remove('syncing');
-  btn.disabled = false;
+  // Also re-sync sports
+  const sportsSavedUrl = load(SK.url);
+  if (sportsSavedUrl) await autoResyncSports(sportsSavedUrl);
+  if (btn) { btn.classList.remove('syncing'); btn.disabled = false; }
 }
 
 async function syncSheet() {
-  // Clear any legacy cached data from older app versions
   ['eventdiary_events_v2','eventdiary_events','eventdiary_lastsync','eventdiary_setlists_v2','eventdiary_setlists'].forEach(k => {
     try { localStorage.removeItem(k); } catch(e) {}
   });
-
   const urlInput = document.getElementById('sheetUrlInput');
   const btn = document.getElementById('syncBtn');
   const rawUrl = urlInput.value.trim();
   if (!rawUrl) { showSyncStatus('error','Please enter a Google Sheet URL first.'); return; }
-
   btn.disabled = true;
   btn.innerHTML = `<span class="spinner"></span> Syncing…`;
   document.getElementById('syncStatus').className = 'sync-status';
   document.getElementById('syncStatus').style.display = 'none';
-
   try {
     const csvUrl = buildCsvUrl(rawUrl);
     showSyncStatus('info', 'Fetching data…');
     const { text, via } = await fetchCsvText(csvUrl);
-    // Decode base64 data URI if proxy returned one (belt-and-suspenders)
     const cleanText = decodeProxyResponse(text);
     if (cleanText.trim().startsWith('<!') || cleanText.trim().startsWith('<html')) {
-      throw new Error('Got an HTML page instead of CSV. The sheet may not be published yet.\nGo to File → Share → Publish to web → choose CSV → Publish.');
+      throw new Error('Got an HTML page instead of CSV.');
     }
     const rows = parseCSV(cleanText);
-    // Debug: show what we got if parsing fails
-    if (rows.length < 2) {
-      const preview = cleanText.substring(0, 300).replace(/\r/g, '').replace(/\n/g, '↵');
-      throw new Error(`Sheet appears empty or only has a header row.\n\nGot ${rows.length} row(s). Text preview:\n${preview}\n\nMake sure your sheet tab has data rows below the header, and that the URL points to the correct sheet tab.`);
-    }
+    if (rows.length < 2) throw new Error(`Sheet appears empty or only has a header row.`);
     const events = rowsToEvents(rows);
-    if (!events.length) {
-      const found = rows[0].join(' | ');
-      throw new Error(`No valid events found.\nHeaders detected: "${found}"\nExpected headers: Date | Artist(s) | Venue | Attended With | Type | Notes | Setlist`);
-    }
+    if (!events.length) throw new Error(`No valid events found. Check column headers.`);
     allEvents = events;
     save(STORAGE_KEYS.events, events);
     save(STORAGE_KEYS.sheetUrl, csvUrl);
@@ -906,12 +1151,9 @@ async function syncSheet() {
     showSyncStatus('success', `✓ Synced ${events.length} event${events.length !== 1 ? 's' : ''} (via ${via}).`);
     updateLastSyncLabel();
     renderAll();
-  } catch(err) {
-    showSyncStatus('error', err.message);
-  }
-
+  } catch(err) { showSyncStatus('error', err.message); }
   btn.disabled = false;
-  btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg> Sync Google Sheet`;
+  btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg> Sync Event Sheet`;
 }
 
 function showSyncStatus(type, msg) {
@@ -926,9 +1168,9 @@ function updateLastSyncLabel() {
   else el.textContent = '';
 }
 
-// ══════════════════════════════════════════════
-//  DATE HELPERS
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════
+//  EVENT DATE HELPERS
+// ══════════════════════════════════════════════════════════════════
 function formatDateParts(dateStr) {
   const p = dateStr.split('-');
   return { year: p[0], month: MONTHS[parseInt(p[1])-1] || '???', day: String(parseInt(p[2])).padStart(2,'0') };
@@ -942,80 +1184,97 @@ function formatDateShort(dateStr) {
   return `${MONTHS[parseInt(p[1])-1]} ${parseInt(p[2])}, ${p[0]}`;
 }
 
-// ══════════════════════════════════════════════
-//  STATS & DATE RANGE
-// ══════════════════════════════════════════════
-function computeStats(events) {
-  const artists = new Set(), venues = new Set();
-  let setlists = 0;
-  events.forEach(e => {
-    // Exclude "Play" type events from artist count
-    if (!(e.type && e.type.trim().toLowerCase() === 'play')) {
-      parseArtists(e.artists).forEach(a => artists.add(a.toLowerCase().trim()));
-    }
-    if (e.venue) {
-      // Deduplicate venues by their full display (name + location normalized)
-      venues.add(venueDisplay(e.venue).toLowerCase().trim());
-    }
-    if (e.setlist && e.setlist.trim()) setlists++;
-  });
-  return { events: events.length, artists: artists.size, venues: venues.size, setlists };
+// ══════════════════════════════════════════════════════════════════
+//  EVENT ARTIST / VENUE HELPERS
+// ══════════════════════════════════════════════════════════════════
+function parseArtists(raw) {
+  if (!raw) return [];
+  const parts = raw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  return parts.length > 0 ? parts : [raw.trim()];
+}
+function artistsToCommaList(raw) { return parseArtists(raw).join(', '); }
+function parseVenue(raw) {
+  if (!raw) return { name: '', location: '' };
+  const parts = raw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  if (parts.length >= 2) return { name: parts[0], location: parts.slice(1).join(', ') };
+  return { name: raw.trim(), location: '' };
+}
+function venueDisplay(raw) { const { name, location } = parseVenue(raw); return location ? name + ', ' + location : name; }
+function venueDisplayShort(raw) { const { name, location } = parseVenue(raw); return location ? name + ' · ' + location : name; }
+
+// ══════════════════════════════════════════════════════════════════
+//  RENDER — COMBINED LIST
+// ══════════════════════════════════════════════════════════════════
+function renderAll(explicitList) {
+  updateAllStats();
+  updateDateRange();
+  updateSportFilterChips();
+  if (explicitList !== undefined) {
+    renderCombinedList(explicitList);
+  } else {
+    applyFilters();
+  }
 }
 
-function updateStats(events) {
-  const s = computeStats(events);
-  document.getElementById('statEvents').textContent = s.events;
-  document.getElementById('statArtists').textContent = s.artists;
-  document.getElementById('statVenues').textContent = s.venues;
-  document.getElementById('statSetlists').textContent = s.setlists;
+function updateDateRange() {
+  const all = [
+    ...allEvents.map(e => e.date),
+    ...allSportsEvents.map(e => e.date)
+  ].filter(Boolean).sort();
+  if (!all.length) {
+    document.getElementById('dateFirst').textContent = '—';
+    document.getElementById('dateLatest').textContent = '—';
+    return;
+  }
+  document.getElementById('dateFirst').textContent = formatDateShort(all[0]);
+  document.getElementById('dateLatest').textContent = formatDateShort(all[all.length-1]);
 }
 
-function updateDateRange(events) {
-  if (!events.length) { document.getElementById('dateFirst').textContent = '—'; document.getElementById('dateLatest').textContent = '—'; return; }
-  const sorted = [...events].sort((a,b) => a.date.localeCompare(b.date));
-  document.getElementById('dateFirst').textContent = formatDateShort(sorted[0].date);
-  document.getElementById('dateLatest').textContent = formatDateShort(sorted[sorted.length-1].date);
-}
-
-// ══════════════════════════════════════════════
-//  RENDER
-// ══════════════════════════════════════════════
-function renderAll(events) {
-  const data = events || allEvents;
-  updateStats(allEvents);
-  updateDateRange(allEvents);
-  renderEventsList(data);
-}
-
-function renderEventsList(events) {
+function renderCombinedList(items) {
+  // items = mixed array of event-source and sport-source objects
   const container = document.getElementById('eventsContainer');
-  if (!events.length) { container.innerHTML = `<div class="no-results">No events found.</div>`; return; }
+  if (!items.length) { container.innerHTML = `<div class="no-results">No events found.</div>`; return; }
+
+  // Sort all items descending by date
+  const sorted = [...items].sort((a,b) => b.date.localeCompare(a.date));
+
+  // Group by year
   const byYear = {};
-  events.forEach(e => { const y = e.date.substring(0,4); if (!byYear[y]) byYear[y] = []; byYear[y].push(e); });
+  sorted.forEach(e => { const y = e.date.substring(0,4); if (!byYear[y]) byYear[y] = []; byYear[y].push(e); });
   const years = Object.keys(byYear).sort((a,b) => b-a);
-  let html = `<div class="section-header"><span class="section-title">All Events</span><span class="section-count">${events.length} event${events.length!==1?'s':''}</span></div>`;
+
+  let html = `<div class="section-header"><span class="section-title">All Events</span><span class="section-count">${items.length} event${items.length!==1?'s':''}</span></div>`;
   years.forEach(year => {
     html += `<div class="year-group" id="year-${year}"><div class="year-label">${year}</div>`;
-    byYear[year].forEach(e => { html += buildEventCard(e); });
+    byYear[year].forEach(e => {
+      html += e._source === 'sport' ? buildSportCard(e) : buildEventCard(e);
+    });
     html += `</div>`;
   });
   container.innerHTML = html;
+
+  // Wire up click handlers (avoids inline onclick with string IDs in attributes)
+  container.querySelectorAll('[data-event-id]').forEach(el => {
+    el.addEventListener('click', () => openEventModal(el.dataset.eventId));
+  });
+  container.querySelectorAll('[data-sport-id]').forEach(el => {
+    el.addEventListener('click', () => openSportsModal(el.dataset.sportId));
+  });
+
+  // Inject logos for sport cards
+  sorted.filter(e => e._source === 'sport').forEach(ev => injectCardLogos(ev));
 }
 
+// ── EVENT CARD ──
 function buildEventCard(e) {
-  const { month, day, year } = formatDateParts(e.date);
+  const { month, day } = formatDateParts(e.date);
   const hasSetlist = !!(e.setlist && e.setlist.trim());
-  const badge = hasSetlist
-    ? `<div class="event-setlist-badge setlist-yes">Setlist</div>`
-    : '';
-  
-  // For multi-artist events, render each on its own line
+  const badge = hasSetlist ? `<div class="event-setlist-badge setlist-yes">Setlist</div>` : '';
   const artists = parseArtists(e.artists);
   const artistsHtml = artists.length > 1
     ? artists.map(a => `<span class="event-artist-line">${escHtml(a)}</span>`).join('')
     : `<span class="event-artist">${escHtml(artists[0] || '')}</span>`;
-  
-  return `<div class="event-card" id="card-${e.id}" onclick="openModal(${e.id})">
+  return `<div class="event-card" id="card-${e.id}" data-event-id="${e.id}">
     <div class="event-card-main">
       <div class="event-date-block">
         <span class="event-date-month">${month}</span>
@@ -1030,31 +1289,106 @@ function buildEventCard(e) {
   </div>`;
 }
 
-function escHtml(s) {
-  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+// ── SPORT CARD ──
+function buildSportCard(ev) {
+  const d = pd(ev.date);
+  const sport = getSportKey(ev.type, ev.league);
+  const icon = SPORT_ICONS[sport] || SPORT_ICONS.default;
+  const home = ev.homeTeam || parseMatchup(ev.title).home;
+  const away = ev.awayTeam || parseMatchup(ev.title).away;
+  return `<div class="sport-card" id="card-${ev.id}" data-sport-id="${ev.id}">
+    <div class="sport-card-main">
+      <div class="sport-date-block">
+        <span class="sport-date-month">${d.mon}</span>
+        <span class="sport-date-day">${d.day}</span>
+      </div>
+      <div class="logos-zone" id="clogos-${ev.id}">
+        ${away ? `
+          <div class="team-logo-col">
+            <span class="team-logo-ph" id="cl-away-${ev.id}">${icon}</span>
+            <span class="logo-score">${ev.awayScore !== undefined && ev.awayScore !== '' ? ev.awayScore : ''}</span>
+          </div>
+          <span class="vs-divider">vs</span>
+          <div class="team-logo-col">
+            <span class="team-logo-ph" id="cl-home-${ev.id}">${icon}</span>
+            <span class="logo-score">${ev.homeScore !== undefined && ev.homeScore !== '' ? ev.homeScore : ''}</span>
+          </div>
+        ` : `<span class="team-logo-ph">${icon}</span>`}
+      </div>
+      <div class="sport-event-info">
+        ${away && home ? `<span class="event-matchup"><span class="event-matchup-away">${esc(away)}</span><span class="event-matchup-vs">vs</span><span class="event-matchup-home">${esc(home)}</span></span>` : `<span class="event-matchup">${esc(ev.title||'—')}</span>`}
+        <span class="event-sub">${esc(venShort(ev.venue))}${ev.league ? ` <span style="color:var(--gold-dim);font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-left:4px">${esc(ev.league)}</span>` : ''}</span>
+      </div>
+    </div>
+  </div>`;
 }
 
-function showEmptyState() {
+// ══════════════════════════════════════════════════════════════════
+//  COMBINED STATS
+// ══════════════════════════════════════════════════════════════════
+function updateAllStats() {
+  // Event stats — artists
+  const artists = new Set();
+  allEvents.forEach(e => {
+    if (!(e.type && e.type.trim().toLowerCase() === 'play')) {
+      parseArtists(e.artists).forEach(a => artists.add(a.toLowerCase().trim()));
+    }
+  });
+  document.getElementById('statArtists').textContent = artists.size;
+
+  // Combined venues (event + sports, deduplicated)
+  const allVenues = new Set();
+  allEvents.forEach(e => { if (e.venue) allVenues.add(venueDisplay(e.venue).toLowerCase().trim()); });
+  allSportsEvents.forEach(e => { if (e.venue) allVenues.add(venShort(e.venue).toLowerCase().trim()); });
+  document.getElementById('statVenues').textContent = allVenues.size;
+
+  // Sports stats
+  updateSportsStats();
+}
+
+function updateSportsStats() {
+  const teams = getAllTeams();
+  const players = getAllPlayers();
+  document.getElementById('statTeams').textContent = Object.keys(teams).length;
+  document.getElementById('statPlayers').textContent = Object.keys(players).length;
+  // Refresh combined venue count
+  const allVenues = new Set();
+  allEvents.forEach(e => { if (e.venue) allVenues.add(venueDisplay(e.venue).toLowerCase().trim()); });
+  allSportsEvents.forEach(e => { if (e.venue) allVenues.add(venShort(e.venue).toLowerCase().trim()); });
+  document.getElementById('statVenues').textContent = allVenues.size;
+}
+
+function updateSportFilterChips() {
+  const container = document.getElementById('sportChipsContainer');
+  if (!container) return;
+  const sports = [...new Set(allSportsEvents.map(e => getSportKey(e.type, e.league)).filter(s => s !== 'default'))];
+  let h = '';
+  sports.forEach(s => {
+    const isActive = currentTypeFilter === 'sports' && activeSportFilter === s;
+    h += `<button class="sport-filter-btn ${isActive ? 'active' : ''}" data-sport="${s}" onclick="filterBySport('${s}')">${SPORT_ICONS[s]||''} ${s.charAt(0).toUpperCase()+s.slice(1)}</button>`;
+  });
+  container.innerHTML = h;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  LOADING STATES
+// ══════════════════════════════════════════════════════════════════
+function showLoadingState() {
   document.getElementById('eventsContainer').innerHTML = `
     <div class="empty-state">
-      <span class="empty-state-icon">🎵</span>
-      <p class="empty-state-title">No Events Yet</p>
-      <p class="empty-state-text">Connect your Google Sheet to load your concert diary.</p>
-      <button class="btn-primary" onclick="showSettings()">Open Settings</button>
+      <span class="empty-state-icon" style="font-size:32px">
+        <span class="spinner" style="width:32px;height:32px;border-width:3px"></span>
+      </span>
+      <p class="empty-state-title" style="margin-top:20px">Loading…</p>
     </div>`;
-  ['statEvents','statArtists','statVenues','statSetlists'].forEach(id => document.getElementById(id).textContent = '0');
-  document.getElementById('dateFirst').textContent = '—';
-  document.getElementById('dateLatest').textContent = '—';
 }
 
-// ══════════════════════════════════════════════
-//  STAT CARD CLICKS
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════
+//  EVENT STAT CARDS
+// ══════════════════════════════════════════════════════════════════
 function onStatClick(type) {
-  if (!allEvents.length) return;
-  if (type === 'artists') openArtistsModal();
-  if (type === 'venues') openVenuesModal();
-  if (type === 'setlists') openSetlistsModal();
+  if (type === 'artists') { if (allEvents.length) openArtistsModal(); }
+  if (type === 'venues') openCombinedVenuesModal();
 }
 
 function openStatModal(title, bodyHtml) {
@@ -1063,15 +1397,9 @@ function openStatModal(title, bodyHtml) {
   document.getElementById('statModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-function closeStatModal() {
-  document.getElementById('statModal').classList.remove('open');
-  document.body.style.overflow = '';
-}
-function closeStatModalIfOutside(e) {
-  if (e.target === document.getElementById('statModal')) closeStatModal();
-}
+function closeStatModal() { document.getElementById('statModal').classList.remove('open'); document.body.style.overflow = ''; }
+function closeStatModalIfOutside(e) { if (e.target === document.getElementById('statModal')) closeStatModal(); }
 
-// Global lookup so stat list items can safely reference strings via index
 window._statItems = [];
 
 function openArtistsModal() {
@@ -1103,17 +1431,18 @@ function statItemClick(idx) {
   const item = window._statItems[idx];
   if (!item) return;
   closeStatModal();
-  // Wait for modal close animation, then populate search and filter
   setTimeout(() => {
     const input = document.getElementById('searchInput');
     input.value = item.searchTerm;
     document.getElementById('searchClear').classList.add('visible');
-    filterEventsBySearch(item.searchTerm);
-    document.getElementById('main-view').scrollTo({ top: 0, behavior: 'smooth' });
+    currentTypeFilter = 'all';
+    document.querySelectorAll('.type-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.type === 'all'));
+    applyFilters();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, 100);
 }
 
-function openVenuesModal() {
+function openEventVenuesModal() {
   window._statItems = [];
   const venueMap = {};
   allEvents.forEach(e => {
@@ -1129,7 +1458,6 @@ function openVenuesModal() {
   const html = sorted.map(({ raw, count }) => {
     const { name, location } = parseVenue(raw);
     const idx = window._statItems.length;
-    // Search by venue name only — not "name city, state" which breaks matching
     window._statItems.push({ type: 'venue', searchTerm: name });
     return `<div class="stat-list-item" onclick="statItemClick(${idx})">
       <div class="stat-list-item-main">
@@ -1141,103 +1469,110 @@ function openVenuesModal() {
       </div>
     </div>`;
   }).join('');
-  openStatModal(`Venues (${sorted.length})`, html);
+  openStatModal(`Event Venues (${sorted.length})`, html);
 }
 
 function openSetlistsModal() {
-  // Each event = one row. For multi-setlist events, extract each artist from their URL
-  // and show them comma-separated on one line.
   const rows = [];
-  allEvents
-    .filter(e => e.setlist && e.setlist.trim())
-    .sort((a,b) => b.date.localeCompare(a.date))
-    .forEach(e => {
-      const urls = e.setlist.split(/\n/).map(s => s.trim()).filter(Boolean);
-      const eventArtists = parseArtists(e.artists);
-      if (urls.length === 1) {
-        // Single URL — extract artist from URL
-        const urlArtist = extractArtistFromSetlistUrl(urls[0], eventArtists);
-        rows.push({ e, displayName: urlArtist || artistsToCommaList(e.artists) });
-      } else {
-        // Multiple URLs — extract each artist and join on one line
-        const names = urls.map(url => extractArtistFromSetlistUrl(url, eventArtists)).filter(Boolean);
-        const displayName = names.length ? names.join(', ') : artistsToCommaList(e.artists);
-        rows.push({ e, displayName });
-      }
-    });
-
+  allEvents.filter(e => e.setlist && e.setlist.trim()).sort((a,b) => b.date.localeCompare(a.date)).forEach(e => {
+    const urls = e.setlist.split(/\n/).map(s => s.trim()).filter(Boolean);
+    const eventArtists = parseArtists(e.artists);
+    if (urls.length === 1) {
+      const urlArtist = extractArtistFromSetlistUrl(urls[0], eventArtists);
+      rows.push({ e, displayName: urlArtist || artistsToCommaList(e.artists) });
+    } else {
+      const names = urls.map(url => extractArtistFromSetlistUrl(url, eventArtists)).filter(Boolean);
+      rows.push({ e, displayName: names.length ? names.join(', ') : artistsToCommaList(e.artists) });
+    }
+  });
   const html = rows.map(({ e, displayName }) =>
-    `<div class="stat-list-item" onclick="closeStatModal(); openModal(${e.id})">
-      <div class="stat-list-item-main">
-        <span class="stat-list-link">${escHtml(displayName)}</span>
-      </div>
+    `<div class="stat-list-item" onclick="closeStatModal(); openEventModal('${e.id}')">
+      <div class="stat-list-item-main"><span class="stat-list-link">${escHtml(displayName)}</span></div>
       <span class="stat-list-item-date">${formatDateShort(e.date)}</span>
     </div>`
   ).join('');
-
   openStatModal(`Setlists (${rows.length})`, html || '<div class="stat-list-item">No setlists yet.</div>');
 }
 
-// ══════════════════════════════════════════════
+function openCombinedVenuesModal() {
+  window._statItems = [];
+  // Collect event venues
+  const venueMap = {};
+  allEvents.forEach(e => {
+    if (!e.venue) return;
+    const { name, location } = parseVenue(e.venue);
+    const key = name.toLowerCase().trim();
+    if (!venueMap[key]) venueMap[key] = { name: name.trim(), location: location.trim(), count: 0 };
+    venueMap[key].count++;
+  });
+  // Merge sports venues
+  allSportsEvents.forEach(e => {
+    if (!e.venue) return;
+    const lines = e.venue.split(/[\r\n]+/).map(s => s.trim()).filter(Boolean);
+    const name = lines[0] || e.venue.trim();
+    const location = lines[1] || '';
+    const key = name.toLowerCase().trim();
+    if (!venueMap[key]) venueMap[key] = { name, location, count: 0 };
+    venueMap[key].count++;
+  });
+  const sorted = Object.values(venueMap).sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+  const html = sorted.map(({ name, location, count }) => {
+    const idx = window._statItems.length;
+    window._statItems.push({ type: 'venue', searchTerm: name });
+    return `<div class="stat-list-item" onclick="statItemClick(${idx})">
+      <div class="stat-list-item-main">
+        <span class="stat-list-item-name-row">
+          <span class="stat-list-link">${escHtml(name)}</span>
+          ${count > 1 ? `<span class="stat-list-item-count">(${count})</span>` : ''}
+        </span>
+        ${location ? `<span class="stat-list-item-sub"> ${escHtml(location)}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  openStatModal(`Venues (${sorted.length})`, html || '<div class="stat-list-item">No venues yet.</div>');
+}
+
+// ══════════════════════════════════════════════════════════════════
 //  EVENT DETAIL MODAL
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════
 let currentModalEventId = null;
 
-function openModal(id) {
-  const e = allEvents.find(ev => ev.id === id);
+function openEventModal(id) {
+  const e = allEvents.find(ev => ev.id === id || String(ev.id) === String(id));
   if (!e) return;
   currentModalEventId = id;
   const { month, day, year } = formatDateParts(e.date);
   const hasSetlist = !!(e.setlist && e.setlist.trim());
   const artists = parseArtists(e.artists);
-
-  // Artists — each on own line
   const artistsHtml = artists.map(a => `<span class="modal-artist-line">${escHtml(a)}</span>`).join('');
-
-  // Meta pills — corrected column mapping: attendedWith = who you were with, type = type of event, notes = notes
   let pills = '';
   if (e.attendedWith && e.attendedWith.trim()) {
-    // Multi-line cell from Google Sheets → comma-separated names
     const withNames = e.attendedWith.split(/[\n,]+/).map(s => s.trim()).filter(Boolean).join(', ');
     pills += `<div class="modal-meta-pill"><span class="modal-meta-pill-label">With</span>&nbsp;${escHtml(withNames)}</div>`;
   }
   if (e.type && e.type.trim()) pills += `<div class="modal-meta-pill"><span class="modal-meta-pill-label">Type</span>&nbsp;${escHtml(e.type)}</div>`;
-
   let notesBlock = '';
   if (e.notes && e.notes.trim()) {
     notesBlock = `<div class="modal-notes-block"><div class="modal-notes-label">Notes</div><p class="modal-notes-text">${escHtml(e.notes)}</p></div>`;
   }
-
-  // Parse multiple setlist URLs (one per line)
-  const setlistUrls = hasSetlist
-    ? e.setlist.split(/\n/).map(s => s.trim()).filter(Boolean)
-    : [];
+  const setlistUrls = hasSetlist ? e.setlist.split(/\n/).map(s => s.trim()).filter(Boolean) : [];
   const multiSetlist = setlistUrls.length > 1;
-
   let setlistBlock = '';
   if (setlistUrls.length === 1) {
     setlistBlock = `<div class="setlist-section" id="modalSetlist">
       <div id="setlistContent"><div class="setlist-loading"><span class="spinner"></span>&nbsp;Loading setlist…</div></div>
     </div>`;
   } else if (setlistUrls.length > 1) {
-    // Side-by-side columns, one per setlist URL
     const cols = setlistUrls.map((url, i) =>
       `<div class="setlist-col" id="setlistCol${i}">
         <div class="setlist-loading"><span class="spinner"></span>&nbsp;Loading…</div>
       </div>`
     ).join('');
-    setlistBlock = `<div class="setlist-section" id="modalSetlist">
-      <div class="setlist-multi-row">${cols}</div>
-    </div>`;
+    setlistBlock = `<div class="setlist-section" id="modalSetlist"><div class="setlist-multi-row">${cols}</div></div>`;
   }
-
-  // Build Google Maps URL for the venue
   const venueParsed = parseVenue(e.venue);
-  const mapsQuery = encodeURIComponent(
-    venueParsed.location ? `${venueParsed.name} ${venueParsed.location}` : venueParsed.name
-  );
+  const mapsQuery = encodeURIComponent(venueParsed.location ? `${venueParsed.name} ${venueParsed.location}` : venueParsed.name);
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
-
   document.getElementById('modalBody').innerHTML = `
     <span class="modal-date-tag">${month} ${day}, ${year}</span>
     <div class="modal-artists">${artistsHtml}</div>
@@ -1250,10 +1585,8 @@ function openModal(id) {
     ${pills ? `<div class="modal-meta-row">${pills}</div>` : ''}
     ${notesBlock}
   `;
-
   document.getElementById('detailModal').classList.add('open');
   document.body.style.overflow = 'hidden';
-
   if (setlistUrls.length === 1) {
     loadSetlist(e, setlistUrls[0], null);
   } else if (setlistUrls.length > 1) {
@@ -1270,326 +1603,115 @@ function closeModal() {
   document.body.style.overflow = '';
   currentModalEventId = null;
 }
-function closeModalIfOutside(e) {
-  if (e.target === document.getElementById('detailModal')) closeModal();
-}
+function closeModalIfOutside(e) { if (e.target === document.getElementById('detailModal')) closeModal(); }
 
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════
 //  SETLIST — LOCAL CACHE + FETCH
-// ══════════════════════════════════════════════
-
-// Load the persistent setlist cache from localStorage
+// ══════════════════════════════════════════════════════════════════
 let setlistCache = load(STORAGE_KEYS.setlistCache) || {};
-// Purge any cached entries that parsed as empty (from old broken parser)
 Object.keys(setlistCache).forEach(k => {
   const v = setlistCache[k];
   if (!v || !v.sets || !v.sets.length || !v.sets.some(s => s.songs && s.songs.length)) {
     delete setlistCache[k];
   }
 });
-saveSetlistCache();
 
 function saveSetlistCache() { save(STORAGE_KEYS.setlistCache, setlistCache); }
 
-// Fetch setlist from GitHub JSON repository
-async function fetchSetlistHtml(url) {
-  if (setlistCache[url] && setlistCache[url].sets) {
-    console.log('[Setlist] Using cached data for:', url);
-    return { cached: setlistCache[url] };
-  }
-  
-  try {
-    const githubUrl = 'https://raw.githubusercontent.com/BooRadley-27/concert-setlists/main/setlists.json';
-    console.log('[Setlist] Fetching from GitHub:', githubUrl);
-    
-    const response = await fetch(githubUrl, { cache: 'no-cache' });
-    
-    if (!response.ok) {
-      console.warn('[Setlist] GitHub JSON not found (this is normal if repo is not set up yet)');
-      return { jsonData: null };
-    }
-    
-    const allSetlists = await response.json();
-    console.log('[Setlist] GitHub JSON loaded, checking for URL:', url);
-    
-    const setlistData = allSetlists[url];
-    if (!setlistData) {
-      console.log('[Setlist] No entry found for this URL in GitHub JSON');
-      return { jsonData: null };
-    }
-    
-    console.log('[Setlist] Found setlist in GitHub JSON');
-    return { jsonData: setlistData };
-  } catch (e) {
-    console.error('[Setlist] GitHub fetch error:', e.message);
-    return { jsonData: null };
-  }
+function loadSetlist(event, url, artistOverride) {
+  loadSetlistInto('setlistContent', url, artistOverride ? [artistOverride] : parseArtists(event.artists));
 }
 
-
-
-// Load a setlist into the default #setlistContent container (single-setlist path)
-async function loadSetlist(event, url, _unused) {
-  const container = document.getElementById('setlistContent');
-  if (!container) return;
-  if (!url) url = event.setlist.trim();
-  const artists = parseArtists(event.artists);
-  const { cached, jsonData } = await fetchSetlistHtml(url);
-  if (cached) { container.innerHTML = renderSetlistHTML(cached, url, artists); return; }
-  if (!jsonData) {
-    container.innerHTML = `<p class="setlist-error">Setlist not available yet.</p>
-      <p class="setlist-source" style="margin-top:8px"><a class="setlist-link" href="${escHtml(url)}" target="_blank">View on setlist.fm</a></p>`;
-    return;
-  }
-  // jsonData is already in our format: { sets: [...] }
-  if (jsonData.sets && jsonData.sets.length && jsonData.sets.some(s => s.songs && s.songs.length)) {
-    setlistCache[url] = jsonData; saveSetlistCache();
-  }
-  container.innerHTML = renderSetlistHTML(jsonData, url, artists);
-}
-
-// Load a setlist into a specific container by ID (multi-setlist path)
 async function loadSetlistInto(containerId, url, artists) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  // Mark as multi-column so header shows artist name
-  if (artists && artists.length) artists._isMultiCol = true;
-  const { cached, jsonData } = await fetchSetlistHtml(url);
-  if (cached) { container.innerHTML = renderSetlistHTML(cached, url, artists); return; }
-  if (!jsonData) {
-    container.innerHTML = `<p class="setlist-error">Not available yet.</p>
-      <p class="setlist-source"><a class="setlist-link" href="${escHtml(url)}" target="_blank">View on setlist.fm</a></p>`;
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const cacheKey = url.trim().toLowerCase();
+  if (setlistCache[cacheKey]) {
+    el.innerHTML = renderSetlistHtml(setlistCache[cacheKey], url, artists);
     return;
   }
-  // jsonData is already in our format: { sets: [...] }
-  if (jsonData.sets && jsonData.sets.length && jsonData.sets.some(s => s.songs && s.songs.length)) {
-    setlistCache[url] = jsonData; saveSetlistCache();
+  el.innerHTML = `<div class="setlist-loading"><span class="spinner"></span>&nbsp;Loading setlist…</div>`;
+  try {
+    const setlistId = extractSetlistId(url);
+    if (!setlistId) { el.innerHTML = `<div class="setlist-error">Invalid setlist URL.</div>`; return; }
+    const apiUrl = `https://api.setlist.fm/rest/1.0/setlist/${setlistId}`;
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl + '?Accept=application/json')}`;
+    const resp = await fetch(proxyUrl, { headers: { 'Accept': 'application/json' } });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const wrapper = await resp.json();
+    const raw = wrapper.contents;
+    if (!raw) throw new Error('Empty response');
+    const data = JSON.parse(raw);
+    const parsed = parseSetlistData(data, artists);
+    setlistCache[cacheKey] = parsed;
+    saveSetlistCache();
+    el.innerHTML = renderSetlistHtml(parsed, url, artists);
+  } catch(err) {
+    el.innerHTML = `<div class="setlist-error">Could not load setlist. <a class="setlist-link" href="${escHtml(url)}" target="_blank">View on setlist.fm ↗</a></div>`;
   }
-  container.innerHTML = renderSetlistHTML(jsonData, url, artists);
 }
 
-
-// Extract artist name from setlist.fm URL, optionally matching against event artists
-// URL format: https://www.setlist.fm/setlist/the-academy-is/2025/gothic-theatre-...
-function extractArtistFromSetlistUrl(url, eventArtists) {
-  if (!url) return null;
-  const match = url.match(/setlist\.fm\/setlist\/([^\/]+)/);
-  if (!match) return null;
-  const slug = match[1];
-  
-  // Convert slug to title case: "the-academy-is" -> "The Academy Is"
-  const slugTitle = slug
-    .split('-')
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ');
-  
-  // If we have event artists, try to find a case-insensitive match
-  // This preserves proper capitalization and punctuation (e.g., "The Academy Is...")
-  if (eventArtists && eventArtists.length) {
-    const found = eventArtists.find(a => 
-      a.toLowerCase().replace(/[^a-z0-9]/g, '') === 
-      slugTitle.toLowerCase().replace(/[^a-z0-9]/g, '')
-    );
-    if (found) return found;
-  }
-  
-  return slugTitle;
+function extractSetlistId(url) {
+  const m = url.match(/setlist\.fm\/setlists?\/[^/]+-([a-f0-9]+)\.html/i) || url.match(/\/([a-f0-9]{5,})(?:\.html)?(?:[?#]|$)/i);
+  return m ? m[1] : null;
 }
 
-function parseSetlistFm(html) {
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  const result = { sets: [] };
-
-  const SET_HEADER_RE = /^(set\s*\d|encore(\s*\d+)?\s*:?|band\s*intro|intermission|acoustic|piano|electric|unplugged|double-neck\s*acoustic)\b/i;
-  const isSetLabel = (text) => SET_HEADER_RE.test(text.trim());
-
-  // Words found in breadcrumb/nav lists — used to skip non-song ols
-  const NAV_WORDS = /^(you are here|artists?|festivals?|venues?|statistics|news|forum|setlists?|s|a|p)$/i;
-
-  // Returns true if an ol looks like a song list (not a breadcrumb/nav)
-  const isSongOl = (ol) => {
-    if (ol.closest('nav, header, footer, aside, [class*="breadcrumb"], [class*="Breadcrumb"]')) return false;
-    const lis = Array.from(ol.querySelectorAll('li'));
-    if (!lis.length) return false;
-    // If the ol contains "You are here" anywhere → breadcrumb
-    if (ol.textContent.includes('You are here')) return false;
-    // If any item matches a date-setlist pattern like "October 4, 2025 Setlist" → breadcrumb
-    if (lis.some(li => /\b(\d{4}\s+setlist|setlist$)/i.test(li.textContent.trim()))) return false;
-    // If most items are short nav-like words, skip
-    const navCount = lis.filter(li => NAV_WORDS.test(li.textContent.trim())).length;
-    if (navCount >= 2) return false;
-    // Must have at least one item that looks like a real song title (longer than 3 chars, not a nav word)
-    return lis.some(li => {
-      const t = li.textContent.trim();
-      return t.length > 3 && t.length < 200 && !isSetLabel(t) && !NAV_WORDS.test(t);
-    });
-  };
-
-  // Extract song name and optional note from a list item
-  const extractSong = (li) => {
-    const labelEl = li.querySelector('.songLabel a, .songLabel, a.songLabel');
-    let name = '';
-    if (labelEl) {
-      name = labelEl.textContent.trim();
-    } else {
-      const clone = li.cloneNode(true);
-      clone.querySelectorAll('.songInfo, .tape, .songCover, .shortNote, button, svg, small, sup').forEach(el => el.remove());
-      name = clone.textContent.trim().split('\n')[0].trim().replace(/\s+/g, ' ');
-    }
-    const infoEl = li.querySelector('.shortNote, .songInfo, .tape');
-    const note = infoEl ? infoEl.textContent.trim().replace(/\s+/g, ' ') : '';
-    return { name, note };
-  };
-
-  // Find the set label immediately preceding a song <ol>
-  const getSetLabel = (ol) => {
-    // Check previous siblings
-    let node = ol.previousElementSibling;
-    while (node) {
-      const text = node.textContent.trim().replace(/\s+/g, ' ');
-      if (text.length > 0 && text.length < 100 && isSetLabel(text)) return text;
-      if (node.tagName.toLowerCase() === 'ol') break;
-      node = node.previousElementSibling;
-    }
-    // Check parent's previous siblings (one level up)
-    const parent = ol.parentElement;
-    if (parent && parent !== doc.body) {
-      let prev = parent.previousElementSibling;
-      while (prev) {
-        const text = prev.textContent.trim().replace(/\s+/g, ' ');
-        if (text.length > 0 && text.length < 100 && isSetLabel(text)) return text;
-        if (prev.tagName.toLowerCase() === 'ol') break;
-        prev = prev.previousElementSibling;
-      }
-    }
-    return null;
-  };
-
-  // ── Strategy 1: find all song-like ols ──
-  const songOls = Array.from(doc.querySelectorAll('ol')).filter(isSongOl);
-
-  if (songOls.length > 0) {
-    songOls.forEach(ol => {
-      const label = getSetLabel(ol);
-      const songs = Array.from(ol.querySelectorAll('li'))
-        .map(li => extractSong(li))
-        .filter(s => s.name.length > 1 && s.name.length < 200 && !isSetLabel(s.name) && !NAV_WORDS.test(s.name));
-      if (songs.length > 0) result.sets.push({ label, songs });
+function parseSetlistData(data, artists) {
+  const sets = [];
+  if (data.sets && data.sets.set) {
+    data.sets.set.forEach(s => {
+      const label = s.name || s.encore ? (s.encore ? `Encore${s.encore > 1 ? ' '+s.encore : ''}` : s.name) : null;
+      const songs = (s.song || []).map(song => ({ name: song.name || '', note: song.info || '' }));
+      sets.push({ label, songs });
     });
   }
-
-  // ── Strategy 2: li.song (older setlist.fm markup) ──
-  if (!result.sets.length) {
-    const songItems = doc.querySelectorAll('li.song');
-    if (songItems.length) {
-      let main = [], encore = [];
-      songItems.forEach(li => {
-        const s = extractSong(li);
-        const inEncore = !!(li.closest('.encore') || /encore/i.test((li.parentElement || {}).className || ''));
-        (inEncore ? encore : main).push(s);
-      });
-      if (main.length) result.sets.push({ label: null, songs: main });
-      if (encore.length) result.sets.push({ label: 'Encore', songs: encore });
-    }
-  }
-
-  // ── Strategy 3: largest <ol> on page (last resort) ──
-  if (!result.sets.length) {
-    let best = null, bestN = 0;
-    doc.querySelectorAll('ol').forEach(ol => {
-      if (ol.closest('nav, header, footer, aside')) return;
-      const n = ol.querySelectorAll('li').length;
-      if (n > bestN) { best = ol; bestN = n; }
-    });
-    if (best && bestN >= 3) {
-      const songs = Array.from(best.querySelectorAll('li'))
-        .map(li => ({ name: li.textContent.trim().split('\n')[0].trim(), note: '' }))
-        .filter(s => s.name.length > 1 && s.name.length < 200);
-      if (songs.length) result.sets.push({ label: null, songs });
-    }
-  }
-
-  return result;
+  return { sets, url: data.url || '', artists: artists || [] };
 }
-
-// Patterns that indicate junk/non-song content to filter out
-const JUNK_PATTERNS = [
-  /^<!\[CDATA\[/i, /^<!--/, /^\/\*/, /CDATA/i,
-  /^setlist\.fm/i, /^edit setlist/i, /^share/i,
-  /^tour statistics/i, /^i was there/i
-];
 
 function isSongNameValid(name) {
-  if (!name || name.length < 1 || name.length > 200) return false;
-  return !JUNK_PATTERNS.some(p => p.test(name.trim()));
+  if (!name || !name.trim()) return false;
+  const n = name.trim().toLowerCase();
+  if (n.length < 2) return false;
+  if (/^\d+$/.test(n)) return false;
+  const junk = ['test','placeholder','song name','unknown','untitled'];
+  if (junk.includes(n)) return false;
+  return true;
 }
 
-// Returns true if this set label looks like a section header (Set 1, Set 2, Encore, etc.)
-function isSetHeader(label) {
-  if (!label) return false;
-  return /^(set\s*\d|encore|band intro|intermission)/i.test(label.trim());
+function extractArtistFromSetlistUrl(url, eventArtists) {
+  try {
+    const path = new URL(url).pathname;
+    const segs = path.split('/').filter(Boolean);
+    const setlistSeg = segs.find(s => s.includes('-setlists-') || s.endsWith('.html'));
+    if (setlistSeg) {
+      let name = setlistSeg.replace(/(-\w{6,8})\.html$/, '').replace(/-setlists?-.*$/, '').replace(/-/g,' ').replace(/\bsetlist\b/gi,'').trim();
+      if (name.length > 2) {
+        if (eventArtists && eventArtists.length > 0) {
+          const match = eventArtists.find(a => a.toLowerCase().replace(/[^a-z0-9]/g,'').includes(name.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,8)));
+          if (match) return match;
+        }
+        return name.charAt(0).toUpperCase() + name.slice(1);
+      }
+    }
+  } catch(e) {}
+  if (eventArtists && eventArtists.length > 0) return eventArtists[0];
+  return null;
 }
 
-function renderSetlistHTML(parsed, url, artists) {
-  if (!parsed.sets || !parsed.sets.length || !parsed.sets.some(s => s.songs && s.songs.length)) {
-    return `<p class="setlist-error">Could not load setlist automatically.</p>
-      <p class="setlist-source" style="margin-top:6px"><a class="setlist-link" href="${escHtml(url)}" target="_blank">View on setlist.fm</a></p>`;
-  }
-
-  // Header logic:
-  // 1. Try to extract artist from the setlist.fm URL itself
-  // 2. If that fails or it's a single-artist show, just say "SETLIST"
-  // 3. For multi-column views, use the passed artist name
+function renderSetlistHtml(parsed, url, urlArtists) {
   let headerText = 'SETLIST';
-  const urlArtist = extractArtistFromSetlistUrl(url, artists);
-  
-  if (artists && artists.length === 1) {
-    // Single artist OR multi-column
-    if (artists._isMultiCol) {
-      // Multi-column: show the passed artist name
-      headerText = `SETLIST — ${escHtml(artists[0].toUpperCase())}`;
-    } else if (urlArtist) {
-      // Single-artist show but URL has artist → shouldn't happen, just show SETLIST
-      headerText = 'SETLIST';
-    }
-    // else: single-artist show, just "SETLIST"
-  } else if (artists && artists.length > 1) {
-    // Multi-artist show: use URL artist if available, otherwise show all
-    if (urlArtist) {
-      headerText = `SETLIST — ${escHtml(urlArtist.toUpperCase())}`;
-    } else {
-      headerText = `SETLIST — ${escHtml(artists.join(', ').toUpperCase())}`;
-    }
-  } else if (urlArtist) {
-    // No artists passed but URL has artist (fallback)
-    headerText = `SETLIST — ${escHtml(urlArtist.toUpperCase())}`;
-  }
+  const urlArtist = urlArtists && urlArtists[0] ? urlArtists[0] : null;
+  if (urlArtist) headerText = `SETLIST — ${escHtml(urlArtist.toUpperCase())}`;
   let html = `<div class="setlist-band-header">${headerText}</div>`;
-
-  // Global song counter across all sets (like setlist.fm shows it)
-  let songNum = 0;
-  let firstSet = true;
-
+  let songNum = 0; let firstSet = true;
   parsed.sets.forEach((set) => {
-    // Filter junk from songs
     const validSongs = set.songs.filter(s => isSongNameValid(s.name));
     if (!validSongs.length && !set.label) return;
-
-    // Gap between sets (not before the very first)
     const gapStyle = firstSet ? '' : ' style="margin-top:20px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.07)"';
     firstSet = false;
-
-    // Set section header — styled like setlist.fm's blue pill labels
-    if (set.label) {
-      html += `<div class="setlist-set-header"${gapStyle}>${escHtml(set.label)}</div>`;
-    } else if (gapStyle) {
-      // No label but still need the gap div
-      html += `<div${gapStyle}></div>`;
-    }
-
+    if (set.label) { html += `<div class="setlist-set-header"${gapStyle}>${escHtml(set.label)}</div>`; }
+    else if (gapStyle) { html += `<div${gapStyle}></div>`; }
     if (!validSongs.length) return;
-
-    // Songs list — manual numbering so headers don't count
     html += `<ol class="setlist-songs">`;
     validSongs.forEach(s => {
       songNum++;
@@ -1598,79 +1720,1080 @@ function renderSetlistHTML(parsed, url, artists) {
     });
     html += `</ol>`;
   });
-
   html += `<p class="setlist-source">Via <a class="setlist-link" href="${escHtml(url)}" target="_blank">setlist.fm</a></p>`;
   return html;
 }
 
-// ══════════════════════════════════════════════
-//  SEARCH
-// ══════════════════════════════════════════════
-let searchDebounce = null;
+function escRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
 
-function onSearchInput(e) {
-  const val = e.target.value.trim();
-  document.getElementById('searchClear').classList.toggle('visible', val.length > 0);
-  clearTimeout(searchDebounce);
-  searchDebounce = setTimeout(() => performSearch(val), 180);
+// ══════════════════════════════════════════════════════════════════
+//  SPORTS — TEAM DATABASE
+// ══════════════════════════════════════════════════════════════════
+const MLB = {
+  'arizona diamondbacks':'ARI','diamondbacks':'ARI','atlanta braves':'ATL','braves':'ATL',
+  'baltimore orioles':'BAL','orioles':'BAL','boston red sox':'BOS','red sox':'BOS',
+  'chicago cubs':'CHC','cubs':'CHC','chicago white sox':'CWS','white sox':'CWS',
+  'cincinnati reds':'CIN','reds':'CIN','cleveland guardians':'CLE','cleveland indians':'CLE','guardians':'CLE','indians':'CLE',
+  'colorado rockies':'COL','rockies':'COL','detroit tigers':'DET','tigers':'DET',
+  'houston astros':'HOU','astros':'HOU','kansas city royals':'KC','royals':'KC',
+  'los angeles angels':'LAA','angels':'LAA','los angeles dodgers':'LAD','dodgers':'LAD',
+  'miami marlins':'MIA','marlins':'MIA','florida marlins':'MIA','milwaukee brewers':'MIL','brewers':'MIL','miluakee brewers':'MIL',
+  'minnesota twins':'MIN','twins':'MIN','new york mets':'NYM','mets':'NYM','new york yankees':'NYY','yankees':'NYY',
+  'oakland athletics':'OAK','athletics':'OAK',"a's":'OAK','philadelphia phillies':'PHI','phillies':'PHI',
+  'pittsburgh pirates':'PIT','pirates':'PIT','san diego padres':'SD','padres':'SD','san francisco giants':'SF','giants':'SF',
+  'seattle mariners':'SEA','mariners':'SEA','st. louis cardinals':'STL','st louis cardinals':'STL','cardinals':'STL','stl cardinals':'STL',
+  'tampa bay rays':'TB','rays':'TB','texas rangers':'TEX','rangers':'TEX','toronto blue jays':'TOR','blue jays':'TOR',
+  'washington nationals':'WSH','nationals':'WSH',
+};
+const NFL = {
+  'arizona cardinals':'ARI','atlanta falcons':'ATL','falcons':'ATL','baltimore ravens':'BAL','ravens':'BAL',
+  'buffalo bills':'BUF','bills':'BUF','carolina panthers':'CAR','panthers':'CAR','chicago bears':'CHI','bears':'CHI',
+  'cincinnati bengals':'CIN','bengals':'CIN','cleveland browns':'CLE','browns':'CLE','dallas cowboys':'DAL','cowboys':'DAL',
+  'denver broncos':'DEN','broncos':'DEN','detroit lions':'DET','lions':'DET','green bay packers':'GB','packers':'GB',
+  'houston texans':'HOU','texans':'HOU','indianapolis colts':'IND','colts':'IND','jacksonville jaguars':'JAX','jaguars':'JAX',
+  'kansas city chiefs':'KC','chiefs':'KC','las vegas raiders':'LV','raiders':'LV','los angeles chargers':'LAC','chargers':'LAC',
+  'los angeles rams':'LA','rams':'LA','st. louis rams':'STL','miami dolphins':'MIA','dolphins':'MIA',
+  'minnesota vikings':'MIN','vikings':'MIN','new england patriots':'NE','patriots':'NE','new orleans saints':'NO','saints':'NO',
+  'new york giants':'NYG','new york jets':'NYJ','jets':'NYJ','philadelphia eagles':'PHI','eagles':'PHI',
+  'pittsburgh steelers':'PIT','steelers':'PIT','san francisco 49ers':'SF','49ers':'SF','seattle seahawks':'SEA','seahawks':'SEA',
+  'tampa bay buccaneers':'TB','buccaneers':'TB','tennessee titans':'TEN','titans':'TEN',
+  'washington commanders':'WSH','washington football team':'WSH','washington redskins':'WSH','commanders':'WSH',
+};
+const NHL = {
+  'anaheim ducks':'ANA','ducks':'ANA','arizona coyotes':'ARI','coyotes':'ARI','boston bruins':'BOS','bruins':'BOS',
+  'buffalo sabres':'BUF','sabres':'BUF','calgary flames':'CGY','flames':'CGY','carolina hurricanes':'CAR','hurricanes':'CAR',
+  'chicago blackhawks':'CHI','blackhawks':'CHI','colorado avalanche':'COL','avalanche':'COL','columbus blue jackets':'CBJ','blue jackets':'CBJ',
+  'dallas stars':'DAL','stars':'DAL','detroit red wings':'DET','red wings':'DET','edmonton oilers':'EDM','oilers':'EDM',
+  'florida panthers':'FLA','los angeles kings':'LA','kings':'LA','minnesota wild':'MIN','wild':'MIN',
+  'montreal canadiens':'MTL','canadiens':'MTL','nashville predators':'NSH','predators':'NSH','new jersey devils':'NJ','devils':'NJ',
+  'new york islanders':'NYI','islanders':'NYI','new york rangers':'NYR','ottawa senators':'OTT','senators':'OTT',
+  'philadelphia flyers':'PHI','flyers':'PHI','pittsburgh penguins':'PIT','penguins':'PIT','san jose sharks':'SJ','sharks':'SJ',
+  'seattle kraken':'SEA','kraken':'SEA','st. louis blues':'STL','st louis blues':'STL','blues':'STL',
+  'tampa bay lightning':'TB','lightning':'TB','toronto maple leafs':'TOR','maple leafs':'TOR','vancouver canucks':'VAN','canucks':'VAN',
+  'vegas golden knights':'VGK','golden knights':'VGK','washington capitals':'WSH','capitals':'WSH','winnipeg jets':'WPG',
+};
+const NBA = {
+  'atlanta hawks':'ATL','hawks':'ATL','boston celtics':'BOS','celtics':'BOS','brooklyn nets':'BKN','nets':'BKN',
+  'charlotte hornets':'CHA','hornets':'CHA','chicago bulls':'CHI','bulls':'CHI','cleveland cavaliers':'CLE','cavaliers':'CLE',
+  'dallas mavericks':'DAL','mavericks':'DAL','denver nuggets':'DEN','nuggets':'DEN','detroit pistons':'DET','pistons':'DET',
+  'golden state warriors':'GS','warriors':'GS','houston rockets':'HOU','rockets':'HOU','indiana pacers':'IND','pacers':'IND',
+  'los angeles clippers':'LAC','clippers':'LAC','los angeles lakers':'LAL','lakers':'LAL','memphis grizzlies':'MEM','grizzlies':'MEM',
+  'miami heat':'MIA','heat':'MIA','milwaukee bucks':'MIL','bucks':'MIL','minnesota timberwolves':'MIN','timberwolves':'MIN',
+  'new orleans pelicans':'NO','pelicans':'NO','new york knicks':'NY','knicks':'NY','oklahoma city thunder':'OKC','thunder':'OKC',
+  'orlando magic':'ORL','magic':'ORL','philadelphia 76ers':'PHI','76ers':'PHI','phoenix suns':'PHX','suns':'PHX',
+  'portland trail blazers':'POR','trail blazers':'POR','sacramento kings':'SAC','sacramento kings':'SAC',
+  'san antonio spurs':'SA','spurs':'SA','toronto raptors':'TOR','raptors':'TOR','utah jazz':'UTAH','jazz':'UTAH',
+  'washington wizards':'WSH','wizards':'WSH',
+};
+const MLS = {
+  'atlanta united':16072,'atlanta united fc':16072,'austin fc':21666,'charlotte fc':22124,
+  'chicago fire':9726,'chicago fire fc':9726,'fc cincinnati':18631,'colorado rapids':9730,'rapids':9730,
+  'columbus crew':9731,'crew':9731,'d.c. united':9734,'dc united':9734,'fc dallas':9735,
+  'houston dynamo':9736,'dynamo':9736,'sporting kc':9739,'sporting kansas city':9739,
+  'la galaxy':9743,'los angeles galaxy':9743,'galaxy':9743,'lafc':19049,'los angeles fc':19049,
+  'inter miami':20232,'inter miami cf':20232,'herons':20232,'minnesota united':15296,'minnesota united fc':15296,'loons':15296,
+  'cf montréal':20388,'cf montreal':20388,'montreal impact':20388,'nashville sc':18506,'nashville':18506,
+  'new england revolution':9742,'revolution':9742,'new york city fc':14880,'nycfc':14880,'nyc fc':14880,
+  'new york red bulls':9744,'red bulls':9744,'nyrb':9744,'orlando city':16516,'orlando city sc':16516,
+  'philadelphia union':14879,'union':14879,'portland timbers':9723,'timbers':9723,'real salt lake':9746,'rsl':9746,
+  'san jose earthquakes':9748,'earthquakes':9748,'seattle sounders':9725,'seattle sounders fc':9725,'sounders':9725,
+  'st. louis city sc':22421,'st louis city sc':22421,'stl city':22421,'st. louis city':22421,'toronto fc':9750,
+  'vancouver whitecaps':9751,'whitecaps':9751,'san diego fc':22912,
+};
+const INTL_SOCCER = {
+  'manchester city':382,'man city':382,'chelsea':363,'chelsea fc':363,'arsenal':359,'liverpool':364,
+  'manchester united':360,'man united':360,'man utd':360,'tottenham':367,'tottenham hotspur':367,'spurs':367,
+  'aston villa':362,'newcastle':361,'newcastle united':361,'west ham':371,'west ham united':371,'brighton':331,
+  'wolverhampton':380,'wolves':380,'fulham':370,'brentford':333,'crystal palace':341,'bournemouth':349,'everton':368,
+  'nottingham forest':374,'leicester city':375,'real madrid':86,'barcelona':83,'atletico madrid':1068,'atletico':1068,
+  'paris saint-germain':160,'psg':160,'bayern munich':132,'bayern':132,'juventus':111,'ac milan':103,'inter milan':110,
+  'borussia dortmund':124,'dortmund':124,'ajax':80,'porto':238,'benfica':229,
+  'uswnt':21620,'us womens national team':21620,'united states women':21620,'usmnt':21604,'united states mens':21604,
+  'england':66,'germany':75,'france':60,'spain':76,'italy':68,'brazil':21,'argentina':7,'mexico':70,'canada':1,'australia':17,
+  'new zealand':22,'football ferns':22,'nz football ferns':22,'new zealand ferns':22,
+};
+
+const SPORT_ICONS = {baseball:'⚾',football:'🏈',basketball:'🏀',hockey:'🏒',soccer:'⚽',default:'🏟'};
+
+const SPECIAL_TEAMS = {
+  'savannah bananas':'https://upload.wikimedia.org/wikipedia/en/6/6e/Savannah_Bananas_logo.svg',
+  'bananas':'https://upload.wikimedia.org/wikipedia/en/6/6e/Savannah_Bananas_logo.svg',
+  'savannah party animals':'https://upload.wikimedia.org/wikipedia/en/8/8c/Savannah_Party_Animals_logo.svg',
+  'party animals':'https://upload.wikimedia.org/wikipedia/en/8/8c/Savannah_Party_Animals_logo.svg',
+};
+
+// ══════════════════════════════════════════════════════════════════
+//  SPORTS — HELPERS
+// ══════════════════════════════════════════════════════════════════
+function getSportKey(t, league) {
+  if (t) {
+    const tl = t.toLowerCase();
+    if (tl.includes('base')) return 'baseball';
+    if (tl.includes('foot')) return 'football';
+    if (tl.includes('basket')) return 'basketball';
+    if (tl.includes('hockey')) return 'hockey';
+    if (tl.includes('soccer')) return 'soccer';
+    if (tl.includes('ncaa') || tl.includes('college')) return 'basketball';
+  }
+  if (league) {
+    const ll = league.toLowerCase().replace(/[^a-z0-9]/g,'');
+    if (['mlb','baseball','ncaabaseball'].includes(ll)) return 'baseball';
+    if (['nfl','football','ncaafootball'].includes(ll)) return 'football';
+    if (['nba','ncaa','basketball','ncaamb','ncaabb'].includes(ll)) return 'basketball';
+    if (['nhl','hockey'].includes(ll)) return 'hockey';
+    if (['mls','usl','epl','premierleague','lalliga','seriea','bundesliga','ligue1','soccer','intl','international'].includes(ll)) return 'soccer';
+  }
+  return 'default';
 }
-// onSearchBlur intentionally removed — onDocClick handles clearing on outside click
-function onDocClick(e) {
+
+function pd(s){const p=s.split('-');const mn=parseInt(p[1]||'1',10)-1;return{mon:MONTHS[mn]||'—',day:parseInt(p[2]||'1',10),year:p[0]||'',mn};}
+function fmtFull(s){const d=pd(s);return`${MONTHS_FULL[d.mn]||''} ${d.day}, ${d.year}`;}
+function fmtShort(s){const d=pd(s);return`${d.mon} ${d.day}, ${d.year}`;}
+function venShort(r){
+  if(!r)return'';
+  const ls=r.split(/[\r\n]+/).map(s=>s.trim()).filter(Boolean);
+  if(ls.length>=2)return ls[0]+' · '+ls[1];
+  const single=ls[0]||r;
+  const m=single.match(/^(.+?)\s+([A-Z][a-zA-Z\s\.]+,\s*[A-Z]{2})$/);
+  if(m)return m[1]+' · '+m[2];
+  return single;
+}
+function fmtScore(raw){
+  if(!raw)return'';const s=raw.match(/(\d+)\s*[-–]\s*(\d+)/);if(s)return`${s[1]}–${s[2]}`;
+  const ns=raw.match(/\d+/g);if(ns&&ns.length>=2)return`${ns[0]}–${ns[1]}`;
+  return raw.replace(/[\r\n]+/g,' ').substring(0,14);
+}
+function fmtCardScore(ev){
+  if(ev.awayScore!==undefined&&ev.awayScore!==''&&ev.homeScore!==undefined&&ev.homeScore!==''){return`${ev.awayScore}–${ev.homeScore}`;}
+  return fmtScore(ev.score);
+}
+function scoreParts(ev){
+  if(ev&&ev.awayScore!==undefined&&ev.awayScore!==''&&ev.homeScore!==undefined&&ev.homeScore!==''){return[+ev.homeScore,+ev.awayScore];}
+  const raw=ev&&ev.score?ev.score:(typeof ev==='string'?ev:'');
+  if(!raw)return[null,null];const ns=raw.match(/\d+/g);if(ns&&ns.length>=2)return[+ns[0],+ns[1]];return[null,null];
+}
+
+function lookupEspn(name, sport) {
+  const key = name.toLowerCase().trim();
+  function fuzzyMatch(map) {
+    if (map[key] !== undefined) return map[key];
+    for (const [k, v] of Object.entries(map)) { if (key.includes(k) || k.includes(key)) return v; }
+    return undefined;
+  }
+  if (sport === 'baseball') { const abbr = fuzzyMatch(MLB); return abbr ? `https://a.espncdn.com/i/teamlogos/mlb/500/${abbr.toLowerCase()}.png` : null; }
+  if (sport === 'football') { const abbr = fuzzyMatch(NFL); return abbr ? `https://a.espncdn.com/i/teamlogos/nfl/500/${abbr.toLowerCase()}.png` : null; }
+  if (sport === 'hockey') { const abbr = fuzzyMatch(NHL); return abbr ? `https://a.espncdn.com/i/teamlogos/nhl/500/${abbr.toLowerCase()}.png` : null; }
+  if (sport === 'basketball') { const nbaAbbr = fuzzyMatch(NBA); if (nbaAbbr) return `https://a.espncdn.com/i/teamlogos/nba/500/${nbaAbbr.toLowerCase()}.png`; return null; }
+  if (sport === 'soccer') {
+    const mlsId = fuzzyMatch(MLS); if (mlsId) return `https://a.espncdn.com/i/teamlogos/soccer/500/${mlsId}.png`;
+    const intlId = fuzzyMatch(INTL_SOCCER); if (intlId) return `https://a.espncdn.com/i/teamlogos/soccer/500/${intlId}.png`;
+    return null;
+  }
+  return null;
+}
+
+const _logoCache = {};
+async function getTeamLogo(name, sport) {
+  if (!name) return null;
+  const ck = `${sport}::${name.toLowerCase().trim()}`;
+  if (ck in _logoCache) return _logoCache[ck];
+  const key = name.toLowerCase().trim();
+  if (SPECIAL_TEAMS[key]) { _logoCache[ck] = SPECIAL_TEAMS[key]; return _logoCache[ck]; }
+  for (const [k, v] of Object.entries(SPECIAL_TEAMS)) { if (key.includes(k) || k.includes(key)) { _logoCache[ck] = v; return _logoCache[ck]; } }
+  let url = lookupEspn(name, sport);
+  if (!url) {
+    try {
+      const r = await fetch(`https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(name)}`);
+      if (r.ok) { const d = await r.json(); const badge = d?.teams?.[0]?.strTeamBadge; if (badge) url = badge + '/preview'; }
+    } catch(e) {}
+  }
+  _logoCache[ck] = url || null;
+  return _logoCache[ck];
+}
+
+const ALL_TEAM_NAMES = (() => {
+  const all = new Set();
+  [MLB, NFL, NHL, NBA].forEach(map => Object.keys(map).forEach(k => { if (k.includes(' ') && k.length > 5) all.add(k); }));
+  return [...all].sort((a, b) => b.length - a.length);
+})();
+
+function parseMatchup(title) {
+  if (!title) return {home:'',away:''};
+  const lines = title.split(/[\r\n]+/).map(s => s.trim()).filter(Boolean);
+  if (lines.length >= 2) {
+    const vsTest = lines[0].match(/^(.+?)\s+v(?:s\.?)?\s+(.+)$/i);
+    if (vsTest) return {home: vsTest[1].trim(), away: vsTest[2].trim()};
+    return {home: lines[0], away: lines[1]};
+  }
+  const flat = title.trim();
+  const vs = flat.match(/^(.+?)\s+v(?:s\.?)?\s+(.+)$/i);
+  if (vs) return {home: vs[1].trim(), away: vs[2].trim()};
+  const at = flat.match(/^(.+?)\s+(?:at|@)\s+(.+)$/i);
+  if (at) return {home: at[2].trim(), away: at[1].trim()};
+  const lower = flat.toLowerCase();
+  for (const teamName of ALL_TEAM_NAMES) {
+    if (lower.startsWith(teamName)) { const rest = flat.slice(teamName.length).trim(); if (rest.length > 3) return {home: flat.slice(0, teamName.length).trim(), away: rest}; }
+  }
+  return {home: flat, away: ''};
+}
+
+async function injectCardLogos(ev) {
+  const sport = getSportKey(ev.type, ev.league);
+  const home = ev.homeTeam || parseMatchup(ev.title).home;
+  const away = ev.awayTeam || parseMatchup(ev.title).away;
+  const icon = SPORT_ICONS[sport] || SPORT_ICONS.default;
+  const [hl, al] = await Promise.all([
+    ev.homeLogoUrl ? Promise.resolve(ev.homeLogoUrl) : getTeamLogo(home, sport),
+    away ? (ev.awayLogoUrl ? Promise.resolve(ev.awayLogoUrl) : getTeamLogo(away, sport)) : Promise.resolve(null)
+  ]);
+  const hEl = document.getElementById(`cl-home-${ev.id}`);
+  const aEl = document.getElementById(`cl-away-${ev.id}`);
+  const errReplace = `onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'team-logo-ph',textContent:'${icon}'}))"`;
+  if (hEl && hl) hEl.outerHTML = `<img class="team-logo" src="${hl}" alt="" ${errReplace}>`;
+  if (aEl && al) aEl.outerHTML = `<img class="team-logo" src="${al}" alt="" ${errReplace}>`;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SPORTS — PLAYER CACHE
+// ══════════════════════════════════════════════════════════════════
+let _playerCache = {};
+function loadPlayerCache() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(SK.players) || '{}');
+    const hasNumericKeys = Object.keys(raw).some(k => /^\d+$/.test(k));
+    if (hasNumericKeys) { _playerCache = {}; localStorage.removeItem(SK.players); }
+    else { _playerCache = raw; }
+  } catch(e) { _playerCache = {}; }
+}
+function savePlayerCache() { try { localStorage.setItem(SK.players, JSON.stringify(_playerCache)); } catch(e) {} }
+function registerPlayers(stableKey, awayPlayers, homePlayers) {
+  if (!stableKey) return;
+  if (_playerCache[stableKey] && (_playerCache[stableKey].away?.length || _playerCache[stableKey].home?.length)) return;
+  _playerCache[stableKey] = {away: awayPlayers.filter(Boolean), home: homePlayers.filter(Boolean)};
+  savePlayerCache(); updateSportsStats();
+}
+function getAllTeams() {
+  const counts = {};
+  allSportsEvents.forEach(ev => {
+    const home = ev.homeTeam || parseMatchup(ev.title).home;
+    const away = ev.awayTeam || parseMatchup(ev.title).away;
+    if (home) counts[home] = (counts[home]||0) + 1;
+    if (away) counts[away] = (counts[away]||0) + 1;
+  });
+  return counts;
+}
+function getAllPlayers() {
+  const counts = {};
+  Object.values(_playerCache).forEach(({away, home}) => {
+    [...(away||[]), ...(home||[])].forEach(p => { if (p) counts[p] = (counts[p]||0) + 1; });
+  });
+  return counts;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SPORTS — STATS LIST MODALS
+// ══════════════════════════════════════════════════════════════════
+function openTeamsList() {
+  const counts = getAllTeams();
+  const sorted = Object.entries(counts).sort((a,b) => a[0].localeCompare(b[0]));
+  const html = sorted.map(([name, count]) => {
+    const countBadge = count > 1 ? ` (${count})` : '';
+    return `<div class="list-item-clickable" data-team="${esc(name)}" style="cursor:pointer"><div style="font-size:15px;font-weight:600;color:var(--gold)">${esc(name)}${countBadge ? `<span style="color:var(--text-dim);font-weight:400;font-size:13px">${countBadge}</span>` : ''}</div></div>`;
+  }).join('');
+  const content = document.getElementById('teamsListContent');
+  content.innerHTML = html || '<div style="color:var(--text-dim);font-size:14px">No teams yet.</div>';
+  content.querySelectorAll('[data-team]').forEach(el => { el.addEventListener('click', () => sportsFilterByTeam(el.getAttribute('data-team'))); });
+  document.getElementById('teamsModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeTeamsList() { document.getElementById('teamsModal').classList.remove('open'); document.body.style.overflow = ''; }
+
+function sportsFilterByTeam(teamName) {
+  closeTeamsList();
+  currentTypeFilter = 'sports'; activeSportFilter = 'all';
+  document.querySelectorAll('.type-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.type === 'sports'));
   const input = document.getElementById('searchInput');
-  const clearBtn = document.getElementById('searchClear');
-  // If click is outside search input and clear button → clear
-  if (e.target !== input && e.target !== clearBtn && !clearBtn.contains(e.target)) {
-    if (input.value.trim()) {
-      input.value = '';
-      clearBtn.classList.remove('visible');
-      renderAll();
+  input.value = teamName; document.getElementById('searchClear').classList.add('visible');
+  applyFilters();
+}
+
+function openPlayersList() {
+  const counts = getAllPlayers();
+  if (!Object.keys(counts).length) {
+    document.getElementById('playersListContent').innerHTML = '<div style="color:var(--text-dim);font-size:14px;padding:8px 0">Player data loads when you open a game with a box score.</div>';
+    document.getElementById('playersModal').classList.add('open'); document.body.style.overflow = 'hidden'; return;
+  }
+  function formatPlayerName(fullName) {
+    const parts = fullName.trim().split(' ');
+    if (parts.length < 2) return fullName;
+    const last = parts[parts.length-1]; const first = parts.slice(0, parts.length-1).join(' ');
+    return `${last}, ${first}`;
+  }
+  const sorted = Object.entries(counts).sort((a,b) => formatPlayerName(a[0]).localeCompare(formatPlayerName(b[0])));
+  const html = sorted.map(([name, count]) => {
+    const display = formatPlayerName(name); const countBadge = count > 1 ? ` (${count})` : '';
+    return `<div class="list-item-clickable" data-player="${esc(name)}" style="cursor:pointer"><div style="font-size:15px;font-weight:600;color:var(--gold)">${esc(display)}${countBadge ? `<span style="color:var(--text-dim);font-weight:400;font-size:13px">${countBadge}</span>` : ''}</div></div>`;
+  }).join('');
+  const content = document.getElementById('playersListContent');
+  content.innerHTML = html;
+  content.querySelectorAll('[data-player]').forEach(el => { el.addEventListener('click', () => filterByPlayer(el.getAttribute('data-player'))); });
+  document.getElementById('playersModal').classList.add('open'); document.body.style.overflow = 'hidden';
+}
+function closePlayersList() { document.getElementById('playersModal').classList.remove('open'); document.body.style.overflow = ''; }
+
+function filterByPlayer(playerName) {
+  closePlayersList();
+  currentTypeFilter = 'sports'; activeSportFilter = 'all';
+  document.querySelectorAll('.type-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.type === 'sports'));
+  const input = document.getElementById('searchInput');
+  input.value = playerName; document.getElementById('searchClear').classList.add('visible');
+  const q = playerName.toLowerCase();
+  const matchingStableKeys = new Set();
+  Object.entries(_playerCache).forEach(([key, {away, home}]) => {
+    if ([...(away||[]), ...(home||[])].some(p => p && p.toLowerCase() === q)) matchingStableKeys.add(key);
+  });
+  const r = allSportsEvents.filter(ev => matchingStableKeys.has(ev.stableKey || String(ev.id)));
+  const results = (r.length ? r : allSportsEvents.filter(ev => (ev.title&&ev.title.toLowerCase().includes(q))||(ev.notes&&ev.notes.toLowerCase().includes(q)))).map(e => ({...e, _source:'sport'}));
+  renderCombinedList(results);
+}
+
+function openSportsVenuesList() {
+  const counts = {};
+  allSportsEvents.forEach(ev => { const v = (ev.venue||'').trim(); if (v) counts[v] = (counts[v]||0) + 1; });
+  const sorted = Object.entries(counts).sort((a,b) => { const nameA = a[0].split(/[\r\n]/)[0].trim(); const nameB = b[0].split(/[\r\n]/)[0].trim(); return nameA.localeCompare(nameB); });
+  const html = sorted.map(([rawVenue, count]) => {
+    const lines = rawVenue.split(/[\r\n]/).map(s=>s.trim()).filter(Boolean);
+    const venueName = lines[0] || rawVenue; const location = lines[1] || ''; const countBadge = count > 1 ? ` (${count})` : '';
+    return `<div class="list-item-clickable" data-venue="${esc(rawVenue)}" style="cursor:pointer">
+      <div style="font-size:15px;font-weight:600;color:var(--gold)">${esc(venueName)}${countBadge ? `<span style="color:var(--text-dim);font-weight:400;font-size:13px">${countBadge}</span>` : ''}</div>
+      ${location ? `<div style="font-size:12px;color:var(--text-dim);margin-top:1px">${esc(location)}</div>` : ''}
+    </div>`;
+  }).join('');
+  const content = document.getElementById('sportsVenuesListContent');
+  content.innerHTML = html || '<div style="color:var(--text-dim);font-size:14px">No venues yet.</div>';
+  content.querySelectorAll('[data-venue]').forEach(el => { el.addEventListener('click', () => sportsFilterByVenue(el.getAttribute('data-venue'))); });
+  document.getElementById('sportsVenuesModal').classList.add('open'); document.body.style.overflow = 'hidden';
+}
+function closeSportsVenuesList() { document.getElementById('sportsVenuesModal').classList.remove('open'); document.body.style.overflow = ''; }
+function sportsFilterByVenue(venueName) {
+  closeSportsVenuesList();
+  currentTypeFilter = 'sports'; activeSportFilter = 'all';
+  document.querySelectorAll('.type-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.type === 'sports'));
+  const input = document.getElementById('searchInput');
+  input.value = venueName; document.getElementById('searchClear').classList.add('visible');
+  applyFilters();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SPORTS — CSV PARSING
+// ══════════════════════════════════════════════════════════════════
+function normDate(r){
+  if(!r)return'';
+  if(/^\d{4}-\d{2}-\d{2}/.test(r))return r.substring(0,10);
+  const m=r.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if(m)return`${m[3]}-${m[1].padStart(2,'0')}-${m[2].padStart(2,'0')}`;
+  return r;
+}
+
+function sportsParseCSV(raw){
+  let t=raw.replace(/^\uFEFF/,'');
+  if(!t.includes('\n')&&t.includes('\\n'))t=t.replace(/\\n/g,'\n').replace(/\\r/g,'');
+  const rows=[];let row=[],f='',q=false,i=0;
+  while(i<t.length){const c=t[i];
+    if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i+=2;continue;}q=false;}else f+=c;}
+    else{if(c==='"')q=true;else if(c===','){row.push(f.trim());f='';}
+    else if(c==='\n'){row.push(f.trim());if(row.some(x=>x))rows.push(row);row=[];f='';}
+    else if(c!=='\r')f+=c;}i++;}
+  if(f.trim()||row.length){row.push(f.trim());if(row.some(x=>x))rows.push(row);}
+  return rows;
+}
+
+function sportsRowsToEvents(rows){
+  if(!rows.length)return[];
+  const h=rows[0].map(x=>x.replace(/^\uFEFF/,'').toLowerCase().trim().replace(/\s+/g,''));
+  const ha=rows[0].map(x=>x.replace(/^\uFEFF/,'').toLowerCase().replace(/[^a-z0-9]/g,''));
+  const fc=(...kws)=>{
+    const kwsClean=kws.map(k=>k.toLowerCase().replace(/[^a-z0-9]/g,''));
+    for(const k of kwsClean){const i=h.findIndex(x=>x===k);if(i!==-1)return i;}
+    for(const k of kwsClean){const i=ha.findIndex(x=>x===k);if(i!==-1)return i;}
+    for(const k of kwsClean){const i=ha.findIndex(x=>x.includes(k)||k.includes(x));if(i!==-1&&k.length>2)return i;}
+    return -1;
+  };
+  const cD=Math.max(fc('date'),0);const cAway=fc('awayteam','away');const cHome=fc('hometeam','home');
+  const cAwayScore=fc('awayteamscore','awayscore','awayteam score');const cHomeScore=fc('hometeamscore','homescore','hometeam score');
+  const cTitle=fc('title','matchup');const cV=fc('venue','location','stadium');const cLeague=fc('league');
+  const cTy=fc('type','sport');const cW=fc('attendedwith','attended','with');const cN=fc('notes','note');
+  const cBoxScore=fc('boxscores','boxscore','box scores','box score','gamelink','gameurl','link','url');
+  const cAwayLogo=fc('awaylogo','awayteamlogo','away logo','away team logo','awaylogourl');
+  const cHomeLogo=fc('homelogo','hometeamlogo','home logo','home team logo','homelogourl');
+  const g=(row,col)=>col>=0?(row[col]||'').trim():'';
+  const evs=[];
+  for(let i=1;i<rows.length;i++){
+    const row=rows[i];if(!row||!row.some(c=>c&&c.trim()))continue;
+    const dr=g(row,cD);if(!dr)continue;
+    const awayTeam=g(row,cAway);const homeTeam=g(row,cHome);
+    const awayScore=g(row,cAwayScore);const homeScore=g(row,cHomeScore);
+    let title=g(row,cTitle);
+    if(!title&&awayTeam&&homeTeam)title=awayTeam+' vs '+homeTeam;
+    else if(!title&&awayTeam)title=awayTeam;
+    let score=g(row,fc('score'));
+    if(!score&&(awayScore||homeScore))score=awayScore+'-'+homeScore;
+    let result=g(row,fc('result','outcome'));
+    if(!result&&awayScore!==''&&homeScore!==''){
+      const as=parseInt(awayScore,10),hs=parseInt(homeScore,10);
+      if(!isNaN(as)&&!isNaN(hs)){result=hs>as?'Win':as>hs?'Loss':'Draw';}
+    }
+    let type=g(row,cTy);
+    if(!type){
+      const league=(g(row,cLeague)||'').toLowerCase();
+      if(league==='mlb'||league==='ncaa baseball')type='Baseball';
+      else if(league==='nfl'||league==='ncaa football')type='Football';
+      else if(league==='nhl')type='Hockey';
+      else if(league==='nba'||league==='ncaa')type='Basketball';
+      else if(['mls','usl','epl','la liga','serie a','bundesliga','ligue 1'].includes(league))type='Soccer';
+    }
+    evs.push({id:'sp_'+i,date:normDate(dr),dateRaw:dr,
+      title,awayTeam,homeTeam,awayScore,homeScore,
+      venue:g(row,cV),result,score,notes:g(row,cN),type,league:g(row,cLeague),attendedWith:g(row,cW),
+      boxScoreUrl:g(row,cBoxScore),
+      stableKey:(normDate(dr)+'::'+(title||'').trim()).replace(/[^a-z0-9:]/gi,'_').toLowerCase(),
+      awayLogoUrl:g(row,cAwayLogo),homeLogoUrl:g(row,cHomeLogo),
+      _source:'sport'
+    });
+  }
+  return evs.sort((a,b)=>b.date.localeCompare(a.date));
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SPORTS — SYNC
+// ══════════════════════════════════════════════════════════════════
+async function autoResyncSports(url) {
+  try {
+    const csvUrl = buildCsvUrl(url);
+    const {text} = await fetchCsvText(csvUrl);
+    const clean = decodeProxyResponse(text);
+    if (!clean || clean.trim().startsWith('<!')) throw new Error('Not CSV');
+    const rows = sportsParseCSV(clean);
+    if (rows.length < 2) throw new Error('Empty');
+    const evs = sportsRowsToEvents(rows);
+    if (!evs.length) throw new Error('No events');
+    allSportsEvents = evs;
+    save(SK.events, evs); save(SK.url, csvUrl); save(SK.sync, new Date().toISOString());
+    renderAll();
+  } catch(e) {
+    console.warn('Sports auto-resync failed:', e.message);
+  }
+}
+
+async function syncSportsExisting() {
+  const u = load(SK.url) || DEFAULT_SPORTS_CSV_URL;
+  const btn = document.getElementById('sportsSyncBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Syncing…';
+  try {
+    const csvUrl = buildCsvUrl(u); const {text, via} = await fetchCsvText(csvUrl);
+    const clean = decodeProxyResponse(text);
+    if (!clean || clean.trim().startsWith('<!')) throw new Error('Not CSV — is sheet published?');
+    const rows = sportsParseCSV(clean); const evs = sportsRowsToEvents(rows);
+    if (!evs.length) throw new Error('No valid events — check column headers');
+    allSportsEvents = evs;
+    save(SK.events, evs); save(SK.url, csvUrl); save(SK.sync, new Date().toISOString());
+    renderAll(); updateSportsLastSyncLabel();
+    showSportsSyncStatus('success', `✓ Synced ${evs.length} games (via ${via})`);
+  } catch(e) { showSportsSyncStatus('error', e.message); }
+  btn.disabled = false;
+  btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg> Sync Sports Sheet`;
+}
+
+function toggleSportsLoadNew() {
+  const p = document.getElementById('sportsLoadNewPanel');
+  const o = p.classList.toggle('open');
+  document.getElementById('sportsLoadNewBtn').innerHTML = o
+    ? `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg> Cancel`
+    : `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Load New Sports Sheet`;
+  if (o) document.getElementById('sportsSheetUrlInput').focus();
+}
+
+async function syncNewSportsSheet() {
+  const rawUrl = document.getElementById('sportsSheetUrlInput').value.trim();
+  if (!rawUrl) { showSportsSyncStatus('error', 'Paste URL first.'); return; }
+  const btn = document.getElementById('sportsLoadNewSyncBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Loading…';
+  try {
+    const csvUrl = buildCsvUrl(rawUrl); const {text, via} = await fetchCsvText(csvUrl);
+    const clean = decodeProxyResponse(text);
+    if (!clean || clean.trim().startsWith('<!')) throw new Error('Not CSV — is sheet published?');
+    const rows = sportsParseCSV(clean); const evs = sportsRowsToEvents(rows);
+    if (!evs.length) throw new Error('No valid events — check column headers');
+    allSportsEvents = evs;
+    save(SK.events, evs); save(SK.url, csvUrl); save(SK.sync, new Date().toISOString());
+    renderAll(); updateSportsLastSyncLabel();
+    showSportsSyncStatus('success', `✓ Loaded ${evs.length} games (via ${via})`);
+    setTimeout(() => { document.getElementById('sportsLoadNewPanel').classList.remove('open'); toggleSportsLoadNew(); }, 1800);
+  } catch(e) { showSportsSyncStatus('error', e.message); }
+  btn.disabled = false; btn.textContent = 'Load Sheet';
+}
+
+function showSportsSyncStatus(t, m) { const el = document.getElementById('sportsSyncStatus'); el.className = `sync-status ${t}`; el.textContent = m; }
+function updateSportsLastSyncLabel() {
+  const el = document.getElementById('sportsLastSyncInfo'); const ts = load(SK.sync);
+  if (ts && el) try { el.textContent = `Last synced: ${new Date(ts).toLocaleString()}`; } catch(e) {}
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SPORTS — PREFETCH PLAYERS
+// ══════════════════════════════════════════════════════════════════
+let _prefetchRunning = false;
+async function prefetchAllPlayers() {
+  if (_prefetchRunning) return;
+  _prefetchRunning = true;
+  const todo = allSportsEvents.filter(ev => {
+    const url = (ev.boxScoreUrl||'').trim();
+    if (!url || url.toLowerCase() === 'n/a') return false;
+    const key = ev.stableKey || String(ev.id);
+    return !(_playerCache[key]?.away?.length || _playerCache[key]?.home?.length);
+  });
+  if (!todo.length) { _prefetchRunning = false; updateSportsStats(); return; }
+  const scratch = document.createElement('div');
+  scratch.style.cssText = 'position:absolute;left:-9999px;top:-9999px;visibility:hidden;pointer-events:none';
+  document.body.appendChild(scratch);
+  for (const ev of todo) {
+    while (document.querySelector('.sports-detail-modal') && document.getElementById('sportsDetailModal').classList.contains('open')) {
+      await new Promise(r => setTimeout(r, 2000));
+    }
+    try {
+      const bsUrlInfo = parseBoxScoreUrl(ev.boxScoreUrl);
+      if (!bsUrlInfo) continue;
+      const sport = getSportKey(ev.type, ev.league);
+      let bsData = null;
+      if (bsUrlInfo.source === 'nhl') bsData = await fetchNhlBoxScore(bsUrlInfo.gameId);
+      else if (bsUrlInfo.source === 'mlb') bsData = await fetchMlbBoxScore(bsUrlInfo.gameId);
+      else if (bsUrlInfo.source === 'espn') bsData = await fetchEspnBoxScore(bsUrlInfo.gameId, espnSportPath(bsUrlInfo.sport || ev.type, ev));
+      if (!bsData) continue;
+      if (bsData.source === 'nhl') scratch.innerHTML = renderNhlBoxScore(bsData, null, null);
+      else if (bsData.source === 'mlb') scratch.innerHTML = renderMlbBoxScore(bsData, null, null);
+      else if (bsData.source === 'espn') {
+        if (sport === 'soccer') scratch.innerHTML = renderSoccerBoxScore(bsData, null, null);
+        else scratch.innerHTML = renderEspnBoxScore(bsData, null, null, sport);
+      }
+      const scrape = id => { const p = scratch.querySelector('#' + id); if (!p) return []; return [...p.querySelectorAll('.bs-player-name')].map(el => [...el.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent.trim()).join('').trim()).filter(Boolean); };
+      const away = scrape('bs-away-panel'); const home = scrape('bs-home-panel');
+      if (away.length || home.length) {
+        const key = ev.stableKey || String(ev.id);
+        _playerCache[key] = {away, home}; savePlayerCache();
+        const el = document.getElementById('statPlayers'); if (el) el.textContent = Object.keys(getAllPlayers()).length;
+      }
+    } catch(e) {}
+    scratch.innerHTML = '';
+    await new Promise(r => setTimeout(r, 1200));
+  }
+  document.body.removeChild(scratch);
+  _prefetchRunning = false; updateSportsStats();
+}
+
+function extractAndRegisterPlayers(stableKey, bsData) {
+  if (!bsData || !stableKey) return;
+  let awayPl = [], homePl = [];
+  if (bsData.source === 'nhl') { const d2 = bsData.data?.playerByGameStats || {}; awayPl = [...(d2.awayTeam?.forwards||[]),...(d2.awayTeam?.defense||[]),...(d2.awayTeam?.goalies||[])].map(p=>p.name?.default).filter(Boolean); homePl = [...(d2.homeTeam?.forwards||[]),...(d2.homeTeam?.defense||[]),...(d2.homeTeam?.goalies||[])].map(p=>p.name?.default).filter(Boolean); }
+  else if (bsData.source === 'mlb') { awayPl = Object.values(bsData.bs?.teams?.away?.players||{}).map(p=>p.person?.fullName).filter(Boolean); homePl = Object.values(bsData.bs?.teams?.home?.players||{}).map(p=>p.person?.fullName).filter(Boolean); }
+  else if (bsData.source === 'espn') {
+    const bsp = bsData.data?.boxscore?.players || [];
+    awayPl = (bsp.find(g=>g.homeAway==='away')?.statistics||[]).flatMap(s=>(s.athletes||[]).map(a=>a.athlete?.displayName)).filter(Boolean);
+    homePl = (bsp.find(g=>g.homeAway==='home')?.statistics||[]).flatMap(s=>(s.athletes||[]).map(a=>a.athlete?.displayName)).filter(Boolean);
+  }
+  if (awayPl.length || homePl.length) registerPlayers(stableKey, awayPl, homePl);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SPORTS — BOX SCORE APIs
+// ══════════════════════════════════════════════════════════════════
+const _bsCache = {};
+
+function parseBoxScoreUrl(url) {
+  if (!url) return null;
+  const espnBoxscore = url.match(/espn\.com\/(.+?)\/boxscore\/_\/gameId\/(\d+)/i);
+  if (espnBoxscore) {
+    const rawPath = espnBoxscore[1].toLowerCase();
+    let sport = 'baseball';
+    if (rawPath.includes('college-basketball') || rawPath.includes('ncaa') || rawPath === 'ncaamb') sport = 'ncaamb';
+    else if (rawPath.includes('basketball')) sport = 'basketball';
+    else if (rawPath.includes('football') && rawPath.includes('college')) sport = 'ncaafb';
+    else if (rawPath.includes('football')) sport = 'football';
+    else if (rawPath.includes('hockey')) sport = 'hockey';
+    else if (rawPath.includes('soccer')) sport = 'soccer';
+    else if (rawPath === 'mlb' || rawPath.includes('baseball')) sport = 'baseball';
+    else if (rawPath === 'nfl') sport = 'football';
+    else if (rawPath === 'nba') sport = 'basketball';
+    else if (rawPath === 'nhl') sport = 'hockey';
+    return {source: 'espn', sport, gameId: espnBoxscore[2]};
+  }
+  const espnSoccer = url.match(/espn\.com\/soccer\/.*?(?:match|game|boxscore)\/_\/gameId\/(\d+)/i);
+  if (espnSoccer) return {source: 'espn', sport: 'soccer', gameId: espnSoccer[1]};
+  const espnGeneric = url.match(/espn\.com\/.*?gameId\/(\d+)/i);
+  if (espnGeneric) {
+    let sport = 'baseball'; const u = url.toLowerCase();
+    if (u.includes('college-basketball') || u.includes('ncaa')) sport = 'ncaamb';
+    else if (u.includes('basketball')) sport = 'basketball';
+    else if (u.includes('football') && u.includes('college')) sport = 'ncaafb';
+    else if (u.includes('football') || u.includes('nfl')) sport = 'football';
+    else if (u.includes('hockey') || u.includes('nhl')) sport = 'hockey';
+    else if (u.includes('soccer') || u.includes('mls')) sport = 'soccer';
+    return {source: 'espn', sport, gameId: espnGeneric[1]};
+  }
+  const nhlGame = url.match(/nhl\.com\/[^?#]*?(\d{8,10})(?:\/|$)/i);
+  if (nhlGame) return {source: 'nhl', gameId: nhlGame[1]};
+  const nhlReport = url.match(/nhl\.com\/.+?(\d{7})\.HTM/i);
+  if (nhlReport) return {source: 'nhl', gameId: nhlReport[1]};
+  const mlb = url.match(/\/gameday\/[^/]+\/\d{4}\/\d{2}\/\d{2}\/(\d+)/);
+  if (mlb) return {source: 'mlb', gameId: mlb[1]};
+  const num = url.match(/\/(\d{6,9})(?:\/|$)/);
+  if (num) return {source: 'mlb', gameId: num[1]};
+  return null;
+}
+function parseGameId(url) { const r = parseBoxScoreUrl(url); return r ? r.gameId : null; }
+
+const ESPN_SPORT_MAP = {mlb:'baseball/mlb',nfl:'football/nfl',nba:'basketball/nba',nhl:'hockey/nhl',mls:'soccer/usa.1',epl:'soccer/eng.1',ncaafb:'football/college-football',ncaamb:'basketball/mens-college-basketball',ncaaw:'basketball/womens-college-basketball',ncaam:'basketball/mens-college-basketball',soccer:'soccer/usa.1'};
+function espnSportPath(sportStr, ev) {
+  if (!sportStr) return 'baseball/mlb';
+  const s = sportStr.toLowerCase().replace(/[^a-z]/g,'');
+  if (ESPN_SPORT_MAP[s]) return ESPN_SPORT_MAP[s];
+  if (ev) {
+    const league = (ev.league||'').toLowerCase().replace(/[^a-z]/g,'');
+    if (league === 'ncaa' || league === 'ncaamb' || league === 'ncaabb' || league.includes('collegebasketball')) return 'basketball/mens-college-basketball';
+    if (['mls','epl','laliga','seriea','bundesliga','ligue1','usls'].includes(league)) { const soccerMap = {mls:'usa.1',epl:'eng.1',laliga:'esp.1',seriea:'ita.1',bundesliga:'ger.1',ligue1:'fra.1',usls:'usa.2'}; return 'soccer/' + (soccerMap[league]||'usa.1'); }
+  }
+  if (s.includes('collegebasketball')||s.includes('ncaamb')||s.includes('ncaabb')) return 'basketball/mens-college-basketball';
+  if (s.includes('basketball')) return 'basketball/nba';
+  if (s.includes('football')&&s.includes('college')) return 'football/college-football';
+  if (s.includes('football')) return 'football/nfl';
+  if (s.includes('hockey')) return 'hockey/nhl';
+  if (s.includes('soccer')||s==='mls') return 'soccer/usa.1';
+  return ESPN_SPORT_MAP[s] || 'baseball/mlb';
+}
+
+async function apiFetch(url, timeoutMs = 8000) {
+  const fetchWithTimeout = (fn) => Promise.race([fn(), new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeoutMs))]);
+  const attempts = [
+    ['direct', () => fetchWithTimeout(() => fetch(url, {mode:'cors', cache:'no-cache'}).then(r => { if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }))],
+    ['corsproxy', () => fetchWithTimeout(() => fetch('https://corsproxy.io/?'+encodeURIComponent(url), {cache:'no-cache'}).then(r => { if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }))],
+    ['allorigins', () => fetchWithTimeout(() => fetch('https://api.allorigins.win/get?url='+encodeURIComponent(url), {cache:'no-cache'}).then(r => r.ok ? r.json() : Promise.reject('HTTP '+r.status)).then(j => { if(!j?.contents) throw new Error('empty contents'); return JSON.parse(j.contents); }))],
+  ];
+  for (const [label, fn] of attempts) {
+    try { const result = await fn(); return result; } catch(e) { console.warn('apiFetch failed ['+label+']:', e.message || e); }
+  }
+  throw new Error('All fetch methods failed for: ' + url);
+}
+
+async function fetchEspnBoxScore(gameId, sportPath) {
+  const ck = `espn::${gameId}::${sportPath}`;
+  if (_bsCache[ck]) return _bsCache[ck];
+  try {
+    const url = `https://site.api.espn.com/apis/site/v2/sports/${sportPath}/summary?event=${gameId}`;
+    const data = await apiFetch(url);
+    _bsCache[ck] = {source:'espn', data}; return _bsCache[ck];
+  } catch(e) { return null; }
+}
+
+async function fetchNhlBoxScore(gameId) {
+  const ck = `nhl::${gameId}`;
+  if (_bsCache[ck]) return _bsCache[ck];
+  try {
+    const [box, summary] = await Promise.allSettled([apiFetch(`https://api-web.nhle.com/v1/gamecenter/${gameId}/boxscore`), apiFetch(`https://api-web.nhle.com/v1/gamecenter/${gameId}/landing`)]);
+    const boxData = box.status === 'fulfilled' ? box.value : null;
+    const summaryData = summary.status === 'fulfilled' ? summary.value : null;
+    if (boxData?.awayTeam) { _bsCache[ck] = {source:'nhl', data: boxData, summary: summaryData}; return _bsCache[ck]; }
+    const oldBox = await apiFetch(`https://statsapi.web.nhl.com/api/v1/game/${gameId}/linescore`);
+    if (oldBox?.currentPeriod !== undefined || oldBox?.periods?.length) {
+      const periods = oldBox.periods || []; const away = oldBox.teams?.away || {}; const home = oldBox.teams?.home || {};
+      const converted = { awayTeam: {name:{default:away.team?.name||'Away'},score:away.goals??'—',sog:away.shotsOnGoal??'—'}, homeTeam: {name:{default:home.team?.name||'Home'},score:home.goals??'—',sog:home.shotsOnGoal??'—'}, linescore:{byPeriod:periods.map(p=>({away:p.away?.goals,home:p.home?.goals}))} };
+      _bsCache[ck] = {source:'nhl', data: converted, summary: null}; return _bsCache[ck];
+    }
+    throw new Error('NHL API returned no usable data');
+  } catch(e) { return null; }
+}
+
+async function fetchMlbBoxScore(gameId) {
+  const ck = `mlb::${gameId}`;
+  if (_bsCache[ck]) return _bsCache[ck];
+  try {
+    const [ls, bs] = await Promise.all([apiFetch(`https://statsapi.mlb.com/api/v1/game/${gameId}/linescore`), apiFetch(`https://statsapi.mlb.com/api/v1/game/${gameId}/boxscore`)]);
+    _bsCache[ck] = {source:'mlb', ls, bs}; return _bsCache[ck];
+  } catch(e) { return null; }
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SPORTS — BOX SCORE RENDERERS
+// ══════════════════════════════════════════════════════════════════
+function renderNhlBoxScore(result, homeLogo, awayLogo) {
+  const d = result.data;
+  if (!d) return '<div class="bs-error">Could not parse NHL data.</div>';
+  const awayTeam = d.awayTeam || {}; const homeTeam = d.homeTeam || {};
+  const awayName = awayTeam.name?.default || awayTeam.commonName?.default || 'Away';
+  const homeName = homeTeam.name?.default || homeTeam.commonName?.default || 'Home';
+  const awayScore = awayTeam.score ?? '—'; const homeScore = homeTeam.score ?? '—';
+  const awaySOG = awayTeam.sog ?? '—'; const homeSOG = homeTeam.sog ?? '—';
+  const periodScores = d.linescore?.byPeriod || []; const numP = periodScores.length;
+  const periodNames = ['1st','2nd','3rd','OT','2OT'];
+  const periodHeaders = periodScores.map((_,i) => `<th>${periodNames[i]||('OT'+(i-2))}</th>`).join('');
+  const awayPeriods = periodScores.map(p => `<td>${p.away ?? '-'}</td>`).join('');
+  const homePeriods = periodScores.map(p => `<td>${p.home ?? '-'}</td>`).join('');
+  const aLogoHtml = awayLogo ? `<img class="ls-logo" src="${awayLogo}" alt="">` : '';
+  const hLogoHtml = homeLogo ? `<img class="ls-logo" src="${homeLogo}" alt="">` : '';
+  const linescore = numP > 0 ? `<div class="ls-wrap"><table class="ls-table"><thead><tr><th class="ls-team-col">Team</th>${periodHeaders}<th class="ls-tot">T</th><th class="ls-rhe-head">SOG</th></tr></thead><tbody><tr><td class="ls-team-col">${aLogoHtml}<span class="ls-name">${esc(awayName)}</span></td>${awayPeriods}<td class="ls-tot-val">${awayScore}</td><td class="ls-rhe">${awaySOG}</td></tr><tr><td class="ls-team-col">${hLogoHtml}<span class="ls-name">${esc(homeName)}</span></td>${homePeriods}<td class="ls-tot-val">${homeScore}</td><td class="ls-rhe">${homeSOG}</td></tr></tbody></table></div>` : '';
+  const goals = result.summary?.summary?.scoring || d.summary?.scoring || [];
+  let goalsHtml = '';
+  if (goals.length) {
+    goalsHtml = goals.map(period => {
+      const pName = periodNames[period.periodDescriptor?.number-1] || period.periodDescriptor?.periodType || '';
+      const goalRows = (period.goals||[]).map(g => {
+        const scorer = g.name?.default || (g.firstName?.default+' '+g.lastName?.default) || 'Unknown';
+        const assists = (g.assists||[]).map(a => a.name?.default || (a.firstName?.default+' '+a.lastName?.default)).join(', ');
+        const team = g.teamAbbrev?.default || ''; const time = g.timeInPeriod || '';
+        const gwg = g.gameWinningGoal ? ' <span style="color:var(--gold);font-size:10px">(GWG)</span>' : '';
+        const ppg = g.goalModifier === 'pp' ? ' <span style="color:#4fc3f7;font-size:10px">(PP)</span>' : '';
+        const shg = g.goalModifier === 'sh' ? ' <span style="color:var(--red);font-size:10px">(SH)</span>' : '';
+        return `<tr><td style="white-space:nowrap;color:var(--text-dim);font-size:11px">${time}</td><td style="font-size:11px;font-weight:600;color:var(--text-dim)">${team}</td><td><span class="bs-player-name">${esc(scorer)}</span>${gwg}${ppg}${shg}${assists?`<br><span style="font-size:10px;color:var(--text-dim)">${esc(assists)}</span>`:''}</td></tr>`;
+      }).join('');
+      return goalRows ? `<div class="bs-stat-section"><div class="bs-stat-heading">${pName} Period Goals</div><table class="bs-stat-table"><thead><tr><th>Time</th><th>Team</th><th>Goal</th></tr></thead><tbody>${goalRows}</tbody></table></div>` : '';
+    }).join('');
+  }
+  function renderNhlPlayers(teamKey) {
+    const teamPlayers = d.playerByGameStats?.[teamKey] || {}; let html = '';
+    const skaters = [...(teamPlayers.forwards||[]), ...(teamPlayers.defense||[])];
+    if (skaters.length) { const rows = skaters.map(p => { const n = p.name?.default || ''; const pos = p.position || ''; return `<tr><td><span class="bs-player-name">${esc(n)}</span><span class="bs-player-pos">${pos}</span></td><td>${p.goals??0}</td><td>${p.assists??0}</td><td>${p.points??0}</td><td>${p.plusMinus!=null?(p.plusMinus>0?'+':'')+p.plusMinus:'—'}</td><td>${p.shots??0}</td><td>${p.toi||'—'}</td></tr>`; }).join(''); html += `<div class="bs-stat-section"><div class="bs-stat-heading">Skaters</div><table class="bs-stat-table"><thead><tr><th>Player</th><th>G</th><th>A</th><th>P</th><th>+/-</th><th>S</th><th>TOI</th></tr></thead><tbody>${rows}</tbody></table></div>`; }
+    const goalies = teamPlayers.goalies || [];
+    if (goalies.length) { const rows = goalies.map(p => { const n = p.name?.default || ''; return `<tr><td><span class="bs-player-name">${esc(n)}</span><span class="bs-player-pos">G</span></td><td>${p.saveShotsAgainst||'—'}</td><td>${p.savePercentage!=null?(+p.savePercentage).toFixed(3):'—'}</td><td>${p.goalsAgainst??'—'}</td><td>${p.toi||'—'}</td></tr>`; }).join(''); html += `<div class="bs-stat-section"><div class="bs-stat-heading">Goalies</div><table class="bs-stat-table"><thead><tr><th>Player</th><th>SA</th><th>SV%</th><th>GA</th><th>TOI</th></tr></thead><tbody>${rows}</tbody></table></div>`; }
+    return html;
+  }
+  const awayPanel = renderNhlPlayers('awayTeam'); const homePanel = renderNhlPlayers('homeTeam');
+  const hasTabs = awayPanel || homePanel;
+  return `${linescore}${goalsHtml}${hasTabs?`<div class="bs-tabs"><button class="bs-tab active" onclick="switchBsTab(this,'bs-away-panel')">${esc(awayName)}</button><button class="bs-tab" onclick="switchBsTab(this,'bs-home-panel')">${esc(homeName)}</button></div><div id="bs-away-panel">${awayPanel}</div><div id="bs-home-panel" style="display:none">${homePanel}</div>`:''}`;
+}
+
+function renderMlbBoxScore(data, homeLogo, awayLogo) {
+  const {ls, bs} = data;
+  const innings = ls.innings || []; const away = bs.teams?.away; const home = bs.teams?.home;
+  if (!away || !home) return '<div class="bs-error">Could not parse box score data.</div>';
+  const awayName = away.team?.name || 'Away'; const homeName = home.team?.name || 'Home';
+  const awayR = ls.teams?.away?.runs ?? '—'; const homeR = ls.teams?.home?.runs ?? '—';
+  const awayH = ls.teams?.away?.hits ?? '—'; const homeH = ls.teams?.home?.hits ?? '—';
+  const awayE = ls.teams?.away?.errors ?? '—'; const homeE = ls.teams?.home?.errors ?? '—';
+  const inningHeaders = innings.map((_,i) => `<th>${i+1}</th>`).join('');
+  const awayInnings = innings.map(inn => `<td>${inn.away?.runs ?? '-'}</td>`).join('');
+  const homeInnings = innings.map(inn => `<td>${inn.home?.runs ?? '-'}</td>`).join('');
+  const aLogoHtml = awayLogo ? `<img class="ls-logo" src="${awayLogo}" alt="">` : '';
+  const hLogoHtml = homeLogo ? `<img class="ls-logo" src="${homeLogo}" alt="">` : '';
+  const linescore = `<div class="ls-wrap"><table class="ls-table"><thead><tr><th class="ls-team-col">Team</th>${inningHeaders}<th class="ls-rhe-head">R</th><th class="ls-rhe-head">H</th><th class="ls-rhe-head">E</th></tr></thead><tbody><tr><td class="ls-team-col">${aLogoHtml}<span class="ls-name">${esc(awayName)}</span></td>${awayInnings}<td class="ls-tot-val">${awayR}</td><td class="ls-rhe">${awayH}</td><td class="ls-rhe">${awayE}</td></tr><tr><td class="ls-team-col">${hLogoHtml}<span class="ls-name">${esc(homeName)}</span></td>${homeInnings}<td class="ls-tot-val">${homeR}</td><td class="ls-rhe">${homeH}</td><td class="ls-rhe">${homeE}</td></tr></tbody></table></div>`;
+  function playerRows(players, statGroup, cols, battingOrder) {
+    let playerList = Object.values(players).filter(p => { const s = p.stats?.[statGroup]; if (!s) return false; if (statGroup === 'batting') return (s.atBats > 0 || s.plateAppearances > 0); if (statGroup === 'pitching') return (s.inningsPitched && s.inningsPitched !== '0.0'); return false; });
+    if (battingOrder) playerList.sort((a,b) => (a.battingOrder||999) - (b.battingOrder||999)); else playerList.sort((a,b) => (a.gameOrder||999) - (b.gameOrder||999));
+    if (!playerList.length) return '';
+    const colHeaders = cols.map(c => `<th>${c.label}</th>`).join('');
+    const rows = playerList.map(p => {
+      const s = p.stats?.[statGroup] || {}; const tds = cols.map(c => `<td>${s[c.key] ?? '—'}</td>`).join('');
+      const pos = p.allPositions?.map(x=>x.abbreviation).join('/') || p.position?.abbreviation || '';
+      let nameStyle = '', decLabel = '';
+      if (statGroup === 'pitching') { const note = p.stats?.pitching?.note || ''; if (note === 'W') { nameStyle = 'color:var(--green)'; decLabel = ' (W)'; } else if (note === 'L') { nameStyle = 'color:var(--red)'; decLabel = ' (L)'; } else if (note === 'S') { nameStyle = 'color:#4fc3f7'; decLabel = ' (S)'; } }
+      return `<tr><td><span class="bs-player-name" style="${nameStyle}">${esc(p.person?.fullName||'')}${decLabel?`<span style="font-size:10px">${decLabel}</span>`:''}</span><span class="bs-player-pos">${pos}</span></td>${tds}</tr>`;
+    }).join('');
+    return `<table class="bs-stat-table"><thead><tr><th>Player</th>${colHeaders}</tr></thead><tbody>${rows}</tbody></table>`;
+  }
+  const BATTING_COLS = [{label:'AB',key:'atBats'},{label:'R',key:'runs'},{label:'H',key:'hits'},{label:'RBI',key:'rbi'},{label:'HR',key:'homeRuns'},{label:'BB',key:'baseOnBalls'},{label:'K',key:'strikeOuts'}];
+  const PITCHING_COLS = [{label:'IP',key:'inningsPitched'},{label:'H',key:'hits'},{label:'R',key:'runs'},{label:'ER',key:'earnedRuns'},{label:'BB',key:'baseOnBalls'},{label:'K',key:'strikeOuts'}];
+  function teamPanel(teamData) {
+    const players = teamData.players || {};
+    const batting = playerRows(players, 'batting', BATTING_COLS, true);
+    const pitching = playerRows(players, 'pitching', PITCHING_COLS, false);
+    return `${batting ? `<div class="bs-stat-section"><div class="bs-stat-heading">Batting</div>${batting}</div>` : ''}${pitching ? `<div class="bs-stat-section"><div class="bs-stat-heading">Pitching</div>${pitching}</div>` : ''}`;
+  }
+  const awayPanel = teamPanel(away); const homePanel = teamPanel(home);
+  return `${linescore}<div class="bs-tabs"><button class="bs-tab active" onclick="switchBsTab(this,'bs-away-panel')">${esc(awayName)}</button><button class="bs-tab" onclick="switchBsTab(this,'bs-home-panel')">${esc(homeName)}</button></div><div id="bs-away-panel">${awayPanel}</div><div id="bs-home-panel" style="display:none">${homePanel}</div>`;
+}
+
+function renderEspnBoxScore(data, homeLogo, awayLogo, sport) {
+  const d = data.data; const comp = d?.header?.competitions?.[0]; const boxscore = d?.boxscore;
+  if (!comp || !boxscore) return '<div class="bs-error">Could not parse ESPN data.</div>';
+  const teams = comp.competitors || [];
+  const awayComp = teams.find(t => t.homeAway === 'away') || teams[1] || {};
+  const homeComp = teams.find(t => t.homeAway === 'home') || teams[0] || {};
+  const awayName = awayComp.team?.displayName || awayComp.team?.name || 'Away';
+  const homeName = homeComp.team?.displayName || homeComp.team?.name || 'Home';
+  const awayLine = awayComp.linescores || []; const homeLine = homeComp.linescores || [];
+  const numPeriods = Math.max(awayLine.length, homeLine.length);
+  const aLogoHtml = awayLogo ? `<img class="ls-logo" src="${awayLogo}" alt="">` : '';
+  const hLogoHtml = homeLogo ? `<img class="ls-logo" src="${homeLogo}" alt="">` : '';
+  const isBaseball = sport === 'baseball'; const isHockey = sport === 'hockey'; const isSoccer = sport === 'soccer';
+  let periodHeaders = '';
+  if (isHockey) { const periodNames = ['1st','2nd','3rd']; for (let i = 0; i < numPeriods; i++) periodHeaders += `<th>${periodNames[i] || ('OT'+(i-2))}</th>`; }
+  else if (isSoccer) { const halfNames = ['1st','2nd']; for (let i = 0; i < numPeriods; i++) periodHeaders += `<th>${halfNames[i] || ('ET'+(i-1))}</th>`; }
+  else { for (let i = 0; i < numPeriods; i++) periodHeaders += `<th>${i+1}</th>`; }
+  const awayInnings = awayLine.map(l => `<td>${l.displayValue ?? '-'}</td>`).join('');
+  const homeInnings = homeLine.map(l => `<td>${l.displayValue ?? '-'}</td>`).join('');
+  const bsTeams = boxscore.teams || [];
+  const awayBsTeam = bsTeams.find(t => t.homeAway === 'away') || bsTeams[1] || {};
+  const homeBsTeam = bsTeams.find(t => t.homeAway === 'home') || bsTeams[0] || {};
+  const awayR = awayComp.score ?? '—'; const homeR = homeComp.score ?? '—';
+  const awayH = awayComp.hits ?? awayComp.statistics?.hits ?? '—';
+  const homeH = homeComp.hits ?? homeComp.statistics?.hits ?? '—';
+  const awayE = awayComp.errors ?? awayComp.statistics?.errors ?? '—';
+  const homeE = homeComp.errors ?? homeComp.statistics?.errors ?? '—';
+  const linescore = numPeriods > 0 ? `<div class="ls-wrap"><table class="ls-table"><thead><tr><th class="ls-team-col">Team</th>${periodHeaders}${isBaseball?`<th class="ls-rhe-head">R</th><th class="ls-rhe-head">H</th><th class="ls-rhe-head">E</th>`:`<th class="ls-tot">T</th>`}</tr></thead><tbody><tr><td class="ls-team-col">${aLogoHtml}<span class="ls-name">${esc(awayName)}</span></td>${awayInnings}${isBaseball?`<td class="ls-tot-val">${awayR}</td><td class="ls-rhe">${awayH}</td><td class="ls-rhe">${awayE}</td>`:`<td class="ls-tot-val">${awayR}</td>`}</tr><tr><td class="ls-team-col">${hLogoHtml}<span class="ls-name">${esc(homeName)}</span></td>${homeInnings}${isBaseball?`<td class="ls-tot-val">${homeR}</td><td class="ls-rhe">${homeH}</td><td class="ls-rhe">${homeE}</td>`:`<td class="ls-tot-val">${homeR}</td>`}</tr></tbody></table></div>` : '';
+  const playerGroups = boxscore.players || [];
+  const awayPlayers = playerGroups.find(g => g.homeAway === 'away') || playerGroups[1] || {};
+  const homePlayers = playerGroups.find(g => g.homeAway === 'home') || playerGroups[0] || {};
+  function renderPlayerGroup(playerGroup, teamName) {
+    if (!playerGroup?.statistics) return '';
+    return playerGroup.statistics.map(statBlock => {
+      const athletes = statBlock.athletes || []; if (!athletes.length) return '';
+      const keys = statBlock.keys || []; const labels = statBlock.labels || statBlock.names || keys;
+      const heading = statBlock.name || statBlock.type || ''; const headers = labels.map(l => `<th>${esc(l)}</th>`).join('');
+      const isPitching = heading.toLowerCase().includes('pitch');
+      const rows = athletes.map(a => {
+        const stats = a.stats || []; const tds = stats.map(s => `<td>${esc(s)}</td>`).join('');
+        const pos = a.position?.abbreviation || a.position?.displayName || (typeof a.position==='string'?a.position:'');
+        const pName = a.athlete?.displayName || a.athlete?.shortName || '';
+        let nameColor = '', decLabel = '';
+        if (isPitching) { const pitchNote = (a.notes||[]).find(n=>n.type==='pitchingDecision'); if (pitchNote) { const txt = pitchNote.text || ''; if (txt.startsWith('W')) { nameColor='color:var(--green)'; decLabel=` (W, ${txt.slice(3)})`; } else if (txt.startsWith('L')) { nameColor='color:var(--red)'; decLabel=` (L, ${txt.slice(3)})`; } else if (txt.startsWith('S')) { nameColor='color:#4fc3f7'; decLabel=` (S, ${txt.slice(3)})`; } else if (txt.startsWith('H')) { nameColor='color:#aaa'; decLabel=` (H, ${txt.slice(3)})`; } } }
+        return `<tr><td><span class="bs-player-name" style="${nameColor}">${esc(pName)}${decLabel?`<span style="font-size:10px;font-weight:600">${decLabel}</span>`:''}</span><span class="bs-player-pos">${esc(pos)}</span></td>${tds}</tr>`;
+      }).join('');
+      return `<div class="bs-stat-section"><div class="bs-stat-heading">${esc(heading)}</div><table class="bs-stat-table"><thead><tr><th>Player</th>${headers}</tr></thead><tbody>${rows}</tbody></table></div>`;
+    }).join('');
+  }
+  const awayPanel = renderPlayerGroup(awayPlayers, awayName); const homePanel = renderPlayerGroup(homePlayers, homeName);
+  const hasTabs = awayPanel || homePanel;
+  return `${linescore}${hasTabs ? `<div class="bs-tabs"><button class="bs-tab active" onclick="switchBsTab(this,'bs-away-panel')">${esc(awayName)}</button><button class="bs-tab" onclick="switchBsTab(this,'bs-home-panel')">${esc(homeName)}</button></div><div id="bs-away-panel">${homePanel || '<div class="bs-error">No batting/pitching data.</div>'}</div><div id="bs-home-panel" style="display:none">${awayPanel || '<div class="bs-error">No batting/pitching data.</div>'}</div>` : ''}`;
+}
+
+function renderSoccerBoxScore(data, homeLogo, awayLogo) {
+  const d = data.data; const comp = d?.header?.competitions?.[0];
+  if (!comp) return '<div class="bs-error">Could not parse match data.</div>';
+  const teams = comp.competitors || [];
+  const awayComp = teams.find(t => t.homeAway === 'away') || teams[1] || {};
+  const homeComp = teams.find(t => t.homeAway === 'home') || teams[0] || {};
+  const awayName = awayComp.team?.displayName || 'Away'; const homeName = homeComp.team?.displayName || 'Home';
+  const awayScore = awayComp.score ?? '—'; const homeScore = homeComp.score ?? '—';
+  const awayTeamId = awayComp.team?.id || awayComp.id; const homeTeamId = homeComp.team?.id || homeComp.id;
+  function getRoster(teamId) { if (Array.isArray(d?.rosters)) { const t = d.rosters.find(r => String(r.team?.id) === String(teamId)); if (t?.roster?.length) return t.roster; } return awayTeamId === teamId ? (awayComp.roster || []) : (homeComp.roster || []); }
+  const awayRoster = getRoster(awayTeamId); const homeRoster = getRoster(homeTeamId);
+  const awayGoals = (awayComp.linescores||[]).map(s=>`<td>${s.displayValue??'-'}</td>`).join('');
+  const homeGoals = (homeComp.linescores||[]).map(s=>`<td>${s.displayValue??'-'}</td>`).join('');
+  const numHalves = Math.max((awayComp.linescores||[]).length,(homeComp.linescores||[]).length);
+  const halfHeaders = ['1st','2nd','ET1','ET2'].slice(0,numHalves).map(h=>`<th>${h}</th>`).join('');
+  const aLogoHtml = awayLogo ? `<img class="ls-logo" src="${awayLogo}" alt="">` : '';
+  const hLogoHtml = homeLogo ? `<img class="ls-logo" src="${homeLogo}" alt="">` : '';
+  const linescore = numHalves > 0 ? `<div class="ls-wrap"><table class="ls-table"><thead><tr><th class="ls-team-col">Team</th>${halfHeaders}<th class="ls-tot">T</th></tr></thead><tbody><tr><td class="ls-team-col">${aLogoHtml}<span class="ls-name">${esc(awayName)}</span></td>${awayGoals}<td class="ls-tot-val">${awayScore}</td></tr><tr><td class="ls-team-col">${hLogoHtml}<span class="ls-name">${esc(homeName)}</span></td>${homeGoals}<td class="ls-tot-val">${homeScore}</td></tr></tbody></table></div>` : '';
+  function renderTeamRoster(roster) {
+    if (!roster?.length) return '<div style="color:var(--text-dim);font-size:13px;padding:12px 0">No lineup data available.</div>';
+    const starters = roster.filter(p => p.starter); const subs = roster.filter(p => !p.starter);
+    const playerRow = (p, dim) => { const name = p.athlete?.displayName || ''; const jersey = p.jersey || p.athlete?.jersey || ''; const style = dim ? 'color:var(--text-dim)' : ''; return `<div style="display:flex;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-dim);font-size:11px;width:24px;flex-shrink:0;text-align:right;margin-right:10px">${esc(jersey)}</span><span style="flex:1;font-size:13px;font-weight:${dim?'400':'500'};${style}"><span class="bs-player-name">${esc(name)}</span></span></div>`; };
+    let html = `<div style="display:flex;padding:4px 0 6px;border-bottom:1px solid var(--border)"><span style="color:var(--text-dim);font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;width:34px;flex-shrink:0;text-align:right;margin-right:10px">NO.</span><span style="color:var(--text-dim);font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase">NAME</span></div>`;
+    html += starters.map(p => playerRow(p, false)).join('');
+    if (subs.length) { html += `<div style="font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);padding:10px 0 4px">Substitutes</div>`; html += subs.map(p => playerRow(p, true)).join(''); }
+    return html;
+  }
+  const awayLineup = renderTeamRoster(awayRoster); const homeLineup = renderTeamRoster(homeRoster);
+  return `${linescore}<div class="bs-tabs" style="margin-top:16px"><button class="bs-tab active" onclick="switchBsTab(this,'bs-away-panel')">${esc(awayName)}</button><button class="bs-tab" onclick="switchBsTab(this,'bs-home-panel')">${esc(homeName)}</button></div><div id="bs-away-panel" style="margin-top:4px">${awayLineup}</div><div id="bs-home-panel" style="display:none;margin-top:4px">${homeLineup}</div>`;
+}
+
+function switchBsTab(btn, panelId) {
+  btn.closest('.modal-content').querySelectorAll('.bs-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const wrap = btn.closest('.modal-content');
+  wrap.querySelectorAll('[id^="bs-"]').forEach(p => p.style.display = 'none');
+  const panel = document.getElementById(panelId);
+  if (panel) panel.style.display = '';
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SPORTS MODAL
+// ══════════════════════════════════════════════════════════════════
+async function openSportsModal(id) {
+  const ev = allSportsEvents.find(e => e.id === id || String(e.id) === String(id));
+  if (!ev) return;
+  const sport = getSportKey(ev.type, ev.league), icon = SPORT_ICONS[sport] || SPORT_ICONS.default;
+  const home = ev.homeTeam || parseMatchup(ev.title).home;
+  const away = ev.awayTeam || parseMatchup(ev.title).away;
+  const [hs, as_] = scoreParts(ev);
+  const homeWon = hs !== null && as_ !== null && hs > as_;
+  const awayWon = hs !== null && as_ !== null && as_ > hs;
+
+  const effectiveBsUrl = (ev.boxScoreUrl && ev.boxScoreUrl.toLowerCase() !== 'n/a') ? ev.boxScoreUrl : '';
+  const bsUrlInfo = parseBoxScoreUrl(effectiveBsUrl);
+  const hasBoxScore = !!(effectiveBsUrl);
+
+  const pills = [
+    ev.type ? `<span class="modal-meta-pill"><span class="modal-meta-pill-label">Sport</span>${icon} ${esc(ev.type)}</span>` : '',
+    ev.attendedWith ? `<span class="modal-meta-pill"><span class="modal-meta-pill-label">With</span>${esc(ev.attendedWith)}</span>` : '',
+  ].filter(Boolean).join('');
+
+  document.getElementById('sportsModalBody').innerHTML = `
+    <div class="modal-scoreboard">
+      <div class="modal-team">
+        <div id="ml-away" class="modal-team-logo-ph">${icon}</div>
+        <div class="modal-team-name">${esc(away||'—')}</div>
+        <div class="modal-team-record" id="record-away"></div>
+      </div>
+      <div class="modal-center">
+        <div class="modal-date-str">${esc(fmtFull(ev.date))}</div>
+        <div class="modal-scores-row">
+          <span class="modal-score-big">${as_ !== null ? as_ : '—'}</span>
+          <span class="modal-score-sep">–</span>
+          <span class="modal-score-big">${hs !== null ? hs : '—'}</span>
+        </div>
+        <div class="modal-final-str">FINAL</div>
+        ${ev.venue ? `<div class="modal-venue-str">${esc(venShort(ev.venue))}</div>` : ''}
+      </div>
+      <div class="modal-team">
+        <div id="ml-home" class="modal-team-logo-ph">${icon}</div>
+        <div class="modal-team-name">${esc(home)}</div>
+        <div class="modal-team-record" id="record-home"></div>
+      </div>
+    </div>
+    <div class="modal-divider"></div>
+    <div class="modal-content">
+      ${hasBoxScore ? `
+        <div class="bs-section">
+          <div class="bs-section-label">Box Score <span class="spinner" id="bsSpinner"></span></div>
+          <div id="bsContent"><div class="bs-loading">Loading game data…</div></div>
+          <div style="margin-top:12px;text-align:left"><a href="${esc(effectiveBsUrl)}" target="_blank" rel="noopener" style="font-size:10px;color:var(--text-dim);text-decoration:none;opacity:0.6">via ${esc((()=>{try{return new URL(effectiveBsUrl).hostname.replace('www.','');}catch(e){return 'source';}})())}</a></div>
+        </div>
+        <div class="modal-divider" style="margin-top:16px"></div>` : ''}
+      ${pills ? `<div class="modal-meta-row" style="margin-top:16px">${pills}</div>` : ''}
+      <div id="notesBlock">${ev.notes ? `<div class="modal-notes-block"><div class="modal-notes-label">Notes</div><div class="modal-notes-text">${esc(ev.notes).replace(/\n/g,'<br>')}</div></div>` : ''}</div>
+    </div>`;
+
+  document.getElementById('sportsDetailModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  let bsPromise = Promise.resolve(null);
+  if (bsUrlInfo) {
+    if (bsUrlInfo.source === 'nhl') bsPromise = fetchNhlBoxScore(bsUrlInfo.gameId);
+    else if (bsUrlInfo.source === 'espn') bsPromise = fetchEspnBoxScore(bsUrlInfo.gameId, espnSportPath(bsUrlInfo.sport || ev.type, ev));
+    else if (bsUrlInfo.source === 'mlb') bsPromise = fetchMlbBoxScore(bsUrlInfo.gameId);
+  }
+
+  const results = await Promise.all([
+    ev.homeLogoUrl ? Promise.resolve(ev.homeLogoUrl) : getTeamLogo(home, sport),
+    away ? (ev.awayLogoUrl ? Promise.resolve(ev.awayLogoUrl) : getTeamLogo(away, sport)) : Promise.resolve(null),
+    bsPromise,
+  ]);
+  const [homeLogo, awayLogo, bsData] = results;
+
+  let finalHomeLogo = homeLogo, finalAwayLogo = awayLogo;
+  if (bsData?.source === 'espn') {
+    const bsComp = bsData.data?.header?.competitions?.[0];
+    if (bsComp) {
+      const bsAway = (bsComp.competitors||[]).find(t=>t.homeAway==='away');
+      const bsHome = (bsComp.competitors||[]).find(t=>t.homeAway==='home');
+      if (bsAway?.team?.logo) finalAwayLogo = bsAway.team.logo;
+      if (bsHome?.team?.logo) finalHomeLogo = bsHome.team.logo;
     }
   }
-}
-function clearSearch() {
-  document.getElementById('searchInput').value = '';
-  document.getElementById('searchClear').classList.remove('visible');
-  renderAll();
-}
 
-function matchingEvents(query) {
-  if (!query) return [];
-  const q = query.toLowerCase();
-  return allEvents.filter(e =>
-    (e.artists && e.artists.toLowerCase().includes(q)) ||
-    (e.venue && e.venue.toLowerCase().includes(q)) ||
-    (e.notes && e.notes.toLowerCase().includes(q)) ||
-    (e.type && e.type.toLowerCase().includes(q)) ||
-    (e.attendedWith && e.attendedWith.toLowerCase().includes(q)) ||
-    (e.date && e.date.includes(q))
-  );
-}
+  const mh = document.getElementById('ml-home'), ma = document.getElementById('ml-away');
+  const errR = () => `onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'modal-team-logo-ph',textContent:'${icon}'}))"`;
+  if (mh && finalHomeLogo) mh.outerHTML = `<img class="modal-team-logo" id="ml-home" src="${finalHomeLogo}" alt="" ${errR()}>`;
+  if (ma && finalAwayLogo) ma.outerHTML = `<img class="modal-team-logo" id="ml-away" src="${finalAwayLogo}" alt="" ${errR()}>`;
 
-function performSearch(query) {
-  if (!query) { 
-    renderAll();
-    return; 
+  if (bsData?.source === 'espn') {
+    const comp2 = bsData.data?.header?.competitions?.[0];
+    if (comp2) {
+      const awayC = (comp2.competitors||[]).find(t=>t.homeAway==='away') || {};
+      const homeC = (comp2.competitors||[]).find(t=>t.homeAway==='home') || {};
+      const awayRec = document.getElementById('record-away'); const homeRec = document.getElementById('record-home');
+      function extractRecord(competitor, isAway) {
+        const recs = Array.isArray(competitor.record) ? competitor.record : (competitor.records || []);
+        if (!recs.length) return '';
+        const overall = recs.find(r=>r.type==='total'||r.type==='0') || recs[0];
+        const splitType = isAway ? 'road' : 'home';
+        const split = recs.find(r=>r.type===splitType);
+        const o = overall?.summary || ''; const s = split?.summary ? (isAway?'Away':'Home')+' '+split.summary : '';
+        return [o,s].filter(Boolean).join(', ');
+      }
+      const awayRecStr = extractRecord(awayC, true); const homeRecStr = extractRecord(homeC, false);
+      if (awayRec && awayRecStr) awayRec.textContent = awayRecStr;
+      if (homeRec && homeRecStr) homeRec.textContent = homeRecStr;
+    }
   }
-  // Filter main list to matching events
-  filterEventsBySearch(query);
+
+  const bsSpin = document.getElementById('bsSpinner');
+  if (bsSpin) bsSpin.remove();
+  const bsEl = document.getElementById('bsContent');
+  if (bsEl) {
+    if (bsData?.source === 'nhl') bsEl.innerHTML = renderNhlBoxScore(bsData, finalHomeLogo, finalAwayLogo);
+    else if (bsData?.source === 'mlb') bsEl.innerHTML = renderMlbBoxScore(bsData, finalHomeLogo, finalAwayLogo);
+    else if (bsData?.source === 'espn') {
+      if (sport === 'soccer') bsEl.innerHTML = renderSoccerBoxScore(bsData, finalHomeLogo, finalAwayLogo);
+      else bsEl.innerHTML = renderEspnBoxScore(bsData, finalHomeLogo, finalAwayLogo, sport);
+    } else if (hasBoxScore) {
+      bsEl.innerHTML = `<a class="bs-link-btn" href="${esc(effectiveBsUrl)}" target="_blank" rel="noopener"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>View Box Score ↗</a>`;
+    }
+
+    if (bsData) {
+      const cacheKey = ev.stableKey || String(ev.id);
+      const scrapeNames = (panelId) => { const panel = bsEl.querySelector('#' + panelId); if (!panel) return []; return [...panel.querySelectorAll('.bs-player-name')].map(el => [...el.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent.trim()).join('').trim()).filter(Boolean); };
+      const awayNames = scrapeNames('bs-away-panel'); const homeNames = scrapeNames('bs-home-panel');
+      if (awayNames.length || homeNames.length) { _playerCache[cacheKey] = {away: awayNames, home: homeNames}; savePlayerCache(); updateSportsStats(); }
+    }
+  }
+
+  if (bsData?.source === 'espn' || bsData?.source === 'nhl') {
+    const extraNotes = [];
+    let gameDate, attendance, durationMins;
+    if (bsData.source === 'espn') {
+      const bsComp2 = bsData.data?.header?.competitions?.[0];
+      gameDate = bsComp2?.date; attendance = bsData.data?.gameInfo?.attendance || bsComp2?.attendance;
+      const parseDurStr = (s) => { if (!s) return 0; if (typeof s === 'number') return s; if (typeof s === 'string') { if (s.includes(':')) { const [h,m]=s.split(':').map(Number); return h*60+(m||0); } if (s.includes('h')) { const [h,m]=(s.match(/(\d+)h\s*(\d+)?m?/)||[]).slice(1).map(Number); return (h||0)*60+(m||0); } const n = parseInt(s); if (n > 0 && n < 500) return n; } return 0; };
+      const gi = bsData.data?.gameInfo || {}; durationMins = parseDurStr(gi.gameTime) || parseDurStr(gi.duration) || parseDurStr(gi.gameDuration) || parseDurStr(bsComp2?.duration) || parseDurStr(bsComp2?.time);
+    } else if (bsData.source === 'nhl') {
+      gameDate = bsData.data?.startTimeUTC; attendance = bsData.data?.venueGames?.attendance ?? bsData.summary?.attendance;
+      const dur = bsData.data?.gameDuration; if (dur && typeof dur === 'string' && dur.includes(':')) { const [h,m] = dur.split(':').map(Number); durationMins = h * 60 + (m||0); }
+    }
+    if (gameDate) { try { const dt = new Date(gameDate); extraNotes.push(`Start: ${dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`); if (durationMins) { const endDt = new Date(dt.getTime() + durationMins * 60000); extraNotes.push(`End: ${endDt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`); } } catch(e) {} }
+    if (attendance) extraNotes.push(`Attendance: ${Number(attendance).toLocaleString()}`);
+    if (extraNotes.length) { const notesBlock = document.getElementById('notesBlock'); if (notesBlock) { const existingNotes = ev.notes ? esc(ev.notes).replace(/\n/g,'<br>') + '<br>' : ''; notesBlock.innerHTML = `<div class="modal-notes-block"><div class="modal-notes-label">Notes</div><div class="modal-notes-text">${existingNotes}${extraNotes.join('<br>')}</div></div>`; } }
+  }
 }
 
-// Actually filter the main event list (for when user hits Enter or clicks a suggestion)
-function filterEventsBySearch(query) {
-  if (!query) { renderAll(); return; }
-  const q = query.toLowerCase();
-  const results = allEvents.filter(e =>
-    (e.artists && e.artists.toLowerCase().includes(q)) ||
-    (e.venue && e.venue.toLowerCase().includes(q)) ||
-    (e.notes && e.notes.toLowerCase().includes(q)) ||
-    (e.type && e.type.toLowerCase().includes(q)) ||
-    (e.attendedWith && e.attendedWith.toLowerCase().includes(q)) ||
-    (e.date && e.date.includes(q))
-  );
-  renderAll(results);
-}
+function closeSportsModal() { document.getElementById('sportsDetailModal').classList.remove('open'); document.body.style.overflow = ''; }
+function closeSportsModalIfOutside(e) { if (e.target === document.getElementById('sportsDetailModal')) closeSportsModal(); }
 
-function escRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+// ══════════════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', async () => {
+  // Event Diary
+  const DEFAULT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTbDktqpGqlQh20V-1MrB6ppZ0E1HzxdRKbjCVdpT1sIzHoBeAGQQD8BjNoAiA8FnWqJv12fqiO5Ov9/pub?output=csv';
+  const savedUrl = load(STORAGE_KEYS.sheetUrl) || DEFAULT_SHEET_URL;
+  document.getElementById('sheetUrlInput').value = savedUrl;
+
+  const savedEvents = load(STORAGE_KEYS.events);
+  if (savedEvents && savedEvents.length) {
+    allEvents = savedEvents;
+  } else if (savedUrl) {
+    await autoResync(savedUrl);
+  }
+
+  // Sports Diary
+  loadPlayerCache();
+  const sportsSaved = load(SK.events);
+  const sportsUrl = load(SK.url) || DEFAULT_SPORTS_CSV_URL;
+  const needsRefresh = sportsSaved && sportsSaved.length && sportsSaved.every(e => e.boxScoreUrl === undefined);
+  if (sportsSaved && sportsSaved.length && !needsRefresh) {
+    allSportsEvents = sportsSaved;
+  } else {
+    await autoResyncSports(sportsUrl);
+  }
+
+  renderAll();
+  updateLastSyncLabel();
+  updateSportsLastSyncLabel();
+  setupScrollWatcher();
+  document.getElementById('searchInput').addEventListener('input', onSearchInput);
+  document.addEventListener('click', onDocClick);
+
+  // Background player prefetch
+  setTimeout(() => prefetchAllPlayers(), 4000);
+});
 </script>
 <script>
 // Register service worker for PWA offline support
