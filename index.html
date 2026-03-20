@@ -480,7 +480,7 @@ const STORAGE_KEYS = {
   events: 'eventdiary_events_v3',      // bumped: forces re-sync after CSV parser fix
   sheetUrl: 'eventdiary_url',
   lastSync: 'eventdiary_lastsync_v3',
-  setlistCache: 'eventdiary_setlists_v11'
+  setlistCache: 'eventdiary_setlists_v12'
 };
 const APP_VERSION = 'v3';
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
@@ -1291,47 +1291,42 @@ saveSetlistCache();
 
 function saveSetlistCache() { save(STORAGE_KEYS.setlistCache, setlistCache); }
 
-// Shared fetch logic for a single setlist URL
+// Fetch setlist from GitHub JSON repository
 async function fetchSetlistHtml(url) {
-  if (setlistCache[url] && setlistCache[url].sets) return { cached: setlistCache[url] };
-  const proxies = [
-    // AllOrigins with raw endpoint (most reliable)
-    async () => {
-      const r = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, { 
-        cache: 'no-cache',
-        headers: { 'Accept': 'text/html' }
-      });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.text();
-    },
-    // AllOrigins with GET endpoint + content extraction
-    async () => {
-      const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, { 
-        cache: 'no-cache' 
-      });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      const j = await r.json();
-      if (!j || !j.contents) throw new Error('empty');
-      return decodeProxyResponse(j.contents);
-    },
-    // Corsproxy
-    async () => {
-      const r = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`, { 
-        cache: 'no-cache',
-        headers: { 'Accept': 'text/html' }
-      });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.text();
-    },
-  ];
-  for (const tryProxy of proxies) {
-    try {
-      const text = await tryProxy();
-      if (text && text.length > 500 && text.includes('<')) return { html: text };
-    } catch(e) {}
+  if (setlistCache[url] && setlistCache[url].sets) {
+    console.log('[Setlist] Using cached data for:', url);
+    return { cached: setlistCache[url] };
   }
-  return { html: null };
+  
+  try {
+    const githubUrl = 'https://raw.githubusercontent.com/BooRadley-27/concert-setlists/main/setlists.json';
+    console.log('[Setlist] Fetching from GitHub:', githubUrl);
+    
+    const response = await fetch(githubUrl, { cache: 'no-cache' });
+    
+    if (!response.ok) {
+      console.warn('[Setlist] GitHub JSON not found (this is normal if repo is not set up yet)');
+      return { jsonData: null };
+    }
+    
+    const allSetlists = await response.json();
+    console.log('[Setlist] GitHub JSON loaded, checking for URL:', url);
+    
+    const setlistData = allSetlists[url];
+    if (!setlistData) {
+      console.log('[Setlist] No entry found for this URL in GitHub JSON');
+      return { jsonData: null };
+    }
+    
+    console.log('[Setlist] Found setlist in GitHub JSON');
+    return { jsonData: setlistData };
+  } catch (e) {
+    console.error('[Setlist] GitHub fetch error:', e.message);
+    return { jsonData: null };
+  }
 }
+
+
 
 // Load a setlist into the default #setlistContent container (single-setlist path)
 async function loadSetlist(event, url, _unused) {
@@ -1339,18 +1334,18 @@ async function loadSetlist(event, url, _unused) {
   if (!container) return;
   if (!url) url = event.setlist.trim();
   const artists = parseArtists(event.artists);
-  const { cached, html } = await fetchSetlistHtml(url);
+  const { cached, jsonData } = await fetchSetlistHtml(url);
   if (cached) { container.innerHTML = renderSetlistHTML(cached, url, artists); return; }
-  if (!html) {
-    container.innerHTML = `<p class="setlist-error">Could not load setlist automatically.</p>
+  if (!jsonData) {
+    container.innerHTML = `<p class="setlist-error">Setlist not available yet.</p>
       <p class="setlist-source" style="margin-top:8px"><a class="setlist-link" href="${escHtml(url)}" target="_blank">View on setlist.fm</a></p>`;
     return;
   }
-  const parsed = parseSetlistFm(html);
-  if (parsed.sets && parsed.sets.length && parsed.sets.some(s => s.songs && s.songs.length)) {
-    setlistCache[url] = parsed; saveSetlistCache();
+  // jsonData is already in our format: { sets: [...] }
+  if (jsonData.sets && jsonData.sets.length && jsonData.sets.some(s => s.songs && s.songs.length)) {
+    setlistCache[url] = jsonData; saveSetlistCache();
   }
-  container.innerHTML = renderSetlistHTML(parsed, url, artists);
+  container.innerHTML = renderSetlistHTML(jsonData, url, artists);
 }
 
 // Load a setlist into a specific container by ID (multi-setlist path)
@@ -1359,18 +1354,18 @@ async function loadSetlistInto(containerId, url, artists) {
   if (!container) return;
   // Mark as multi-column so header shows artist name
   if (artists && artists.length) artists._isMultiCol = true;
-  const { cached, html } = await fetchSetlistHtml(url);
+  const { cached, jsonData } = await fetchSetlistHtml(url);
   if (cached) { container.innerHTML = renderSetlistHTML(cached, url, artists); return; }
-  if (!html) {
-    container.innerHTML = `<p class="setlist-error">Could not load.</p>
+  if (!jsonData) {
+    container.innerHTML = `<p class="setlist-error">Not available yet.</p>
       <p class="setlist-source"><a class="setlist-link" href="${escHtml(url)}" target="_blank">View on setlist.fm</a></p>`;
     return;
   }
-  const parsed = parseSetlistFm(html);
-  if (parsed.sets && parsed.sets.length && parsed.sets.some(s => s.songs && s.songs.length)) {
-    setlistCache[url] = parsed; saveSetlistCache();
+  // jsonData is already in our format: { sets: [...] }
+  if (jsonData.sets && jsonData.sets.length && jsonData.sets.some(s => s.songs && s.songs.length)) {
+    setlistCache[url] = jsonData; saveSetlistCache();
   }
-  container.innerHTML = renderSetlistHTML(parsed, url, artists);
+  container.innerHTML = renderSetlistHTML(jsonData, url, artists);
 }
 
 
