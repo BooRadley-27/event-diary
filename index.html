@@ -372,8 +372,8 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 .setlist-song-note { font-size: 11px; color: var(--text-dim); font-style: italic; }
 .setlist-set-header {
   display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
-  color: #fff; background: #3a6bc4; border-radius: 4px;
-  padding: 3px 8px; margin-bottom: 8px;
+  color: var(--text-mid); background: var(--surface2); border-radius: 4px;
+  border: 1px solid var(--border); padding: 3px 8px; margin-bottom: 8px;
 }
 .setlist-source { font-size: 11px; color: var(--text-dim); margin-top: 10px; font-style: italic; }
 .setlist-link { color: var(--gold); text-decoration: none; }
@@ -830,7 +830,7 @@ const STORAGE_KEYS = {
   events: 'eventdiary_events_v3',
   sheetUrl: 'eventdiary_url',
   lastSync: 'eventdiary_lastsync_v3',
-  setlistCache: 'eventdiary_setlists_v12'
+  setlistCache: 'eventdiary_setlists_v13'
 };
 const APP_VERSION = 'v3';
 
@@ -1120,7 +1120,7 @@ async function quickSync() {
 }
 
 async function syncSheet() {
-  ['eventdiary_events_v2','eventdiary_events','eventdiary_lastsync','eventdiary_setlists_v2','eventdiary_setlists'].forEach(k => {
+  ['eventdiary_events_v2','eventdiary_events','eventdiary_lastsync','eventdiary_setlists_v2','eventdiary_setlists','eventdiary_setlists_v12'].forEach(k => {
     try { localStorage.removeItem(k); } catch(e) {}
   });
   const urlInput = document.getElementById('sheetUrlInput');
@@ -1475,7 +1475,7 @@ function openEventVenuesModal() {
 function openSetlistsModal() {
   const rows = [];
   allEvents.filter(e => e.setlist && e.setlist.trim()).sort((a,b) => b.date.localeCompare(a.date)).forEach(e => {
-    const urls = e.setlist.split(/\n/).map(s => s.trim()).filter(Boolean);
+    const urls = e.setlist.split(/[\r\n]+/).map(s => s.trim()).filter(s => s.startsWith('http'));
     const eventArtists = parseArtists(e.artists);
     if (urls.length === 1) {
       const urlArtist = extractArtistFromSetlistUrl(urls[0], eventArtists);
@@ -1555,7 +1555,7 @@ function openEventModal(id) {
   if (e.notes && e.notes.trim()) {
     notesBlock = `<div class="modal-notes-block"><div class="modal-notes-label">Notes</div><p class="modal-notes-text">${escHtml(e.notes)}</p></div>`;
   }
-  const setlistUrls = hasSetlist ? e.setlist.split(/\n/).map(s => s.trim()).filter(Boolean) : [];
+  const setlistUrls = hasSetlist ? e.setlist.split(/[\r\n]+/).map(s => s.trim()).filter(s => s.startsWith('http')) : [];
   const multiSetlist = setlistUrls.length > 1;
   let setlistBlock = '';
   if (setlistUrls.length === 1) {
@@ -1619,18 +1619,36 @@ Object.keys(setlistCache).forEach(k => {
 function saveSetlistCache() { save(STORAGE_KEYS.setlistCache, setlistCache); }
 
 // Fetch from GitHub JSON repo (keyed by setlist.fm URL)
-async function fetchSetlistHtml(url) {
+async function fetchSetlistHtml(rawUrl) {
+  const url = rawUrl.trim().replace(/[\r\n]/g, '');
   if (setlistCache[url] && setlistCache[url].sets) {
     return { cached: setlistCache[url] };
   }
   try {
-    const githubUrl = 'https://raw.githubusercontent.com/BooRadley-27/concert-setlists/main/setlists.json';
+    const githubUrl = 'https://raw.githubusercontent.com/BooRadley-27/concert-setlist/main/setlists.json';
     const response = await fetch(githubUrl, { cache: 'no-cache' });
-    if (!response.ok) return { jsonData: null };
+    if (!response.ok) {
+      console.warn('[Setlist] GitHub fetch failed:', response.status);
+      return { jsonData: null };
+    }
     const allSetlists = await response.json();
-    const setlistData = allSetlists[url];
-    if (!setlistData) return { jsonData: null };
-    return { jsonData: setlistData };
+    const keys = Object.keys(allSetlists);
+    console.log('[Setlist] Looking up URL:', JSON.stringify(url));
+    console.log('[Setlist] JSON has', keys.length, 'keys. First 3:', keys.slice(0,3).map(k => JSON.stringify(k)));
+    // Try exact match first
+    if (allSetlists[url]) {
+      console.log('[Setlist] Exact match found');
+      return { jsonData: allSetlists[url] };
+    }
+    // Try case-insensitive / trimmed match
+    const urlNorm = url.trim().toLowerCase();
+    const fuzzyKey = keys.find(k => k.trim().toLowerCase() === urlNorm);
+    if (fuzzyKey) {
+      console.log('[Setlist] Fuzzy match found:', JSON.stringify(fuzzyKey));
+      return { jsonData: allSetlists[fuzzyKey] };
+    }
+    console.log('[Setlist] No match found for URL');
+    return { jsonData: null };
   } catch (e) {
     console.error('[Setlist] GitHub fetch error:', e.message);
     return { jsonData: null };
@@ -1641,7 +1659,8 @@ function loadSetlist(event, url, _unused) {
   loadSetlistInto('setlistContent', url, parseArtists(event.artists));
 }
 
-async function loadSetlistInto(containerId, url, artists) {
+async function loadSetlistInto(containerId, rawUrl, artists) {
+  const url = rawUrl.trim().replace(/[\r\n]/g, '');
   const container = document.getElementById(containerId);
   if (!container) return;
   if (artists && artists.length) artists._isMultiCol = (containerId !== 'setlistContent');
@@ -1709,7 +1728,7 @@ function renderSetlistHTML(parsed, url, artists) {
   parsed.sets.forEach((set) => {
     const validSongs = set.songs.filter(s => isSongNameValid(s.name));
     if (!validSongs.length && !set.label) return;
-    const gapStyle = firstSet ? '' : ' style="margin-top:20px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.07)"';
+    const gapStyle = firstSet ? '' : ' style="margin-top:12px"';
     firstSet = false;
     if (set.label) {
       html += `<div class="setlist-set-header"${gapStyle}>${escHtml(set.label)}</div>`;
