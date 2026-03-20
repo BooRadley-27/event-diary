@@ -1606,7 +1606,7 @@ function closeModal() {
 function closeModalIfOutside(e) { if (e.target === document.getElementById('detailModal')) closeModal(); }
 
 // ══════════════════════════════════════════════════════════════════
-//  SETLIST — LOCAL CACHE + FETCH
+//  SETLIST — GITHUB JSON + LOCAL CACHE
 // ══════════════════════════════════════════════════════════════════
 let setlistCache = load(STORAGE_KEYS.setlistCache) || {};
 Object.keys(setlistCache).forEach(k => {
@@ -1618,99 +1618,104 @@ Object.keys(setlistCache).forEach(k => {
 
 function saveSetlistCache() { save(STORAGE_KEYS.setlistCache, setlistCache); }
 
-function loadSetlist(event, url, artistOverride) {
-  loadSetlistInto('setlistContent', url, artistOverride ? [artistOverride] : parseArtists(event.artists));
+// Fetch from GitHub JSON repo (keyed by setlist.fm URL)
+async function fetchSetlistHtml(url) {
+  if (setlistCache[url] && setlistCache[url].sets) {
+    return { cached: setlistCache[url] };
+  }
+  try {
+    const githubUrl = 'https://raw.githubusercontent.com/BooRadley-27/concert-setlists/main/setlists.json';
+    const response = await fetch(githubUrl, { cache: 'no-cache' });
+    if (!response.ok) return { jsonData: null };
+    const allSetlists = await response.json();
+    const setlistData = allSetlists[url];
+    if (!setlistData) return { jsonData: null };
+    return { jsonData: setlistData };
+  } catch (e) {
+    console.error('[Setlist] GitHub fetch error:', e.message);
+    return { jsonData: null };
+  }
+}
+
+function loadSetlist(event, url, _unused) {
+  loadSetlistInto('setlistContent', url, parseArtists(event.artists));
 }
 
 async function loadSetlistInto(containerId, url, artists) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
-  const cacheKey = url.trim().toLowerCase();
-  if (setlistCache[cacheKey]) {
-    el.innerHTML = renderSetlistHtml(setlistCache[cacheKey], url, artists);
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  if (artists && artists.length) artists._isMultiCol = (containerId !== 'setlistContent');
+  container.innerHTML = `<div class="setlist-loading"><span class="spinner"></span>&nbsp;Loading setlist…</div>`;
+  const { cached, jsonData } = await fetchSetlistHtml(url);
+  if (cached) { container.innerHTML = renderSetlistHTML(cached, url, artists); return; }
+  if (!jsonData) {
+    container.innerHTML = `<p class="setlist-error">Setlist not available yet.</p>
+      <p class="setlist-source" style="margin-top:8px"><a class="setlist-link" href="${escHtml(url)}" target="_blank">View on setlist.fm</a></p>`;
     return;
   }
-  el.innerHTML = `<div class="setlist-loading"><span class="spinner"></span>&nbsp;Loading setlist…</div>`;
-  try {
-    const setlistId = extractSetlistId(url);
-    if (!setlistId) { el.innerHTML = `<div class="setlist-error">Invalid setlist URL.</div>`; return; }
-    const apiUrl = `https://api.setlist.fm/rest/1.0/setlist/${setlistId}`;
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl + '?Accept=application/json')}`;
-    const resp = await fetch(proxyUrl, { headers: { 'Accept': 'application/json' } });
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const wrapper = await resp.json();
-    const raw = wrapper.contents;
-    if (!raw) throw new Error('Empty response');
-    const data = JSON.parse(raw);
-    const parsed = parseSetlistData(data, artists);
-    setlistCache[cacheKey] = parsed;
-    saveSetlistCache();
-    el.innerHTML = renderSetlistHtml(parsed, url, artists);
-  } catch(err) {
-    el.innerHTML = `<div class="setlist-error">Could not load setlist. <a class="setlist-link" href="${escHtml(url)}" target="_blank">View on setlist.fm ↗</a></div>`;
+  if (jsonData.sets && jsonData.sets.length && jsonData.sets.some(s => s.songs && s.songs.length)) {
+    setlistCache[url] = jsonData; saveSetlistCache();
   }
-}
-
-function extractSetlistId(url) {
-  const m = url.match(/setlist\.fm\/setlists?\/[^/]+-([a-f0-9]+)\.html/i) || url.match(/\/([a-f0-9]{5,})(?:\.html)?(?:[?#]|$)/i);
-  return m ? m[1] : null;
-}
-
-function parseSetlistData(data, artists) {
-  const sets = [];
-  if (data.sets && data.sets.set) {
-    data.sets.set.forEach(s => {
-      const label = s.name || s.encore ? (s.encore ? `Encore${s.encore > 1 ? ' '+s.encore : ''}` : s.name) : null;
-      const songs = (s.song || []).map(song => ({ name: song.name || '', note: song.info || '' }));
-      sets.push({ label, songs });
-    });
-  }
-  return { sets, url: data.url || '', artists: artists || [] };
-}
-
-function isSongNameValid(name) {
-  if (!name || !name.trim()) return false;
-  const n = name.trim().toLowerCase();
-  if (n.length < 2) return false;
-  if (/^\d+$/.test(n)) return false;
-  const junk = ['test','placeholder','song name','unknown','untitled'];
-  if (junk.includes(n)) return false;
-  return true;
+  container.innerHTML = renderSetlistHTML(jsonData, url, artists);
 }
 
 function extractArtistFromSetlistUrl(url, eventArtists) {
-  try {
-    const path = new URL(url).pathname;
-    const segs = path.split('/').filter(Boolean);
-    const setlistSeg = segs.find(s => s.includes('-setlists-') || s.endsWith('.html'));
-    if (setlistSeg) {
-      let name = setlistSeg.replace(/(-\w{6,8})\.html$/, '').replace(/-setlists?-.*$/, '').replace(/-/g,' ').replace(/\bsetlist\b/gi,'').trim();
-      if (name.length > 2) {
-        if (eventArtists && eventArtists.length > 0) {
-          const match = eventArtists.find(a => a.toLowerCase().replace(/[^a-z0-9]/g,'').includes(name.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,8)));
-          if (match) return match;
-        }
-        return name.charAt(0).toUpperCase() + name.slice(1);
-      }
-    }
-  } catch(e) {}
-  if (eventArtists && eventArtists.length > 0) return eventArtists[0];
-  return null;
+  if (!url) return null;
+  const match = url.match(/setlist\.fm\/setlist\/([^\/]+)/);
+  if (!match) return null;
+  const slug = match[1];
+  const slugTitle = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  if (eventArtists && eventArtists.length) {
+    const found = eventArtists.find(a =>
+      a.toLowerCase().replace(/[^a-z0-9]/g, '') ===
+      slugTitle.toLowerCase().replace(/[^a-z0-9]/g, '')
+    );
+    if (found) return found;
+  }
+  return slugTitle;
 }
 
-function renderSetlistHtml(parsed, url, urlArtists) {
+const JUNK_PATTERNS = [
+  /^<!\[CDATA\[/i, /^<!--/, /^\/\*/, /CDATA/i,
+  /^setlist\.fm/i, /^edit setlist/i, /^share/i,
+  /^tour statistics/i, /^i was there/i
+];
+
+function isSongNameValid(name) {
+  if (!name || name.length < 1 || name.length > 200) return false;
+  return !JUNK_PATTERNS.some(p => p.test(name.trim()));
+}
+
+function renderSetlistHTML(parsed, url, artists) {
+  if (!parsed.sets || !parsed.sets.length || !parsed.sets.some(s => s.songs && s.songs.length)) {
+    return `<p class="setlist-error">Could not load setlist automatically.</p>
+      <p class="setlist-source" style="margin-top:6px"><a class="setlist-link" href="${escHtml(url)}" target="_blank">View on setlist.fm</a></p>`;
+  }
   let headerText = 'SETLIST';
-  const urlArtist = urlArtists && urlArtists[0] ? urlArtists[0] : null;
-  if (urlArtist) headerText = `SETLIST — ${escHtml(urlArtist.toUpperCase())}`;
+  const urlArtist = extractArtistFromSetlistUrl(url, artists);
+  if (artists && artists.length === 1) {
+    if (artists._isMultiCol) {
+      headerText = `SETLIST — ${escHtml(artists[0].toUpperCase())}`;
+    }
+  } else if (artists && artists.length > 1) {
+    headerText = urlArtist
+      ? `SETLIST — ${escHtml(urlArtist.toUpperCase())}`
+      : `SETLIST — ${escHtml(artists.join(', ').toUpperCase())}`;
+  } else if (urlArtist) {
+    headerText = `SETLIST — ${escHtml(urlArtist.toUpperCase())}`;
+  }
   let html = `<div class="setlist-band-header">${headerText}</div>`;
-  let songNum = 0; let firstSet = true;
+  let songNum = 0, firstSet = true;
   parsed.sets.forEach((set) => {
     const validSongs = set.songs.filter(s => isSongNameValid(s.name));
     if (!validSongs.length && !set.label) return;
     const gapStyle = firstSet ? '' : ' style="margin-top:20px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.07)"';
     firstSet = false;
-    if (set.label) { html += `<div class="setlist-set-header"${gapStyle}>${escHtml(set.label)}</div>`; }
-    else if (gapStyle) { html += `<div${gapStyle}></div>`; }
+    if (set.label) {
+      html += `<div class="setlist-set-header"${gapStyle}>${escHtml(set.label)}</div>`;
+    } else if (gapStyle) {
+      html += `<div${gapStyle}></div>`;
+    }
     if (!validSongs.length) return;
     html += `<ol class="setlist-songs">`;
     validSongs.forEach(s => {
