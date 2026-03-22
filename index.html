@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="icon-512.png">
 <meta name="theme-color" content="#0d0d0f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #0d0d0f;
@@ -98,17 +98,6 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
   max-height: 400px; opacity: 1; margin-bottom: 12px;
 }
 
-/* Sports stat row — same grid but visually separated */
-.stats-grid-sports {
-  display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; pointer-events: all;
-  max-height: 0; overflow: hidden; opacity: 0; margin-bottom: 0;
-  transition: max-height 0.4s ease, opacity 0.2s ease, margin-bottom 0.3s ease;
-  border-top: 1px solid var(--border); padding-top: 0;
-}
-.stats-grid-sports.open {
-  max-height: 200px; opacity: 1; margin-bottom: 12px; padding-top: 8px;
-}
-
 /* Type filter pills — wrap, never overflow */
 .type-filters {
   display: flex; gap: 8px; flex-wrap: wrap; pointer-events: all;
@@ -141,25 +130,12 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
   background: var(--gold-dim); border-color: rgba(232,197,71,0.5); color: var(--gold); font-weight: 600;
 }
 
-/* Divider label inside expanded panel */
-.stats-section-divider {
-  max-height: 0; overflow: hidden; opacity: 0; margin: 0;
-  transition: max-height 0.4s ease, opacity 0.2s ease, margin 0.3s ease;
-  font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--text-dim);
-}
-.stats-section-divider.open {
-  max-height: 30px; opacity: 1; margin-bottom: 6px;
-}
-
 .stat-card {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 12px 8px; text-align: center; cursor: pointer;
   transition: border-color 0.2s, background 0.15s;
 }
 .stat-card:active { background: var(--surface2); border-color: rgba(232,197,71,0.3); }
-.stat-card.no-click { cursor: default; }
-.stat-card.no-click:active { background: var(--surface); border-color: var(--border); }
 .stat-number { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--gold); line-height: 1; display: block; }
 .stat-label { font-size: 9px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); display: block; margin-top: 3px; }
 
@@ -212,7 +188,6 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 .event-venue { font-size: 12px; color: var(--text-dim); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .event-setlist-badge { flex-shrink: 0; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 9px; border-radius: 6px; border: 1px solid; align-self: center; }
 .setlist-yes { color: var(--gold); border-color: rgba(232,197,71,0.5); background: rgba(232,197,71,0.08); }
-.setlist-no { color: var(--text-dim); border-color: var(--border); background: transparent; }
 
 /* ── SPORT CARD ── */
 .sport-card {
@@ -221,11 +196,14 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
   border-left: 3px solid transparent;
 }
 .sport-card:active { background: var(--surface2); }
-.sport-card-main { display: flex; align-items: center; padding: 11px 14px; gap: 12px; }
+.sport-card-main { display: flex; align-items: center; padding: 14px 16px; gap: 14px; }
 .sport-date-block { flex-shrink: 0; text-align: center; width: 46px; align-self: center; }
 .sport-date-month { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); display: block; }
 .sport-date-day { font-family: 'Bebas Neue', sans-serif; font-size: 28px; line-height: 1; color: var(--text); display: block; }
 .logos-zone { flex-shrink: 0; display: flex; align-items: center; gap: 4px; width: 96px; justify-content: center; }
+.sport-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.sport-card-top { display: flex; align-items: center; gap: 14px; }
+.sport-card-venue { font-size: 12px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .team-logo-col { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .logo-score { font-family: 'Bebas Neue', sans-serif; font-size: 14px; line-height: 1; color: var(--text-mid); letter-spacing: 0.04em; }
 .team-logo { width: 34px; height: 34px; object-fit: contain; }
@@ -237,11 +215,6 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 .event-matchup-vs { color: var(--text-dim); font-size: 11px; font-weight: 400; margin: 0 3px; }
 .event-matchup-home { display: block; }
 .event-sub { font-size: 11px; color: var(--text-dim); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
-.result-pill { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; margin-top: 3px; }
-.result-pill.win { background: rgba(92,224,138,0.15); color: var(--green); border: 1px solid rgba(92,224,138,0.3); }
-.result-pill.loss { background: rgba(224,92,92,0.15); color: var(--red); border: 1px solid rgba(224,92,92,0.3); }
-.result-pill.draw { background: rgba(232,197,71,0.12); color: var(--gold); border: 1px solid rgba(232,197,71,0.3); }
-
 /* ── EMPTY / LOADING ── */
 .empty-state { text-align: center; padding: 60px 20px; color: var(--text-dim); }
 .empty-state-icon { font-size: 48px; margin-bottom: 16px; display: block; }
@@ -377,7 +350,6 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 }
 .setlist-source { font-size: 11px; color: var(--text-dim); margin-top: 10px; font-style: italic; }
 .setlist-link { color: var(--gold); text-decoration: none; }
-.setlist-separator { height: 1px; background: var(--border); margin: 12px 0; }
 
 /* ── SPINNER ── */
 .spinner { width: 16px; height: 16px; border: 2px solid rgba(232,197,71,0.2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; flex-shrink: 0; }
@@ -423,8 +395,6 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 .stat-list-item-count { font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
 .stat-list-link { color: var(--gold); text-decoration: none; font-family: 'DM Sans', sans-serif; font-size: 15px; }
 
-/* ── HIGHLIGHT ── */
-.highlight { color: var(--gold); font-weight: 600; }
 
 /* ── SPORTS MODAL ── */
 .sports-modal-overlay {
@@ -456,9 +426,6 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 .modal-center { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; justify-content: flex-start; padding-top: 4px; }
 .modal-team-logo { width: 60px; height: 60px; object-fit: contain; }
 .modal-team-logo-ph { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 34px; }
-.modal-team-score { font-family: 'Bebas Neue', sans-serif; font-size: 48px; line-height: 1; color: var(--text); }
-.modal-team-score.win-score { color: var(--green); }
-.modal-team-score.loss-score { color: var(--text-mid); }
 .modal-team-name { font-size: 11px; font-weight: 600; color: var(--text-mid); text-align: center; line-height: 1.3; max-width: 100px; }
 .modal-result-pill { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 14px; border-radius: 6px; }
 .modal-result-pill.win { background: rgba(92,224,138,0.15); color: var(--green); border: 1px solid rgba(92,224,138,0.3); }
@@ -505,6 +472,26 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 
 /* List item for sports modals */
 .list-item-clickable { padding: 12px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+
+/* ── COLLAPSIBLE DROPDOWN (setlist + stats) ── */
+.collapse-toggle {
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 14px; margin-bottom: 0; width: 100%;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-mid);
+  transition: background 0.15s, color 0.15s;
+}
+.collapse-toggle:active { background: var(--surface); }
+.collapse-toggle.open { color: var(--gold); border-color: rgba(232,197,71,0.3); }
+.collapse-toggle svg { width: 12px; height: 12px; transition: transform 0.2s; margin-left: auto; flex-shrink: 0; }
+.collapse-toggle.open svg { transform: rotate(180deg); }
+.collapse-body {
+  overflow: hidden; max-height: 0;
+  transition: max-height 0.35s ease, opacity 0.2s ease;
+  opacity: 0;
+}
+.collapse-body.open { max-height: 4000px; opacity: 1; }
 </style>
 </head>
 <body>
@@ -529,11 +516,11 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
 
 <!-- ════════ MAIN VIEW ════════ -->
 <div class="view active" id="main-view">
-  <div class="sticky-header" id="stickyHeader">
+  <div class="sticky-header">
     <div class="header-hero" id="headerHero">
       <p class="eyebrow">Personal Archive</p>
       <h1 class="hero-title">EVENT <span>DIARY</span></h1>
-      <div class="date-range-strip" id="dateRangeStrip">
+      <div class="date-range-strip">
         <span class="date-range-item">First: <strong id="dateFirst">—</strong></span>
         <span class="date-range-sep">·</span>
         <span class="date-range-item">Latest: <strong id="dateLatest">—</strong></span>
@@ -600,7 +587,7 @@ html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 
       </button>
     </div>
   </div>
-  <div class="content-area" id="contentArea">
+  <div class="content-area">
     <div id="eventsContainer"></div>
   </div>
 </div>
@@ -832,8 +819,6 @@ const STORAGE_KEYS = {
   lastSync: 'eventdiary_lastsync_v3',
   setlistCache: 'eventdiary_setlists_v13'
 };
-const APP_VERSION = 'v3';
-
 let allEvents = [];   // event-diary events
 
 // ══════════════════════════════════════════════════════════════════
@@ -974,8 +959,15 @@ function eventMatchesSearch(e, q) {
     .join(' ').toLowerCase().includes(q);
 }
 function sportMatchesSearch(e, q) {
-  return [(e.title||''), (e.venue||''), (e.notes||''), (e.type||''), (e.attendedWith||''), e.date]
-    .join(' ').toLowerCase().includes(q);
+  if ([(e.title||''), (e.venue||''), (e.notes||''), (e.type||''), (e.attendedWith||''), e.date]
+    .join(' ').toLowerCase().includes(q)) return true;
+  // Also search player names from cache
+  const key = e.stableKey || String(e.id);
+  const cached = _playerCache[key];
+  if (cached) {
+    return [...(cached.away||[]), ...(cached.home||[])].some(p => p && p.toLowerCase().includes(q));
+  }
+  return false;
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -1296,28 +1288,34 @@ function buildSportCard(ev) {
   const icon = SPORT_ICONS[sport] || SPORT_ICONS.default;
   const home = ev.homeTeam || parseMatchup(ev.title).home;
   const away = ev.awayTeam || parseMatchup(ev.title).away;
+  const venueStr = venShort(ev.venue);
+  const leagueBadge = ev.league ? ` <span style="color:var(--gold-dim);font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-left:4px">${esc(ev.league)}</span>` : '';
   return `<div class="sport-card" id="card-${ev.id}" data-sport-id="${ev.id}">
     <div class="sport-card-main">
       <div class="sport-date-block">
         <span class="sport-date-month">${d.mon}</span>
         <span class="sport-date-day">${d.day}</span>
       </div>
-      <div class="logos-zone" id="clogos-${ev.id}">
-        ${away ? `
-          <div class="team-logo-col">
-            <span class="team-logo-ph" id="cl-away-${ev.id}">${icon}</span>
-            <span class="logo-score">${ev.awayScore !== undefined && ev.awayScore !== '' ? ev.awayScore : ''}</span>
+      <div class="sport-card-body">
+        <div class="sport-card-top">
+          <div class="logos-zone" id="clogos-${ev.id}">
+            ${away ? `
+              <div class="team-logo-col">
+                <span class="team-logo-ph" id="cl-away-${ev.id}">${icon}</span>
+                <span class="logo-score">${ev.awayScore !== undefined && ev.awayScore !== '' ? ev.awayScore : ''}</span>
+              </div>
+              <span class="vs-divider">vs</span>
+              <div class="team-logo-col">
+                <span class="team-logo-ph" id="cl-home-${ev.id}">${icon}</span>
+                <span class="logo-score">${ev.homeScore !== undefined && ev.homeScore !== '' ? ev.homeScore : ''}</span>
+              </div>
+            ` : `<span class="team-logo-ph">${icon}</span>`}
           </div>
-          <span class="vs-divider">vs</span>
-          <div class="team-logo-col">
-            <span class="team-logo-ph" id="cl-home-${ev.id}">${icon}</span>
-            <span class="logo-score">${ev.homeScore !== undefined && ev.homeScore !== '' ? ev.homeScore : ''}</span>
+          <div class="sport-event-info">
+            ${away && home ? `<span class="event-matchup"><span class="event-matchup-away">${esc(away)}</span><span class="event-matchup-vs">vs</span><span class="event-matchup-home">${esc(home)}</span></span>` : `<span class="event-matchup">${esc(ev.title||'—')}</span>`}
           </div>
-        ` : `<span class="team-logo-ph">${icon}</span>`}
-      </div>
-      <div class="sport-event-info">
-        ${away && home ? `<span class="event-matchup"><span class="event-matchup-away">${esc(away)}</span><span class="event-matchup-vs">vs</span><span class="event-matchup-home">${esc(home)}</span></span>` : `<span class="event-matchup">${esc(ev.title||'—')}</span>`}
-        <span class="event-sub">${esc(venShort(ev.venue))}${ev.league ? ` <span style="color:var(--gold-dim);font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-left:4px">${esc(ev.league)}</span>` : ''}</span>
+        </div>
+        ${venueStr ? `<div class="sport-card-venue">${esc(venueStr)}${leagueBadge}</div>` : ''}
       </div>
     </div>
   </div>`;
@@ -1433,66 +1431,47 @@ function statItemClick(idx) {
   closeStatModal();
   setTimeout(() => {
     const input = document.getElementById('searchInput');
-    input.value = item.searchTerm;
-    document.getElementById('searchClear').classList.add('visible');
-    currentTypeFilter = 'all';
-    document.querySelectorAll('.type-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.type === 'all'));
-    applyFilters();
+    input.value = '';
+    document.getElementById('searchClear').classList.remove('visible');
+
+    if (item.type === 'artist') {
+      const q = item.searchTerm.toLowerCase();
+      // Find all events matching this artist
+      const matches = allEvents.filter(e =>
+        parseArtists(e.artists).some(a => a.toLowerCase().trim() === q)
+      );
+      // Determine the dominant event type and activate that pill
+      const types = [...new Set(matches.map(e => (e.type||'').toLowerCase().trim()).filter(Boolean))];
+      const dominantType = types.length === 1 ? types[0] : 'all';
+      currentTypeFilter = dominantType;
+      activeSportFilter = 'all';
+      document.querySelectorAll('.type-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.type === dominantType));
+      document.querySelectorAll('.sport-filter-btn').forEach(b => b.classList.remove('active'));
+      const results = matches.map(e => ({...e, _source:'event'}));
+      updateAllStats(); updateSportFilterChips();
+      renderCombinedList(results);
+    } else {
+      // venue click — search both event and sports for matching venue name
+      const vq = item.searchTerm.toLowerCase();
+      const evMatches = allEvents.filter(e =>
+        e.venue && parseVenue(e.venue).name.toLowerCase().includes(vq)
+      ).map(e => ({...e, _source:'event'}));
+      const spMatches = allSportsEvents.filter(e =>
+        e.venue && venShort(e.venue).toLowerCase().includes(vq)
+      ).map(e => ({...e, _source:'sport'}));
+      const combined = [...evMatches, ...spMatches];
+      currentTypeFilter = 'all';
+      activeSportFilter = 'all';
+      document.querySelectorAll('.type-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.type === 'all'));
+      document.querySelectorAll('.sport-filter-btn').forEach(b => b.classList.remove('active'));
+      updateAllStats(); updateSportFilterChips();
+      renderCombinedList(combined);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, 100);
 }
 
-function openEventVenuesModal() {
-  window._statItems = [];
-  const venueMap = {};
-  allEvents.forEach(e => {
-    if (!e.venue) return;
-    const key = e.venue.toLowerCase().trim();
-    if (!venueMap[key]) venueMap[key] = { raw: e.venue.trim(), count: 0 };
-    venueMap[key].count++;
-  });
-  const sorted = Object.values(venueMap).sort((a,b) => {
-    const an = parseVenue(a.raw).name.toLowerCase(), bn = parseVenue(b.raw).name.toLowerCase();
-    return an.localeCompare(bn);
-  });
-  const html = sorted.map(({ raw, count }) => {
-    const { name, location } = parseVenue(raw);
-    const idx = window._statItems.length;
-    window._statItems.push({ type: 'venue', searchTerm: name });
-    return `<div class="stat-list-item" onclick="statItemClick(${idx})">
-      <div class="stat-list-item-main">
-        <span class="stat-list-item-name-row">
-          <span class="stat-list-link">${escHtml(name)}</span>
-          ${count > 1 ? `<span class="stat-list-item-count">(${count})</span>` : ''}
-        </span>
-        ${location ? `<span class="stat-list-item-sub"> ${escHtml(location)}</span>` : ''}
-      </div>
-    </div>`;
-  }).join('');
-  openStatModal(`Event Venues (${sorted.length})`, html);
-}
 
-function openSetlistsModal() {
-  const rows = [];
-  allEvents.filter(e => e.setlist && e.setlist.trim()).sort((a,b) => b.date.localeCompare(a.date)).forEach(e => {
-    const urls = e.setlist.split(/[\r\n]+/).map(s => s.trim()).filter(s => s.startsWith('http'));
-    const eventArtists = parseArtists(e.artists);
-    if (urls.length === 1) {
-      const urlArtist = extractArtistFromSetlistUrl(urls[0], eventArtists);
-      rows.push({ e, displayName: urlArtist || artistsToCommaList(e.artists) });
-    } else {
-      const names = urls.map(url => extractArtistFromSetlistUrl(url, eventArtists)).filter(Boolean);
-      rows.push({ e, displayName: names.length ? names.join(', ') : artistsToCommaList(e.artists) });
-    }
-  });
-  const html = rows.map(({ e, displayName }) =>
-    `<div class="stat-list-item" onclick="closeStatModal(); openEventModal('${e.id}')">
-      <div class="stat-list-item-main"><span class="stat-list-link">${escHtml(displayName)}</span></div>
-      <span class="stat-list-item-date">${formatDateShort(e.date)}</span>
-    </div>`
-  ).join('');
-  openStatModal(`Setlists (${rows.length})`, html || '<div class="stat-list-item">No setlists yet.</div>');
-}
 
 function openCombinedVenuesModal() {
   window._statItems = [];
@@ -1556,19 +1535,33 @@ function openEventModal(id) {
     notesBlock = `<div class="modal-notes-block"><div class="modal-notes-label">Notes</div><p class="modal-notes-text">${escHtml(e.notes)}</p></div>`;
   }
   const setlistUrls = hasSetlist ? e.setlist.split(/[\r\n]+/).map(s => s.trim()).filter(s => s.startsWith('http')) : [];
-  const multiSetlist = setlistUrls.length > 1;
   let setlistBlock = '';
+  const chevronSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
   if (setlistUrls.length === 1) {
-    setlistBlock = `<div class="setlist-section" id="modalSetlist">
-      <div id="setlistContent"><div class="setlist-loading"><span class="spinner"></span>&nbsp;Loading setlist…</div></div>
-    </div>`;
+    setlistBlock = `
+      <button class="collapse-toggle" id="setlistToggle" onclick="toggleCollapse('setlistToggle','setlistBody')">
+        Setlist ${chevronSvg}
+      </button>
+      <div class="collapse-body" id="setlistBody">
+        <div class="setlist-section" id="modalSetlist" style="padding-top:14px">
+          <div id="setlistContent"><div class="setlist-loading"><span class="spinner"></span>&nbsp;Loading setlist…</div></div>
+        </div>
+      </div>`;
   } else if (setlistUrls.length > 1) {
     const cols = setlistUrls.map((url, i) =>
       `<div class="setlist-col" id="setlistCol${i}">
         <div class="setlist-loading"><span class="spinner"></span>&nbsp;Loading…</div>
       </div>`
     ).join('');
-    setlistBlock = `<div class="setlist-section" id="modalSetlist"><div class="setlist-multi-row">${cols}</div></div>`;
+    setlistBlock = `
+      <button class="collapse-toggle" id="setlistToggle" onclick="toggleCollapse('setlistToggle','setlistBody')">
+        Setlists ${chevronSvg}
+      </button>
+      <div class="collapse-body" id="setlistBody">
+        <div class="setlist-section" id="modalSetlist" style="padding-top:14px">
+          <div class="setlist-multi-row">${cols}</div>
+        </div>
+      </div>`;
   }
   const venueParsed = parseVenue(e.venue);
   const mapsQuery = encodeURIComponent(venueParsed.location ? `${venueParsed.name} ${venueParsed.location}` : venueParsed.name);
@@ -1596,6 +1589,14 @@ function openEventModal(id) {
       loadSetlistInto(`setlistCol${i}`, url, [artist]);
     });
   }
+}
+
+function toggleCollapse(btnId, bodyId) {
+  const btn = document.getElementById(btnId);
+  const body = document.getElementById(bodyId);
+  if (!btn || !body) return;
+  const isOpen = body.classList.toggle('open');
+  btn.classList.toggle('open', isOpen);
 }
 
 function closeModal() {
@@ -1628,26 +1629,14 @@ async function fetchSetlistHtml(rawUrl) {
     const githubUrl = 'https://raw.githubusercontent.com/BooRadley-27/concert-setlist/main/setlists.json';
     const response = await fetch(githubUrl, { cache: 'no-cache' });
     if (!response.ok) {
-      console.warn('[Setlist] GitHub fetch failed:', response.status);
       return { jsonData: null };
     }
     const allSetlists = await response.json();
-    const keys = Object.keys(allSetlists);
-    console.log('[Setlist] Looking up URL:', JSON.stringify(url));
-    console.log('[Setlist] JSON has', keys.length, 'keys. First 3:', keys.slice(0,3).map(k => JSON.stringify(k)));
-    // Try exact match first
-    if (allSetlists[url]) {
-      console.log('[Setlist] Exact match found');
-      return { jsonData: allSetlists[url] };
-    }
+    if (allSetlists[url]) return { jsonData: allSetlists[url] };
     // Try case-insensitive / trimmed match
     const urlNorm = url.trim().toLowerCase();
-    const fuzzyKey = keys.find(k => k.trim().toLowerCase() === urlNorm);
-    if (fuzzyKey) {
-      console.log('[Setlist] Fuzzy match found:', JSON.stringify(fuzzyKey));
-      return { jsonData: allSetlists[fuzzyKey] };
-    }
-    console.log('[Setlist] No match found for URL');
+    const fuzzyKey = Object.keys(allSetlists).find(k => k.trim().toLowerCase() === urlNorm);
+    if (fuzzyKey) return { jsonData: allSetlists[fuzzyKey] };
     return { jsonData: null };
   } catch (e) {
     console.error('[Setlist] GitHub fetch error:', e.message);
@@ -1695,7 +1684,6 @@ function extractArtistFromSetlistUrl(url, eventArtists) {
 }
 
 const JUNK_PATTERNS = [
-  /^<!\[CDATA\[/i, /^<!--/, /^\/\*/, /CDATA/i,
   /^setlist\.fm/i, /^edit setlist/i, /^share/i,
   /^tour statistics/i, /^i was there/i
 ];
@@ -1748,7 +1736,6 @@ function renderSetlistHTML(parsed, url, artists) {
   return html;
 }
 
-function escRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
 
 // ══════════════════════════════════════════════════════════════════
 //  SPORTS — TEAM DATABASE
@@ -1881,15 +1868,6 @@ function venShort(r){
   const m=single.match(/^(.+?)\s+([A-Z][a-zA-Z\s\.]+,\s*[A-Z]{2})$/);
   if(m)return m[1]+' · '+m[2];
   return single;
-}
-function fmtScore(raw){
-  if(!raw)return'';const s=raw.match(/(\d+)\s*[-–]\s*(\d+)/);if(s)return`${s[1]}–${s[2]}`;
-  const ns=raw.match(/\d+/g);if(ns&&ns.length>=2)return`${ns[0]}–${ns[1]}`;
-  return raw.replace(/[\r\n]+/g,' ').substring(0,14);
-}
-function fmtCardScore(ev){
-  if(ev.awayScore!==undefined&&ev.awayScore!==''&&ev.homeScore!==undefined&&ev.homeScore!==''){return`${ev.awayScore}–${ev.homeScore}`;}
-  return fmtScore(ev.score);
 }
 function scoreParts(ev){
   if(ev&&ev.awayScore!==undefined&&ev.awayScore!==''&&ev.homeScore!==undefined&&ev.homeScore!==''){return[+ev.homeScore,+ev.awayScore];}
@@ -2032,13 +2010,39 @@ function openTeamsList() {
 }
 function closeTeamsList() { document.getElementById('teamsModal').classList.remove('open'); document.body.style.overflow = ''; }
 
+// After filtering to a set of sport events, activate the most specific sport chip if all same sport
+function activateSportChip(sportEvents) {
+  const sports = [...new Set(sportEvents.map(e => getSportKey(e.type, e.league)).filter(s => s !== 'default'))];
+  if (sports.length === 1) {
+    activeSportFilter = sports[0];
+    document.querySelectorAll('.sport-filter-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.sport === sports[0]);
+    });
+  } else {
+    activeSportFilter = 'all';
+    document.querySelectorAll('.sport-filter-btn').forEach(b => b.classList.remove('active'));
+  }
+}
+
 function sportsFilterByTeam(teamName) {
   closeTeamsList();
   currentTypeFilter = 'sports'; activeSportFilter = 'all';
   document.querySelectorAll('.type-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.type === 'sports'));
+  document.querySelectorAll('.sport-filter-btn').forEach(b => b.classList.remove('active'));
+  // Clear search so debounce doesn't override our direct render
   const input = document.getElementById('searchInput');
-  input.value = teamName; document.getElementById('searchClear').classList.add('visible');
-  applyFilters();
+  input.value = '';
+  document.getElementById('searchClear').classList.remove('visible');
+  const q = teamName.toLowerCase();
+  const r = allSportsEvents.filter(ev =>
+    (ev.title&&ev.title.toLowerCase().includes(q)) ||
+    (ev.awayTeam&&ev.awayTeam.toLowerCase().includes(q)) ||
+    (ev.homeTeam&&ev.homeTeam.toLowerCase().includes(q))
+  ).map(e => ({...e, _source:'sport'}));
+  updateAllStats();
+  updateSportFilterChips();
+  activateSportChip(r);
+  renderCombinedList(r);
 }
 
 function openPlayersList() {
@@ -2069,44 +2073,26 @@ function filterByPlayer(playerName) {
   closePlayersList();
   currentTypeFilter = 'sports'; activeSportFilter = 'all';
   document.querySelectorAll('.type-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.type === 'sports'));
+  document.querySelectorAll('.sport-filter-btn').forEach(b => b.classList.remove('active'));
+  // Clear search so debounce doesn't override our direct render
   const input = document.getElementById('searchInput');
-  input.value = playerName; document.getElementById('searchClear').classList.add('visible');
+  input.value = '';
+  document.getElementById('searchClear').classList.remove('visible');
   const q = playerName.toLowerCase();
   const matchingStableKeys = new Set();
   Object.entries(_playerCache).forEach(([key, {away, home}]) => {
-    if ([...(away||[]), ...(home||[])].some(p => p && p.toLowerCase() === q)) matchingStableKeys.add(key);
+    if ([...(away||[]), ...(home||[])].some(p => p && p.toLowerCase().includes(q))) matchingStableKeys.add(key);
   });
   const r = allSportsEvents.filter(ev => matchingStableKeys.has(ev.stableKey || String(ev.id)));
-  const results = (r.length ? r : allSportsEvents.filter(ev => (ev.title&&ev.title.toLowerCase().includes(q))||(ev.notes&&ev.notes.toLowerCase().includes(q)))).map(e => ({...e, _source:'sport'}));
+  const results = (r.length ? r : allSportsEvents.filter(ev =>
+    (ev.title&&ev.title.toLowerCase().includes(q))||(ev.notes&&ev.notes.toLowerCase().includes(q))
+  )).map(e => ({...e, _source:'sport'}));
+  updateAllStats();
+  updateSportFilterChips();
+  activateSportChip(results);
   renderCombinedList(results);
 }
 
-function openSportsVenuesList() {
-  const counts = {};
-  allSportsEvents.forEach(ev => { const v = (ev.venue||'').trim(); if (v) counts[v] = (counts[v]||0) + 1; });
-  const sorted = Object.entries(counts).sort((a,b) => { const nameA = a[0].split(/[\r\n]/)[0].trim(); const nameB = b[0].split(/[\r\n]/)[0].trim(); return nameA.localeCompare(nameB); });
-  const html = sorted.map(([rawVenue, count]) => {
-    const lines = rawVenue.split(/[\r\n]/).map(s=>s.trim()).filter(Boolean);
-    const venueName = lines[0] || rawVenue; const location = lines[1] || ''; const countBadge = count > 1 ? ` (${count})` : '';
-    return `<div class="list-item-clickable" data-venue="${esc(rawVenue)}" style="cursor:pointer">
-      <div style="font-size:15px;font-weight:600;color:var(--gold)">${esc(venueName)}${countBadge ? `<span style="color:var(--text-dim);font-weight:400;font-size:13px">${countBadge}</span>` : ''}</div>
-      ${location ? `<div style="font-size:12px;color:var(--text-dim);margin-top:1px">${esc(location)}</div>` : ''}
-    </div>`;
-  }).join('');
-  const content = document.getElementById('sportsVenuesListContent');
-  content.innerHTML = html || '<div style="color:var(--text-dim);font-size:14px">No venues yet.</div>';
-  content.querySelectorAll('[data-venue]').forEach(el => { el.addEventListener('click', () => sportsFilterByVenue(el.getAttribute('data-venue'))); });
-  document.getElementById('sportsVenuesModal').classList.add('open'); document.body.style.overflow = 'hidden';
-}
-function closeSportsVenuesList() { document.getElementById('sportsVenuesModal').classList.remove('open'); document.body.style.overflow = ''; }
-function sportsFilterByVenue(venueName) {
-  closeSportsVenuesList();
-  currentTypeFilter = 'sports'; activeSportFilter = 'all';
-  document.querySelectorAll('.type-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.type === 'sports'));
-  const input = document.getElementById('searchInput');
-  input.value = venueName; document.getElementById('searchClear').classList.add('visible');
-  applyFilters();
-}
 
 // ══════════════════════════════════════════════════════════════════
 //  SPORTS — CSV PARSING
@@ -2119,7 +2105,7 @@ function normDate(r){
   return r;
 }
 
-function sportsParseCSV(raw){
+function parseCSV(raw){
   let t=raw.replace(/^\uFEFF/,'');
   if(!t.includes('\n')&&t.includes('\\n'))t=t.replace(/\\n/g,'\n').replace(/\\r/g,'');
   const rows=[];let row=[],f='',q=false,i=0;
@@ -2197,7 +2183,7 @@ async function autoResyncSports(url) {
     const {text} = await fetchCsvText(csvUrl);
     const clean = decodeProxyResponse(text);
     if (!clean || clean.trim().startsWith('<!')) throw new Error('Not CSV');
-    const rows = sportsParseCSV(clean);
+    const rows = parseCSV(clean);
     if (rows.length < 2) throw new Error('Empty');
     const evs = sportsRowsToEvents(rows);
     if (!evs.length) throw new Error('No events');
@@ -2217,7 +2203,7 @@ async function syncSportsExisting() {
     const csvUrl = buildCsvUrl(u); const {text, via} = await fetchCsvText(csvUrl);
     const clean = decodeProxyResponse(text);
     if (!clean || clean.trim().startsWith('<!')) throw new Error('Not CSV — is sheet published?');
-    const rows = sportsParseCSV(clean); const evs = sportsRowsToEvents(rows);
+    const rows = parseCSV(clean); const evs = sportsRowsToEvents(rows);
     if (!evs.length) throw new Error('No valid events — check column headers');
     allSportsEvents = evs;
     save(SK.events, evs); save(SK.url, csvUrl); save(SK.sync, new Date().toISOString());
@@ -2246,7 +2232,7 @@ async function syncNewSportsSheet() {
     const csvUrl = buildCsvUrl(rawUrl); const {text, via} = await fetchCsvText(csvUrl);
     const clean = decodeProxyResponse(text);
     if (!clean || clean.trim().startsWith('<!')) throw new Error('Not CSV — is sheet published?');
-    const rows = sportsParseCSV(clean); const evs = sportsRowsToEvents(rows);
+    const rows = parseCSV(clean); const evs = sportsRowsToEvents(rows);
     if (!evs.length) throw new Error('No valid events — check column headers');
     allSportsEvents = evs;
     save(SK.events, evs); save(SK.url, csvUrl); save(SK.sync, new Date().toISOString());
@@ -2314,18 +2300,6 @@ async function prefetchAllPlayers() {
   _prefetchRunning = false; updateSportsStats();
 }
 
-function extractAndRegisterPlayers(stableKey, bsData) {
-  if (!bsData || !stableKey) return;
-  let awayPl = [], homePl = [];
-  if (bsData.source === 'nhl') { const d2 = bsData.data?.playerByGameStats || {}; awayPl = [...(d2.awayTeam?.forwards||[]),...(d2.awayTeam?.defense||[]),...(d2.awayTeam?.goalies||[])].map(p=>p.name?.default).filter(Boolean); homePl = [...(d2.homeTeam?.forwards||[]),...(d2.homeTeam?.defense||[]),...(d2.homeTeam?.goalies||[])].map(p=>p.name?.default).filter(Boolean); }
-  else if (bsData.source === 'mlb') { awayPl = Object.values(bsData.bs?.teams?.away?.players||{}).map(p=>p.person?.fullName).filter(Boolean); homePl = Object.values(bsData.bs?.teams?.home?.players||{}).map(p=>p.person?.fullName).filter(Boolean); }
-  else if (bsData.source === 'espn') {
-    const bsp = bsData.data?.boxscore?.players || [];
-    awayPl = (bsp.find(g=>g.homeAway==='away')?.statistics||[]).flatMap(s=>(s.athletes||[]).map(a=>a.athlete?.displayName)).filter(Boolean);
-    homePl = (bsp.find(g=>g.homeAway==='home')?.statistics||[]).flatMap(s=>(s.athletes||[]).map(a=>a.athlete?.displayName)).filter(Boolean);
-  }
-  if (awayPl.length || homePl.length) registerPlayers(stableKey, awayPl, homePl);
-}
 
 // ══════════════════════════════════════════════════════════════════
 //  SPORTS — BOX SCORE APIs
@@ -2373,7 +2347,6 @@ function parseBoxScoreUrl(url) {
   if (num) return {source: 'mlb', gameId: num[1]};
   return null;
 }
-function parseGameId(url) { const r = parseBoxScoreUrl(url); return r ? r.gameId : null; }
 
 const ESPN_SPORT_MAP = {mlb:'baseball/mlb',nfl:'football/nfl',nba:'basketball/nba',nhl:'hockey/nhl',mls:'soccer/usa.1',epl:'soccer/eng.1',ncaafb:'football/college-football',ncaamb:'basketball/mens-college-basketball',ncaaw:'basketball/womens-college-basketball',ncaam:'basketball/mens-college-basketball',soccer:'soccer/usa.1'};
 function espnSportPath(sportStr, ev) {
@@ -2490,7 +2463,8 @@ function renderNhlBoxScore(result, homeLogo, awayLogo) {
   }
   const awayPanel = renderNhlPlayers('awayTeam'); const homePanel = renderNhlPlayers('homeTeam');
   const hasTabs = awayPanel || homePanel;
-  return `${linescore}${goalsHtml}${hasTabs?`<div class="bs-tabs"><button class="bs-tab active" onclick="switchBsTab(this,'bs-away-panel')">${esc(awayName)}</button><button class="bs-tab" onclick="switchBsTab(this,'bs-home-panel')">${esc(homeName)}</button></div><div id="bs-away-panel">${awayPanel}</div><div id="bs-home-panel" style="display:none">${homePanel}</div>`:''}`;
+  const nhlPlayerHtml = hasTabs ? `<div class="bs-tabs"><button class="bs-tab active" onclick="switchBsTab(this,'bs-away-panel')">${esc(awayName)}</button><button class="bs-tab" onclick="switchBsTab(this,'bs-home-panel')">${esc(homeName)}</button></div><div id="bs-away-panel">${awayPanel}</div><div id="bs-home-panel" style="display:none">${homePanel}</div>` : '';
+  return linescore + goalsHtml + wrapPlayerStats(nhlPlayerHtml);
 }
 
 function renderMlbBoxScore(data, homeLogo, awayLogo) {
@@ -2530,7 +2504,8 @@ function renderMlbBoxScore(data, homeLogo, awayLogo) {
     return `${batting ? `<div class="bs-stat-section"><div class="bs-stat-heading">Batting</div>${batting}</div>` : ''}${pitching ? `<div class="bs-stat-section"><div class="bs-stat-heading">Pitching</div>${pitching}</div>` : ''}`;
   }
   const awayPanel = teamPanel(away); const homePanel = teamPanel(home);
-  return `${linescore}<div class="bs-tabs"><button class="bs-tab active" onclick="switchBsTab(this,'bs-away-panel')">${esc(awayName)}</button><button class="bs-tab" onclick="switchBsTab(this,'bs-home-panel')">${esc(homeName)}</button></div><div id="bs-away-panel">${awayPanel}</div><div id="bs-home-panel" style="display:none">${homePanel}</div>`;
+  const mlbPlayerHtml = `<div class="bs-tabs"><button class="bs-tab active" onclick="switchBsTab(this,'bs-away-panel')">${esc(awayName)}</button><button class="bs-tab" onclick="switchBsTab(this,'bs-home-panel')">${esc(homeName)}</button></div><div id="bs-away-panel">${awayPanel}</div><div id="bs-home-panel" style="display:none">${homePanel}</div>`;
+  return linescore + wrapPlayerStats(mlbPlayerHtml);
 }
 
 function renderEspnBoxScore(data, homeLogo, awayLogo, sport) {
@@ -2541,11 +2516,27 @@ function renderEspnBoxScore(data, homeLogo, awayLogo, sport) {
   const homeComp = teams.find(t => t.homeAway === 'home') || teams[0] || {};
   const awayName = awayComp.team?.displayName || awayComp.team?.name || 'Away';
   const homeName = homeComp.team?.displayName || homeComp.team?.name || 'Home';
-  const awayLine = awayComp.linescores || []; const homeLine = homeComp.linescores || [];
+  const isBaseball = sport === 'baseball'; const isHockey = sport === 'hockey'; const isSoccer = sport === 'soccer';
+  // ESPN baseball: linescores array is sometimes innings-only, sometimes innings + R + H + E.
+  // Strategy: if array length > 9 AND the entry at position [-3] matches the known run total
+  // for EITHER team, ESPN appended R/H/E — strip the last 3.
+  const rawAwayLine = awayComp.linescores || [];
+  const rawHomeLine = homeComp.linescores || [];
+  // For baseball: ESPN omits the bottom of the final inning if the home team wins.
+  // Pad the shorter array with '-' placeholders so columns align correctly.
+  let awayLine = rawAwayLine, homeLine = rawHomeLine;
+  if (isBaseball) {
+    const maxLen = Math.max(rawAwayLine.length, rawHomeLine.length);
+    if (rawAwayLine.length < maxLen) {
+      awayLine = [...rawAwayLine, ...Array(maxLen - rawAwayLine.length).fill({displayValue: '-'})];
+    }
+    if (rawHomeLine.length < maxLen) {
+      homeLine = [...rawHomeLine, ...Array(maxLen - rawHomeLine.length).fill({displayValue: '-'})];
+    }
+  }
   const numPeriods = Math.max(awayLine.length, homeLine.length);
   const aLogoHtml = awayLogo ? `<img class="ls-logo" src="${awayLogo}" alt="">` : '';
   const hLogoHtml = homeLogo ? `<img class="ls-logo" src="${homeLogo}" alt="">` : '';
-  const isBaseball = sport === 'baseball'; const isHockey = sport === 'hockey'; const isSoccer = sport === 'soccer';
   let periodHeaders = '';
   if (isHockey) { const periodNames = ['1st','2nd','3rd']; for (let i = 0; i < numPeriods; i++) periodHeaders += `<th>${periodNames[i] || ('OT'+(i-2))}</th>`; }
   else if (isSoccer) { const halfNames = ['1st','2nd']; for (let i = 0; i < numPeriods; i++) periodHeaders += `<th>${halfNames[i] || ('ET'+(i-1))}</th>`; }
@@ -2584,7 +2575,8 @@ function renderEspnBoxScore(data, homeLogo, awayLogo, sport) {
   }
   const awayPanel = renderPlayerGroup(awayPlayers, awayName); const homePanel = renderPlayerGroup(homePlayers, homeName);
   const hasTabs = awayPanel || homePanel;
-  return `${linescore}${hasTabs ? `<div class="bs-tabs"><button class="bs-tab active" onclick="switchBsTab(this,'bs-away-panel')">${esc(awayName)}</button><button class="bs-tab" onclick="switchBsTab(this,'bs-home-panel')">${esc(homeName)}</button></div><div id="bs-away-panel">${homePanel || '<div class="bs-error">No batting/pitching data.</div>'}</div><div id="bs-home-panel" style="display:none">${awayPanel || '<div class="bs-error">No batting/pitching data.</div>'}</div>` : ''}`;
+  const espnPlayerHtml = hasTabs ? `<div class="bs-tabs"><button class="bs-tab active" onclick="switchBsTab(this,'bs-away-panel')">${esc(awayName)}</button><button class="bs-tab" onclick="switchBsTab(this,'bs-home-panel')">${esc(homeName)}</button></div><div id="bs-away-panel">${homePanel || '<div class="bs-error">No batting/pitching data.</div>'}</div><div id="bs-home-panel" style="display:none">${awayPanel || '<div class="bs-error">No batting/pitching data.</div>'}</div>` : '';
+  return linescore + wrapPlayerStats(espnPlayerHtml);
 }
 
 function renderSoccerBoxScore(data, homeLogo, awayLogo) {
@@ -2615,7 +2607,8 @@ function renderSoccerBoxScore(data, homeLogo, awayLogo) {
     return html;
   }
   const awayLineup = renderTeamRoster(awayRoster); const homeLineup = renderTeamRoster(homeRoster);
-  return `${linescore}<div class="bs-tabs" style="margin-top:16px"><button class="bs-tab active" onclick="switchBsTab(this,'bs-away-panel')">${esc(awayName)}</button><button class="bs-tab" onclick="switchBsTab(this,'bs-home-panel')">${esc(homeName)}</button></div><div id="bs-away-panel" style="margin-top:4px">${awayLineup}</div><div id="bs-home-panel" style="display:none;margin-top:4px">${homeLineup}</div>`;
+  const soccerPlayerHtml = `<div class="bs-tabs" style="margin-top:16px"><button class="bs-tab active" onclick="switchBsTab(this,'bs-away-panel')">${esc(awayName)}</button><button class="bs-tab" onclick="switchBsTab(this,'bs-home-panel')">${esc(homeName)}</button></div><div id="bs-away-panel" style="margin-top:4px">${awayLineup}</div><div id="bs-home-panel" style="display:none;margin-top:4px">${homeLineup}</div>`;
+  return linescore + wrapPlayerStats(soccerPlayerHtml);
 }
 
 function switchBsTab(btn, panelId) {
@@ -2630,6 +2623,18 @@ function switchBsTab(btn, panelId) {
 // ══════════════════════════════════════════════════════════════════
 //  SPORTS MODAL
 // ══════════════════════════════════════════════════════════════════
+function wrapPlayerStats(playerHtml) {
+  if (!playerHtml || !playerHtml.trim()) return '';
+  const chevron = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+  return `
+    <button class="collapse-toggle" id="statsToggleBtn" onclick="toggleCollapse('statsToggleBtn','statsBody')" style="margin-top:8px">
+      Player Stats ${chevron}
+    </button>
+    <div class="collapse-body" id="statsBody">
+      <div style="padding-top:4px">${playerHtml}</div>
+    </div>`;
+}
+
 async function openSportsModal(id) {
   const ev = allSportsEvents.find(e => e.id === id || String(e.id) === String(id));
   if (!ev) return;
@@ -2818,8 +2823,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Background player prefetch
   setTimeout(() => prefetchAllPlayers(), 4000);
 });
-</script>
-<script>
+
 // Register service worker for PWA offline support
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
