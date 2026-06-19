@@ -1,4 +1,127 @@
 {
+  "https://www.setlist.fm/setlist/matt-maeson/2026/the-hawthorn-st-louis-mo-2372883b.html": {
+    "sets": [
+      {
+        "label": "",
+        "songs": [
+          {
+            "name": "Problems",
+            "note": ""
+          },
+          {
+            "name": "Cringe",
+            "note": ""
+          },
+          {
+            "name": "Beggar's Song",
+            "note": ""
+          },
+          {
+            "name": "Halfway to Whole",
+            "note": ""
+          },
+          {
+            "name": "Cliffy",
+            "note": ""
+          },
+          {
+            "name": "Tribulation",
+            "note": ""
+          },
+          {
+            "name": "The Mask",
+            "note": ""
+          },
+          {
+            "name": "Cry Baby",
+            "note": ""
+          },
+          {
+            "name": "Mr. Rattlebone",
+            "note": "New song"
+          },
+          {
+            "name": "Everlasting",
+            "note": ""
+          },
+          {
+            "name": "Cursive",
+            "note": ""
+          },
+          {
+            "name": "Nelsonwood Lane",
+            "note": ""
+		  },
+          {
+            "name": "In My Arms",
+            "note": ""  
+          },  
+          {
+            "name": "Cut Deep"",
+            "note": ""
+		  },
+          {
+            "name": "Hallucinogenics",
+            "note": ""
+          }
+        ]   
+	  },
+	  {
+	  	"label": "Encore",
+	  	"songs": [
+          {
+            "name": "All My Wars",
+            "note": ""  
+          },
+          {
+            "name": "Legacy",
+            "note": ""             
+          }
+        ]
+      }
+    ]
+  },
+  "https://www.setlist.fm/setlist/haffway/2026/the-hawthorn-st-louis-mo-4b728bf6.html": {
+    "sets": [
+      {
+        "label": "",
+        "songs": [
+          {
+            "name": "Better if Worse",
+            "note": ""
+          },
+          {
+            "name": "I Don't Need You Anymore",
+            "note": ""
+          },
+          {
+            "name": "I'm on Fire",
+            "note": "Bruce Springsteen cover"
+          },
+          {
+            "name": "Bones Sleep",
+            "note": ""
+          },
+          {
+            "name": "??",
+            "note": ""
+          },
+          {
+            "name": "Golden",
+            "note": ""
+          },
+          {
+            "name": "East Coast",
+            "note": ""
+          },
+          {
+            "name": "Sold the Boat,
+            "note": ""
+          }
+        ]
+      }
+    ]
+  },  
   "https://www.setlist.fm/setlist/park/2026/dumb-records-springfield-il-6b488ada.html": {
     "sets": [
       {
