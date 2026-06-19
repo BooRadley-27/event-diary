@@ -1626,7 +1626,7 @@ async function fetchSetlistHtml(rawUrl) {
     return { cached: setlistCache[url] };
   }
   try {
-    const githubUrl = 'https://raw.githubusercontent.com/BooRadley-27/concert-setlist/main/setlists.json';
+    const githubUrl = 'https://raw.githubusercontent.com/BooRadley-27/event-diary/main/setlists.json';
     const response = await fetch(githubUrl, { cache: 'no-cache' });
     if (!response.ok) {
       return { jsonData: null };
